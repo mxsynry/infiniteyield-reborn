@@ -18,12 +18,11 @@
 ]]--
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/fuckusfm/infiniteyield-reborn/master/uselessscriptthatexistsinthisrepoiwin'))()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/fuckusfm/infiniteyield-reborn/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
 	return
 end
 
--- yeah no there no way to enable this by using a command or somehting. scriptblox is just gay. they have to enable it manually with a one-liner. yes im talking about the is18 shit 
-pcall(function() getgenv().IY_LOADED = true; --[[getgenv().IS18TOUSENSFWFEATURES = false]] end)
+pcall(function() getgenv().IY_LOADED = true end)
 
 local cloneref = cloneref or function(o) return o end
 COREGUI = cloneref(game:GetService("CoreGui"))
@@ -231,12 +230,8 @@ Title.BorderSizePixel = 0
 Title.Size = UDim2.new(0, 250, 0, 20)
 Title.Font = Enum.Font.SourceSans
 Title.TextSize = 18
-if os.date("*t", os.time()).month == 4 then
-	-- This is a reminder how EdgeIY edgy was
-	Title.Text = "Infinite Yiff v"  .. currentVersion
-else
-	Title.Text = "Infinite Yield Reborn v"  .. currentVersion
-end
+Title.Text = "IYR (ScriptBlox) v"  .. currentVersion
+
 do
 	local emoji = ({
 		["01 01"] = "🎆",
@@ -4731,9 +4726,6 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
-CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
 CMDs[#CMDs + 1] = {NAME = 'uncarpet', DESC = 'Undoes carpet'}
 CMDs[#CMDs + 1] = {NAME = 'friend [player]', DESC = 'Sends a friend request to certain players'}
@@ -6395,7 +6387,7 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if KeepInfYield and (not TeleportCheck) and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/fuckusfm/infiniteyield-reborn/master/source'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/fuckusfm/infiniteyield-reborn/scriptblox/source'))()")
 	end
 end)
 
@@ -11341,138 +11333,6 @@ function getTorso(x)
 	return x:FindFirstChild("Torso") or x:FindFirstChild("UpperTorso") or x:FindFirstChild("LowerTorso") or x:FindFirstChild("HumanoidRootPart")
 end
 
---------------------------------------------------------------------------------------------------------
-
--- I dont know what to say. this video says it all.
--- https://www.youtube.com/watch?v=jjxD4goI6jg
-
--- Also why people care about this if they gonna just use another script
--- with the same features but for everyone
--- It's like saying "YOU ADDED SO MANY NSFW COMMANDS!" even tho i added only one.
--- the other one ;bang is already added in the Original IY but modified
--- What am i gonna do next? add ;blowjob??????
--- No. how come SOME nsfw scripts be allowed on ScriptBlox but mine gets deleted
--- and GET banned for having 2 COMMANDS that are nsfw
--- "more" yeah totally more huh
--- i will add more nsfw commands when the earth and mars explodes. (which it will never happen)
--- also HUGE W for rscripts.net for allowing my script to be on the site (someone uploaded it for me)
--- well yeah they dont have anything against perverted shit
-
--- also scriptblox riddle me this.
--- how COME 300 kids not get banned on your website for uploading IY?
--- ;bang / ;rape command exists in the original IY
--- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
--- the community is sped :broken_heart:
-
-local isbanging = false
-addcmd("Bang",{"rape"}, function(args, speaker)
-	if args[1] then
-		local players = getPlayer(args[1], speaker)
-		for _, v in pairs(players) do
-			--if IS18TOUSENSFWFEATURES then
-			--	if table.find(nsfwWhitelist, speaker.Name) ~= nil then
-					if table.find(devblacklist, Players[v].Name) ~= nil then
-						execCmd("unbang")
-						notify("Error","HEY! You cannot bang a developer of Infinite Yield Reborn!")
-						return
-					else
-						execCmd("unbang")
-						task.wait()
-						isbanging = true
-						local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-						bangAnim = Instance.new("Animation")
-						bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
-						bang = humanoid:LoadAnimation(bangAnim)
-						bang:Play(0.1, 1, 1)
-						bang:AdjustSpeed(args[2] or 2)
-						bangDied = humanoid.Died:Connect(function()
-							bang:Stop()
-							bangAnim:Destroy()
-							bangDied:Disconnect()
-							isbanging = false
-						end)
-						local bangplr = Players[v].Name
-						local bangOffet = CFrame.new(0,0,1.1)
-						task.spawn(function()
-							while task.wait() do
-								if isbanging == false then
-									break
-								end
-								local otherRoot = getTorso(Players[bangplr].Character)
-								getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet
-								getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
-							end
-						end)
-					end
-			--	else
-			--		execCmd("unbang")
-			--		notify("Error","No sorry. Due to ScriptBlox banning ME.\nThe command is NOW whitelisted only!")
-			--		return
-			--	end
-			--else
-			--	execCmd("unbang")
-			--	notify("Error","A global has not been set to true (IS18TOUSENSFWFEATURES)")
-			--	return
-			--end		
-		end
-	end
-end)
-
-addcmd("facebang", {"facerape","facefuck"}, function(args, speaker)
-	if args[1] then
-		local players = getPlayer(args[1], speaker)
-		for _, v in pairs(players) do
-			--if IS18TOUSENSFWFEATURES then
-			--	if table.find(nsfwWhitelist, speaker.Name) ~= nil then
-					if table.find(devblacklist, Players[v].Name) ~= nil then
-						execCmd("unbang")
-						notify("Error","HEY! You cannot bang a developer of Infinite Yield Reborn!")
-						return
-					else
-						execCmd("unbang")
-						task.wait()
-						isbanging = true
-						local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-						bangAnim = Instance.new("Animation")
-						bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
-						bang = humanoid:LoadAnimation(bangAnim)
-						bang:Play(0.1, 1, 1)
-						bang:AdjustSpeed(args[2] or 2)
-						bangDied = humanoid.Died:Connect(function()
-							bang:Stop()
-							bangAnim:Destroy()
-							bangDied:Disconnect()
-							isbanging = false
-						end)
-						local bangplr = Players[v].Name
-						local bangOffet = CFrame.new(0, 2.3, -1.1)
-						task.spawn(function()
-							while task.wait() do
-								if isbanging == false then
-									break
-								end
-								local otherRoot = getTorso(Players[bangplr].Character)
-								getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet * CFrame.Angles(0,3.15,0)
-								getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
-							end
-						end)
-					end
-			--	else
-			--		execCmd("unbang")
-			--		notify("Error","No sorry. Due to ScriptBlox banning ME.\nThe command is NOW whitelisted only!")
-			--		return
-			--	end
-			--else
-			--	execCmd("unbang")
-			--	notify("Error","A global has not been set to true (IS18TOUSENSFWFEATURES)")
-			--	return
-			--end	
-		end
-	end
-end)
-
---------------------------------------------------------------------------------------------------------
-
 addcmd("antibang",{'antirape'},function(args, speaker)
 	AntiBangEnabled = true
 	notify("Anti Bang","Anti bang has been turned on.")
@@ -11523,15 +11383,6 @@ addcmd("mantibang", {"mantirape"}, function(args, speaker)
 		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 
 		IsVoiding = false
-	end
-end)
-
-addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
-	if bangDied then
-		bangDied:Disconnect()
-		bang:Stop()
-		bangAnim:Destroy()
-		isbanging = false
 	end
 end)
 
@@ -14092,7 +13943,7 @@ IYMouse.Move:Connect(checkTT)
 task.spawn(function()
 	while task.wait() do
 		local success, latestVersionInfo = pcall(function() 
-			local versionJson = game:HttpGet('https://raw.githubusercontent.com/fuckusfm/infiniteyield-reborn/master/version')
+			local versionJson = game:HttpGet('https://raw.githubusercontent.com/fuckusfm/infiniteyield-reborn/scriptblox/version')
 			return HttpService:JSONDecode(versionJson)
 		end)
 	
