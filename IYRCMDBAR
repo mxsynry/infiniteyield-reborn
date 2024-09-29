@@ -1,0 +1,340 @@
+local reqenv = function() return ((getgenv and getgenv()) or shared or _G) end
+local NewPrefix = reqenv()._NewPrefix or "'" -- change your prefix here :3
+
+if not reqenv().IY_LOADED then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/scriptblox/source"))()
+else 
+    local Shadow = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
+    local Main = Instance.new("Frame")
+    local Message = Instance.new("TextLabel")
+    local CloseButton = Instance.new("TextButton")
+
+    function randomString()
+        local length = math.random(10, 20)
+        local array = {}
+        for i = 1, length do
+            array[i] = string.char(math.random(32, 126))
+        end
+        return table.concat(array)
+    end
+
+    local PARENT = nil
+    if get_hidden_gui or gethui then
+        local hiddenUI = get_hidden_gui or gethui
+        local Main = Instance.new("ScreenGui")
+        Main.Name = randomString()
+        Main.Parent = hiddenUI()
+        PARENT = Main
+    elseif (not is_sirhurt_closure) and (syn and syn.protect_gui) then
+        local Main = Instance.new("ScreenGui")
+        Main.Name = randomString()
+        syn.protect_gui(Main)
+        Main.Parent = COREGUI
+        PARENT = Main
+    elseif COREGUI:FindFirstChild('RobloxGui') then
+        PARENT = COREGUI.RobloxGui
+    else
+        local Main = Instance.new("ScreenGui")
+        Main.Name = randomString()
+        Main.Parent = COREGUI
+        PARENT = Main
+    end
+
+    Shadow.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+    Shadow.ZIndex = 10
+    Shadow.Size = UDim2.new(0, 455, 0, 20)
+    Shadow.Position = UDim2.new(0.327, 0, -1, 0)
+    Shadow.BorderSizePixel = 0
+    Shadow.Parent = PARENT
+
+    Main.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+    Main.ZIndex = 10
+    Main.Size = UDim2.new(0, 455, 0, 215)
+    Main.Position = UDim2.new(0, 0, 1, 0)
+    Main.BorderSizePixel = 0
+    Main.Parent = Shadow
+
+    Title.Size = UDim2.new(0, 375, 0, 20)
+    Title.Position = UDim2.new(0.1, 0, 0, 0)
+    Title.BackgroundTransparency = 1
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Text = "Message from Infinite Yield Reborn"
+    Title.ZIndex = 10
+    Title.Font = Enum.Font.SourceSans 
+    Title.TextScaled = false
+    Title.TextSize = 18
+    Title.Parent = Shadow
+
+    CloseButton.Size = UDim2.new(0, 20, 0, 20)
+    CloseButton.Position = UDim2.new(0.95, 0, 0, 0)
+    CloseButton.BackgroundTransparency = 1
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Text = "x"
+    CloseButton.ZIndex = 10
+    CloseButton.Font = Enum.Font.Code
+    CloseButton.TextSize = 20 
+    CloseButton.TextXAlignment = Enum.TextXAlignment.Center
+    CloseButton.TextYAlignment = Enum.TextYAlignment.Center
+    CloseButton.Parent = Shadow
+    CloseButton.MouseButton1Click:Connect(function()
+    Shadow:TweenPosition(UDim2.new(0.327, 0, -1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Sine, 0.5, true)
+    task.wait(0.5)
+    Shadow:Destroy()
+    end)
+
+    Message.Size = UDim2.new(0, 455, 0, 215)
+    Message.Position = UDim2.new(0, 0, 0, 0)
+    Message.BackgroundTransparency = 1
+    Message.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Message.Text = "IYCommandLine is already executed. If you want to pair it with both IYR and IYStore, you will need to rejoin and execute the script. IYCommandLine will NOT automatically pair with IYR or IYR x IYStore."
+    Message.ZIndex = 10
+    Message.TextWrapped = true
+    Message.Font = Enum.Font.SourceSans
+    Message.TextSize = 16
+    Message.TextScaled = false
+    Message.Parent = Main
+
+    Shadow:TweenPosition(UDim2.new(0.327, 0, 0.327, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Sine, 0.5, true)
+    task.wait(10)
+    if Shadow.Parent then
+        Shadow:TweenPosition(UDim2.new(0.327, 0, -1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Sine, 0.5, true)
+        task.wait(0.5)
+        Shadow:Destroy()
+    end
+end
+
+local commandBar = Instance.new("Frame")
+local arrow = Instance.new("TextLabel")
+local input = Instance.new("TextBox")
+local predict = Instance.new("TextLabel")
+local shadow = Instance.new("ImageLabel")
+
+commandBar.Name = "CommandBar"
+commandBar.Parent = PARENT
+commandBar.BackgroundColor3 = Color3.fromRGB(46, 46, 47)
+commandBar.BorderSizePixel = 0
+commandBar.Position = UDim2.new(0.5, -100, 1, 5)
+commandBar.Size = UDim2.new(0, 200, 0, 35)
+commandBar.ZIndex = 0
+
+arrow.Name = "Arrow"
+arrow.Parent = commandBar
+arrow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+arrow.BackgroundTransparency = 1.0
+arrow.BorderSizePixel = 0
+arrow.Size = UDim2.new(0, 25, 1, 0)
+arrow.ZIndex = 0
+arrow.Font = Enum.Font.GothamSemibold
+arrow.Text = ">"
+arrow.TextColor3 = Color3.fromRGB(220, 224, 234)
+arrow.TextSize = 14
+arrow.TextStrokeColor3 = Color3.fromRGB(220, 224, 234)
+arrow.TextStrokeTransparency = 0.95
+
+input.Name = "Input"
+input.Parent = commandBar
+input.Active = false
+input.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+input.BackgroundTransparency = 1.0
+input.BorderSizePixel = 0
+input.Position = UDim2.new(0, 20, 0, 0)
+input.Selectable = false
+input.Size = UDim2.new(1, -25, 1, 0)
+input.ZIndex = 5
+input.Font = Enum.Font.Gotham
+input.Text = ""
+input.TextColor3 = Color3.fromRGB(220, 224, 234)
+input.TextSize = 14
+input.TextStrokeColor3 = Color3.fromRGB(220, 224, 234)
+input.TextStrokeTransparency = 0.95
+input.TextXAlignment = Enum.TextXAlignment.Left
+
+predict.Name = "Predict"
+predict.Parent = input
+predict.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+predict.BackgroundTransparency = 1.0
+predict.BorderSizePixel = 0
+predict.Size = UDim2.new(1, 0, 1, 0)
+predict.ZIndex = 0
+predict.Font = Enum.Font.Gotham
+predict.Text = ""
+predict.TextColor3 = Color3.fromRGB(220, 224, 234)
+predict.TextSize = 14
+predict.TextStrokeColor3 = Color3.fromRGB(220, 224, 234)
+predict.TextTransparency = 0.5
+predict.TextXAlignment = Enum.TextXAlignment.Left
+
+shadow.Name = "Shadow"
+shadow.Parent = commandBar
+shadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+shadow.BackgroundTransparency = 1.0
+shadow.Position = UDim2.new(0, -3, 0, -3)
+shadow.Size = UDim2.new(1, 6, 1, 6)
+shadow.ZIndex = -5
+shadow.Image = "rbxassetid://222785823"
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(100, 100, 100, 100)
+shadow.SliceScale = 0.25
+
+local function tween(instance, easingStyle, easingDirection, duration, properties)
+    local tweenService = game:GetService("TweenService")
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle[easingStyle], Enum.EasingDirection[easingDirection])
+    local tween = tweenService:Create(instance, tweenInfo, properties)
+    tween:Play()
+    return tween
+end
+
+local function toggleCommandBar(show)
+    if show then
+        commandBar.Input:CaptureFocus()
+        spawn(function()
+            repeat commandBar.Input.Text = "" until commandBar.Input.Text == ""
+        end)
+        spawn(function()
+            tween(commandBar, "Quint", "Out", 0.5, { Position = UDim2.new(0.5, -100, 1, -60) })
+        end)
+    else
+        spawn(function()
+            tween(commandBar, "Quint", "Out", 0.5, { Position = UDim2.new(0.5, -100, 1, 5) })
+        end)
+    end
+end
+
+local function startsWith(prefix, str)
+    return str:sub(1, #prefix) == prefix
+end
+
+local function findAlias(alias, str)
+    if alias == nil then return end
+    if type(alias) == "table" then
+        for _, v in ipairs(alias) do
+            if startsWith(str, v) then
+                return v
+            end
+        end
+    end
+end
+
+local function resolveTarget(target)
+    local lowerTarget = string.lower(target)
+    local validTargets = {
+        "all", "others", "random", "me", "nearest", "farthest", "allies", "enemies", "team",
+        "nonteam", "friends", "nonfriends", "bacons", "nearest", "farthest", "alive", "dead"
+    }
+    return findAlias(validTargets, lowerTarget) or function()
+        for _, player in ipairs(Players:GetPlayers()) do
+            local playerName = string.lower(player.Name)
+            if startsWith(lowerTarget, playerName) then
+                return playerName
+            end
+        end
+    end
+end
+
+local predictLabel = commandBar.Input.Predict
+local focusConnection = nil
+local function handleFocusLost(focused)
+    predictLabel.Text = ""
+    if focusConnection then
+        focusConnection:Disconnect()
+    end
+    if focused then
+        local inputText = input.Text:gsub("^" .. "%" .. NewPrefix, "")
+        spawn(function()
+            toggleCommandBar(false)
+        end)
+        spawn(function()
+            execCmd(inputText, Players.LocalPlayer, true)
+        end)
+    end
+    wait()
+    if not input:IsFocused() then
+        input.Text = ""
+    end
+end
+
+input.FocusLost:Connect(handleFocusLost)
+
+input:GetPropertyChangedSignal("Text"):Connect(function()
+    input.Text = string.lower(input.Text)
+    predictLabel.Text = ""
+    local text = input.Text
+    local words = string.split(text, " ")
+    local args = cargs or {}
+
+    if text == "" then return end
+
+    for _, cmd in pairs(cmds) do
+        local commandName = cmd.NAME
+        local commandAliases = cmd.ALIAS
+        local matched = false
+
+        if startsWith(text, commandName) then
+            predictLabel.Text = commandName
+            break
+        end
+
+        for _, alias in pairs(commandAliases) do
+            if startsWith(text, alias) then
+                matched = true
+                predictLabel.Text = alias
+                break
+            end
+        end
+
+        if matched then break end
+    end
+
+    for i, word in ipairs(words) do
+        if i > 1 and word ~= "" then
+            local replacement = ""
+            if #args >= 1 then
+                replacement = resolveTarget(word) or replacement
+            else
+                replacement = resolveTarget(word) or replacement
+            end
+            predictLabel.Text = text:sub(1, #text - #words[#words]) .. replacement
+            local subWords = word:split(",")
+            if next(subWords) then
+                for j, subWord in ipairs(subWords) do
+                    if j > 1 and subWord ~= "" then
+                        local resolved = resolveTarget(subWord)
+                        predictLabel.Text = text:sub(1, #text - #subWords[#subWords]) .. (resolved or "")
+                    end
+                end
+            end
+        end
+    end
+end)
+
+input.Focused:Connect(function()
+    local userInputService = game:GetService("UserInputService")
+    focusConnection = userInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+        if input.KeyCode == Enum.KeyCode.Tab and input.UserInputType == Enum.UserInputType.Keyboard then
+            if not gameProcessedEvent then
+                if predictLabel.Text ~= "" then
+                    if string.match(predictLabel.Text, " ") then
+                        input.Text = predictLabel.Text
+                        wait()
+                        input.Text = input.Text:gsub("\t", "")
+                        input.CursorPosition = #input.Text + 1
+                    else
+                        input.Text = predictLabel.Text .. " "
+                        wait()
+                        input.Text = input.Text:gsub("\t", "")
+                        input.CursorPosition = #input.Text + 1
+                    end
+                end
+            end
+        end
+    end)
+end)
+
+IYMouse.KeyDown:Connect(function(key)
+    if tostring(string.lower(key)) == NewPrefix then
+        spawn(function()
+            toggleCommandBar(true)
+        end)
+    end
+end)
