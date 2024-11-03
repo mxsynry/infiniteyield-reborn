@@ -1,23 +1,20 @@
-# Infinite Yield Reborn
-A forked infinite yield but **better**.
+# <h1 align="center">![IYR1](https://github.com/user-attachments/assets/3a9ca248-b931-41a9-b46e-b503f3c051f0)
+</h1>
 
-Loadstring:
-```lua
-loadstring(game:HttpGet("https://github.com/fuckusfm/infiniteyield-reborn/raw/scriptblox/source"))()
-```
+A forked version of Infinite Yield that’s **better**.
 
-# For the reuploaders on scriptblox. PLEASE READ ME
-You can reupload this branch and NOT our main. sadly scriptblox hates the one more nsfw command
+# THIS IS THE SCRIPTBLOX BRANCH
+You can reupload this branch, NOT our main one. sadly ScriptBlox hates the one more nsfw command
 But somehow they allow nameless admin.
-to reupload YOU HAVE to add [READ DESC]
+to re-upload YOU HAVE to add [READ DESC]
 for example
 ```
 Title: IYR Reupload [READ DESC]
 Desc: [FOR THE ADMINS]
 This script does not have any nsfw commands
-Its another branch without it
+It's another branch without it
 Please do not take any action on this post
-This is a scriptblox version of IYR
+This is a script box version of IYR
 [END]
 
 IYR But better.
@@ -28,6 +25,11 @@ Features:
 ;infinity
 ;antibang
 ;windowfocus
+```
+
+## Loadstring:
+```lua
+loadstring(game:HttpGet("https://github.com/RyXeleron/infiniteyield-reborn/raw/scriptblox/source"))()
 ```
 
 Thank you.
