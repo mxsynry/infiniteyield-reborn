@@ -38,7 +38,7 @@ if not game:IsLoaded() then
 	notLoaded:Destroy()
 end
 
-currentVersion = '6.3.4' -- _Real, you'd be treating your ScriptBlox branch like trashcan 😭
+currentVersion = '6.3.5' -- _Real, you'd be treating the ScriptBlox branch like trashes 😭
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
