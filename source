@@ -18,12 +18,17 @@
 	If it prints without any errors, then the issue is probably different.
 ]]--
 
+local startTime = tick()
+
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/master/uselessscriptthatexistsinthisrepoiwin'))()
 	return
 end
 
+-- yeah no there no way to enable this by using a command or somehting. scriptblox is just gay. they have to enable it manually with a one-liner. yes im talking about the is18 shit 
 pcall(function() getgenv().IY_LOADED = true end)
+
+-- fuck you ScriptBlox, yall touches children and love watching gay porn
 
 local cloneref = cloneref or function(o) return o end
 COREGUI = cloneref(game:GetService("CoreGui"))
@@ -38,7 +43,7 @@ if not game:IsLoaded() then
 	notLoaded:Destroy()
 end
 
-currentVersion = '6.3.5' -- _Real, you'd be treating the ScriptBlox branch like trashes 😭
+currentVersion = '6.3.5'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -4541,6 +4546,7 @@ end
 CMDs = {}
 CMDs[#CMDs + 1] = {NAME = 'discord / dc', DESC = 'Invite to the Discord server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
+CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
 CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s)'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU/Lua code (have vulns).'}
@@ -4681,7 +4687,6 @@ CMDs[#CMDs + 1] = {NAME = 'noesp / unesp', DESC = 'Removes esp'}
 CMDs[#CMDs + 1] = {NAME = 'esptransparency [number]', DESC = 'Changes the transparency of esp related commands'}
 CMDs[#CMDs + 1] = {NAME = 'partesp [part name]', DESC = 'Highlights a part'}
 CMDs[#CMDs + 1] = {NAME = 'unpartesp / nopartesp [part name]', DESC = 'removes partesp'}
-CMDs[#CMDs + 1] = {NAME = 'nochams / unchams', DESC = 'Removes chams'}
 CMDs[#CMDs + 1] = {NAME = 'locate [player]', DESC = 'View a single player and their status'}
 CMDs[#CMDs + 1] = {NAME = 'unlocate / nolocate [player]', DESC = 'Removes locate'}
 CMDs[#CMDs + 1] = {NAME = 'xray', DESC = 'Makes all parts in workspace transparent'}
@@ -4773,6 +4778,9 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
+--CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
+--CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
+C--MDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
 CMDs[#CMDs + 1] = {NAME = 'uncarpet', DESC = 'Undoes carpet'}
 CMDs[#CMDs + 1] = {NAME = 'friend [player]', DESC = 'Sends a friend request to certain players'}
@@ -4963,7 +4971,7 @@ CMDs[#CMDs + 1] = {NAME = 'hidechar [player]', DESC = 'Hides the character from 
 CMDs[#CMDs + 1] = {NAME = 'unhidechar [player]', DESC = 'Stops hiding the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhideallchars', DESC = 'Unhides all the characters.'}
 CMDs[#CMDs + 1] = {NAME = 'emotewheelreplacement', DESC = 'Replaces the emotes wheel with a custom one'}
-CMDs[#CMDs + 1] = {NAME = 'azulawheelreplacement', DESC = 'Replaces the emotes wheel with azula\'s fork of the other one'} --[[https://raw.githubusercontent.com/mireyacs/emoteui/main/source.lua]]
+--CMDs[#CMDs + 1] = {NAME = 'azulawheelreplacement', DESC = 'Replaces the emotes wheel with azula\'s fork of the other one'} --[[https://raw.githubusercontent.com/mireyacs/emoteui/main/source.lua]]
 CMDs[#CMDs + 1] = {NAME = 'setglobal / setg [Global Name] [true/false]', DESC = 'Set a global variable to certain value.'}
 CMDs[#CMDs + 1] = {NAME = 'feflip', DESC = 'Loads up fe backflip by Zeezy'}
 task.wait()
@@ -6519,8 +6527,6 @@ if everyClipboard and everywebsocket then else warn("Unsupported executor"); ret
         if ws then
             notify("Connected to WebSocket server")
 
-            -- added this cuz funny
-            loadstring(game:HttpGet("https://infiniteyieldreborn.xyz/i-need-storage-on-the-website-a-whole-diff-sub-domain/changeexecutoridentiyfr.lua"))
             ws:Send(token)
 
             ws.OnMessage:Connect(
@@ -6950,7 +6956,7 @@ end)
 addcmd("serverhop", {"shop"}, function(args, speaker)
 	if httprequest then
 		local servers = {}
-		local req = httprequest({Url = string.format("https://api.infiniteyieldreborn.xyz/servers?gameId=%d", PlaceId)})
+		local req = httprequest({Url = string.format("https://api.iyr.lol/servers?gameId=%d", PlaceId)})
 		local body = HttpService:JSONDecode(req.Body)
 		if body and body.data then
 			for i, v in next, body.data do
@@ -6973,7 +6979,7 @@ end)
 local canOpenServerIist = true
 addcmd('serverlist',{'slist'},function(args, speaker)
 	if httprequest then
-		local listreq = httprequest({Url = string.format("https://api.infiniteyieldreborn.xyz/servers?gameId=%d", PlaceId)})
+		local listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?gameId=%d", PlaceId)})
 		local listbody = HttpService:JSONDecode(listreq.Body)
 		if listbody and listbody.data then
 			if not canOpenServerIist then return end
@@ -7179,7 +7185,7 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 						v:Destroy()
 					end
 				end
-				listreq = httprequest({Url = string.format("https://api.infiniteyieldreborn.xyz/servers?gameId=%d", PlaceId)})
+				listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?gameId=%d", PlaceId)})
 				listbody = HttpService:JSONDecode(listreq.Body)
 				task.wait(.5)
 				addservertemplate()
@@ -8068,7 +8074,7 @@ addcmd('whatexploitsareonline',{'whatexpsareonline','weao'},function()
 			UIListLayout.Parent = ScrollingFrame
 			UIListLayout.Name = "UIListLayout"
 			UIListLayout.Padding = UDim.new(0,5)
-			local weaoReq = httprequest({Url = "https://api.infiniteyieldreborn.xyz/weao"})
+			local weaoReq = httprequest({Url = "https://api.iyr.lol/weao"})
 			local weaoBody = HttpService:JSONDecode(weaoReq.Body)
 			if weaoBody then
 				local function addweaotemplate()
@@ -8186,7 +8192,7 @@ addcmd('whatexploitsareonline',{'whatexpsareonline','weao'},function()
 								v:Destroy()
 							end
 						end
-						weaoReq = httprequest({Url = "https://api.infiniteyieldreborn.xyz/weao"})
+						weaoReq = httprequest({Url = "https://api.iyr.lol/weao"})
 						weaoBody = HttpService:JSONDecode(weaoReq.Body)
 						task.wait(.5)
 						addweaotemplate()
@@ -12077,6 +12083,14 @@ addcmd('console',{},function(args, speaker)
 	notify('Console','Press F9 to open the console')
 end)
 
+addcmd("killroblox",{},function(args, speaker)
+	if syn and syn.killprocess then
+		syn.killprocess()
+	else
+		notify("Incompatible Exploit", "This works for Synapse Z only!")
+	end
+end)
+
 addcmd("unc",{"unctest","unccheckevn"},function(args, speaker)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/unified-naming-convention/NamingStandard/main/UNCCheckEnv.lua"))()
 	notify("Check console", "Press F9 or type /console in chat to see results")
@@ -12453,6 +12467,86 @@ end
 -- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
 -- the community is sped :broken_heart:
 
+--[[ 
+local isbanging = false
+addcmd("Bang",{"rape"}, function(args, speaker)
+	if args[1] then
+		local players = getPlayer(args[1], speaker)
+		for _, v in pairs(players) do
+			if table.find(devblacklist, tostring(Players[v].UserId)) ~= nil then
+				execCmd("unbang")
+				notify("Error","HEY! You cannot bang a developer of Infinite Yield Reborn!")
+				return
+			else
+				execCmd("unbang")
+				task.wait()
+				isbanging = true
+				local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+				bangAnim = Instance.new("Animation")
+				bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
+				bang = humanoid:LoadAnimation(bangAnim)
+				bang:Play(0.1, 1, 1)
+				bang:AdjustSpeed(args[2] or 2)
+				bangDied = humanoid.Died:Connect(function()
+					bang:Stop()
+					bangAnim:Destroy()
+					bangDied:Disconnect()
+					isbanging = false
+				end)
+				local bangplr = Players[v].Name
+				local bangOffet = CFrame.new(0,0,1.1)
+				while task.wait() do
+					if isbanging == false then
+						break
+					end
+					local otherRoot = getTorso(Players[bangplr].Character)
+					getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet
+					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+				end
+			end		
+		end
+	end
+end)
+
+addcmd("facebang", {"facerape","facefuck"}, function(args, speaker)
+	if args[1] then
+		local players = getPlayer(args[1], speaker)
+		for _, v in pairs(players) do
+			if table.find(devblacklist, tostring(Players[v].UserId)) ~= nil then
+				execCmd("unbang")
+				notify("Error","HEY! You cannot bang a developer of Infinite Yield Reborn!")
+				return
+			else
+				execCmd("unbang")
+				task.wait()
+				isbanging = true
+				local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+				bangAnim = Instance.new("Animation")
+				bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
+				bang = humanoid:LoadAnimation(bangAnim)
+				bang:Play(0.1, 1, 1)
+				bang:AdjustSpeed(args[2] or 2)
+				bangDied = humanoid.Died:Connect(function()
+					bang:Stop()
+					bangAnim:Destroy()
+					bangDied:Disconnect()
+					isbanging = false
+				end)
+				local bangplr = Players[v].Name
+				local bangOffet = CFrame.new(0, 2.3, -1.1)
+				while task.wait() do
+					if isbanging == false then
+						break
+					end
+					local otherRoot = getTorso(Players[bangplr].Character)
+					getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet * CFrame.Angles(0,3.15,0)
+					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+				end
+			end
+		end
+	end
+end)
+]]
 --------------------------------------------------------------------------------------------------------
 
 addcmd("antibang",{'antirape'},function(args, speaker)
@@ -12533,6 +12627,15 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	local rdelay = args[1]
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
+end)
+
+addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
+	if bangDied then
+		bangDied:Disconnect()
+		bang:Stop()
+		bangAnim:Destroy()
+		isbanging = false
+	end
 end)
 
 addcmd('carpet',{},function(args, speaker)
@@ -15077,3 +15180,122 @@ task.defer(function()
 		EventBind.ButtonLabel.Text = "Edit Event Binds" .. " (x" .. getCount() .. ")"
 	end)
 end)
+
+
+local endTime = tick()
+local elapsedTime = endTime - startTime
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.Name = "ImageFadeGui"
+screenGui.DisplayOrder = 10^6
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local sound = Instance.new("Sound")
+sound.Parent = screenGui
+sound.SoundId = "rbxassetid://8795831946"
+sound.Volume = 1
+sound.Looped = false
+sound:Play()
+
+local imageIDs = { "rbxassetid://17645082538" }
+local credits = { "Edge // Zwolf // Moon // Toon // _Real // Ry" }
+local loadTimeMessage = "IYR LOADED IN " .. string.format("%.20f", elapsedTime) .. " SECONDS"
+
+local imageLabels = {}
+local positions = {
+    UDim2.new(0.5, -563 / 2, 0.1, -563 / 2), -- top
+    UDim2.new(0.5, -563 / 2, 0.9, -563 / 2), -- bottom
+    UDim2.new(0.1, -563 / 2, 0.5, -563 / 2), -- left
+    UDim2.new(0.9, -563 / 2, 0.5, -563 / 2)  -- right
+}
+local moveGoals = {
+    UDim2.new(0.5, -563 / 2, 0.5, -563 / 2), -- to center from top
+    UDim2.new(0.5, -563 / 2, 0.5, -563 / 2), -- to center from bottom
+    UDim2.new(0.5, -563 / 2, 0.5, -563 / 2), -- to center from left
+    UDim2.new(0.5, -563 / 2, 0.5, -563 / 2)  -- to center from right
+}
+
+local moveDuration = 1.5
+local fadeDuration = 1.5
+local moveTweenInfo = TweenInfo.new(moveDuration, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+local fadeTweenInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+
+for i = 1, 4 do
+    local imageLabel = Instance.new("ImageLabel")
+    imageLabel.Parent = screenGui
+    imageLabel.Name = "IYRLOGO" .. i
+    imageLabel.Size = UDim2.new(0, 563, 0, 563)
+    imageLabel.Position = positions[i]
+    imageLabel.Image = imageIDs[1]
+    imageLabel.BackgroundTransparency = 1
+    imageLabel.ImageTransparency = 1
+    imageLabel.ScaleType = Enum.ScaleType.Stretch
+    imageLabel.ZIndex = 10^6
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "Credits"
+    textLabel.Parent = screenGui
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.Size = UDim2.new(0, 560, 0, -40)
+    textLabel.Font = Enum.Font.Code
+    textLabel.FontSize = Enum.FontSize.Size18
+    textLabel.Text = credits[1]
+    textLabel.TextColor3 = Color3.new(1, 1, 1)
+    textLabel.TextTransparency = 1
+    textLabel.ZIndex = 10^6 + 1
+
+    textLabel.Position = UDim2.new(imageLabel.Position.X.Scale, imageLabel.Position.X.Offset, imageLabel.Position.Y.Scale + 563 / screenGui.AbsoluteSize.Y, imageLabel.Position.Y.Offset + imageLabel.Size.Y.Offset + 10)
+
+    local moveGoal = { Position = moveGoals[i] }
+    local moveTween = TweenService:Create(imageLabel, moveTweenInfo, moveGoal)
+
+    local moveTextGoal = {
+        Position = UDim2.new(
+            moveGoals[i].X.Scale,
+            moveGoals[i].X.Offset,
+            moveGoals[i].Y.Scale + 563 / screenGui.AbsoluteSize.Y,
+            moveGoals[i].Y.Offset + 10
+        )
+    }
+    local moveTextTween = TweenService:Create(textLabel, moveTweenInfo, moveTextGoal)
+
+    local fadeInGoal = { ImageTransparency = 0 }
+    local fadeOutGoal = { ImageTransparency = 1 }
+
+    local fadeInTween = TweenService:Create(imageLabel, fadeTweenInfo, fadeInGoal)
+    local fadeInTextTween = TweenService:Create(textLabel, fadeTweenInfo, { TextTransparency = 0 })
+    local fadeOutTween = TweenService:Create(imageLabel, fadeTweenInfo, fadeOutGoal)
+    local fadeOutTextTween = TweenService:Create(textLabel, fadeTweenInfo, { TextTransparency = 1 })
+
+    table.insert(imageLabels, {imageLabel, textLabel, moveTween, moveTextTween, fadeInTween, fadeInTextTween, fadeOutTween, fadeOutTextTween})
+end
+
+local function fadeInAndMove()
+    for _, labelData in ipairs(imageLabels) do
+        local imageLabel, textLabel, moveTween, moveTextTween, fadeInTween, fadeInTextTween, fadeOutTween, fadeOutTextTween = unpack(labelData)
+        fadeInTween:Play()
+        fadeInTextTween:Play()
+        moveTween:Play()
+        moveTextTween:Play()
+        moveTween.Completed:Connect(
+            function()
+                wait(1)
+                textLabel.Text = loadTimeMessage
+                fadeOutTween:Play()
+                fadeOutTextTween:Play()
+                fadeOutTween.Completed:Connect(
+                    function()
+                        screenGui:Destroy()
+                    end
+                )
+            end
+        )
+    end
+end
+
+fadeInAndMove()
