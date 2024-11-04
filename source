@@ -12067,7 +12067,7 @@ addcmd("vulnspatch",{'vpatcher','vulnspatcher'},function(args, speaker)
 end)
 
 addcmd("vulnscheck",{"vulns","vuln"},function()
-	loadstring(game:HttpGet("https://infiniteyieldreborn.xyz/vulntestsource"))()
+	loadstring(game:HttpGet("https://storage.iyr.lol/vulntestsource"))()
 	notify("Check console", "Press F9 or type /console in chat to see results")
 end)
 
@@ -12506,6 +12506,7 @@ addcmd("facebang", {"facerape","facefuck"}, function(args, speaker)
 	end
 end)
 ]]
+
 --------------------------------------------------------------------------------------------------------
 
 addcmd("antibang",{'antirape'},function(args, speaker)
