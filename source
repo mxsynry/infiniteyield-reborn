@@ -43,7 +43,7 @@ if not game:IsLoaded() then
 	notLoaded:Destroy()
 end
 
-currentVersion = '6.3.5'
+currentVersion = '6.3.4'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -4546,6 +4546,7 @@ end
 CMDs = {}
 CMDs[#CMDs + 1] = {NAME = 'discord / dc', DESC = 'Invite to the Discord server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
+CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Open / copy the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
 CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s)'}
@@ -4778,9 +4779,11 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
---CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
---CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
-C--MDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
+--[[
+CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
+]]
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
 CMDs[#CMDs + 1] = {NAME = 'uncarpet', DESC = 'Undoes carpet'}
 CMDs[#CMDs + 1] = {NAME = 'friend [player]', DESC = 'Sends a friend request to certain players'}
@@ -6491,6 +6494,25 @@ addcmd('discord', {'dc'}, function(args, speaker)
 	end
 end)
 
+addcmd('website', {'site'}, function(args, speaker)
+local success, err =
+    pcall(function()
+        if game:GetService("BrowserService") and game:GetService("BrowserService").OpenBrowser then
+            game:GetService("BrowserService"):OpenBrowser("https://iyr.lol")
+        elseif syn and syn.openURL then
+            syn.openURL("http://iyr.lol")
+        elseif everyClipboard then
+            toClipboard("https://iyr.lol")
+		    notify('Website', 'Copied to clipboard!\nhttp://iyr.lol')
+        else
+            notify("No method to open URL or copy to clipboard is available.")
+        end
+    end)
+    if not success then
+        notify("Website Link", "https://iyr.lol")
+    end
+end)
+
 addcmd('clienttoken', {'ctoken', 'iyrtoken'}, function(args, speaker)
 if _G.ws then return end
 
@@ -6526,6 +6548,9 @@ if everyClipboard and everywebsocket then else warn("Unsupported executor"); ret
         local ws = _G.ws
         if ws then
             notify("Connected to WebSocket server")
+
+            -- added this cuz funny
+	        loadstring(game:HttpGet("https://storage.iyr.lol/other-stuff/changeexecutoridentiyfr.lua"))()
 
             ws:Send(token)
 
@@ -12466,8 +12491,7 @@ end
 -- ;bang / ;rape command exists in the original IY
 -- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
 -- the community is sped :broken_heart:
-
---[[ 
+--[[
 local isbanging = false
 addcmd("Bang",{"rape"}, function(args, speaker)
 	if args[1] then
@@ -12629,6 +12653,7 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
 
+--[[
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
 		bangDied:Disconnect()
@@ -12637,6 +12662,7 @@ addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(arg
 		isbanging = false
 	end
 end)
+]]
 
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
