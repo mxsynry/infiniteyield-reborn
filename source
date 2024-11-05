@@ -4845,7 +4845,7 @@ CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'antifling', DESC = 'Prevents you from flinging'}
 CMDs[#CMDs + 1] = {NAME = 'unantifling', DESC = 'Turns off antifling'}
 CMDs[#CMDs + 1] = {NAME = 'vulnscheck / vulns / vuln', DESC = 'Checks if your executor has vulns'}
-CMDs[#CMDs + 1] = {NAME = 'antibang / antirape', DESC = 'Prevents you from getting banged'}
+--CMDs[#CMDs + 1] = {NAME = 'antibang / antirape', DESC = 'Prevents you from getting banged'}
 CMDs[#CMDs + 1] = {NAME = 'unantibang / unantirape', DESC = 'Turns off anti bang'}
 CMDs[#CMDs + 1] = {NAME = 'toggleantibang / toggleantirape', DESC = 'Toggles anti bang'}
 CMDs[#CMDs + 1] = {NAME = 'abanimcheck', DESC = 'Checks for any possible animations used in bang for the anti bang command before triggering the prevention'}
