@@ -21,14 +21,11 @@
 local startTime = tick()
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/master/uselessscriptthatexistsinthisrepoiwin'))()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
 	return
 end
 
--- Yeah, there is no way to enable this by using a command or something. scriptblox is just gay. They have to enable it manually with a one-liner. yes I'm talking about the is18 shit 
 pcall(function() getgenv().IY_LOADED = true end)
-
--- fuck you ScriptBlox, yall touch children and love watching gay porn
 
 local cloneref = cloneref or function(o) return o end
 COREGUI = cloneref(game:GetService("CoreGui"))
@@ -1963,7 +1960,6 @@ StatsService = cloneref(game:GetService("Stats"))
 MaterialService = cloneref(game:GetService("MaterialService"))
 AvatarEditorService = cloneref(game:GetService("AvatarEditorService"))
 TextChatService = cloneref(game:GetService("TextChatService"))
-VirtualUser = cloneref(game:GetService("VirtualUser"))
 
 sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
@@ -1973,16 +1969,6 @@ httprequest = (syn and syn.request) or (http and http.request) or http_request o
 PlaceId, JobId = game.PlaceId, game.JobId
 local IsOnMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform())
 everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
-
--- Developers for IY Reborn (EDIT we need to move this to the storage)
-devblacklist = {
-	"\50\56\54\51\49\52\48\49\57\52",
-	"\53\55\49\57\53\53\50\51\50\54",
-	"\53\50\49\50\48\56\48\55\50\57",
-	"\51\48\57\49\48\50\51\53\51\56",
-	"\51\50\49\54\48\53\54\48\56",
-	"\52\56\57\54\52\49\55\50\52\51"
-}
 
 local isChatLegacy = (TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService)
 local chatRemote = ReplicatedStorage:FindFirstChild("SayMessageRequest", true)
@@ -1998,23 +1984,8 @@ function chatsend(str)
 	end
 end
 
-writefile = type(writefile) == "function" and function(file, data, safe)
-    if safe == true then return pcall(writefile, file, data) end
-    writefile(file, data)
-end
-readfile = type(readfile) == "function" and function(file, safe)
-    if safe == true then return pcall(readfile, file) end
-    return readfile(file)
-end
-
 function writefileExploit()
 	if writefile then
-		return true
-	end
-end
-
-function readfileExploit()
-	if readfile then
 		return true
 	end
 end
@@ -2040,10 +2011,6 @@ function r15(plr)
 	if plr.Character:FindFirstChildOfClass('Humanoid').RigType == Enum.HumanoidRigType.R15 then
 		return true
 	end
-end
-
-function rigType(player)
-    return tostring(player.Character:FindFirstChildWhichIsA("Humanoid").RigType):split(".")[3]
 end
 
 function toClipboard(txt)
@@ -2116,7 +2083,7 @@ function writefileCooldown(name,data)
 	task.spawn(function()
 		if not cooldown then
 			cooldown = true
-            writefile(name, data, true)
+			writefile(name, data)
 		else
 			repeat task.wait() until cooldown == false
 			writefileCooldown(name,data)
@@ -2891,6 +2858,7 @@ useFactorySettings = function()
 	PluginsTable = {}
 end
 
+
 createPopup = function(text)
     local FileError = Instance.new("Frame")
     local background = Instance.new("Frame")
@@ -2974,39 +2942,43 @@ end
 local loadedEventData = nil
 local jsonAttempts = 0
 function saves()
-    if writefileExploit() and readfileExploit() and jsonAttempts < 10 then
-        local readSuccess, out = readfile("IY_FE.iy", true)
-        if readSuccess then
-            if out ~= nil and tostring(out):gsub("%s", "") ~= "" then
-                local success, response = pcall(function()
-                    local json = HttpService:JSONDecode(out)
-                    if json.prefix ~= nil then prefix = json.prefix else prefix = ';' end
-                    if json.StayOpen ~= nil then StayOpen = json.StayOpen else StayOpen = false end
-                    if json.keepIY ~= nil then KeepInfYield = json.keepIY else KeepInfYield = true end
-                    if json.espTransparency ~= nil then espTransparency = json.espTransparency else espTransparency = 0.3 end
-                    if json.logsEnabled ~= nil then logsEnabled = json.logsEnabled else logsEnabled = false end
-                    if json.jLogsEnabled ~= nil then jLogsEnabled = json.jLogsEnabled else jLogsEnabled = false end
-                    if json.aliases ~= nil then aliases = json.aliases else aliases = {} end
-                    if json.binds ~= nil then binds = (json.binds or {}) else binds = {} end
-                    if json.spawnCmds ~= nil then spawnCmds = json.spawnCmds end
-                    if json.WayPoints ~= nil then AllWaypoints = json.WayPoints else WayPoints = {} AllWaypoints = {} end
-                    if json.PluginsTable ~= nil then PluginsTable = json.PluginsTable else PluginsTable = {} end
-                    if json.currentShade1 ~= nil then currentShade1 = Color3.new(json.currentShade1[1],json.currentShade1[2],json.currentShade1[3]) end
-                    if json.currentShade2 ~= nil then currentShade2 = Color3.new(json.currentShade2[1],json.currentShade2[2],json.currentShade2[3]) end
-                    if json.currentShade3 ~= nil then currentShade3 = Color3.new(json.currentShade3[1],json.currentShade3[2],json.currentShade3[3]) end
-                    if json.currentText1 ~= nil then currentText1 = Color3.new(json.currentText1[1],json.currentText1[2],json.currentText1[3]) end
-                    if json.currentText2 ~= nil then currentText2 = Color3.new(json.currentText2[1],json.currentText2[2],json.currentText2[3]) end
-                    if json.currentScroll ~= nil then currentScroll = Color3.new(json.currentScroll[1],json.currentScroll[2],json.currentScroll[3]) end
-                    if json.eventBinds ~= nil then loadedEventData = json.eventBinds end
-                end)
-                if not success then
-                    jsonAttempts = jsonAttempts + 1
-                    warn("Save Json Error:", response)
-                    warn("Overwriting Save File")
-                    writefile("IY_FE.iy", defaults, true)
-                    wait()
-                    saves()
-                end
+	if writefileExploit() and jsonAttempts < 50 then
+		if pcall(function() readfile("IY_FE.iy") end) then
+			if readfile("IY_FE.iy") ~= nil then
+				local success, response = pcall(function()
+					local json = HttpService:JSONDecode(readfile("IY_FE.iy"))
+					if json.prefix ~= nil then prefix = json.prefix else prefix = ';' end
+					if json.StayOpen ~= nil then StayOpen = json.StayOpen else StayOpen = false end
+					if json.keepIY ~= nil then KeepInfYield = json.keepIY else KeepInfYield = true end
+					if json.espTransparency ~= nil then espTransparency = json.espTransparency else espTransparency = 0.3 end
+					if json.logsEnabled ~= nil then logsEnabled = json.logsEnabled else logsEnabled = false end
+					if json.jLogsEnabled ~= nil then jLogsEnabled = json.jLogsEnabled else jLogsEnabled = false end
+					if json.aliases ~= nil then aliases = json.aliases else aliases = {} end
+					if json.binds ~= nil then binds = (json.binds or {}) else binds = {} end
+					if json.spawnCmds ~= nil then spawnCmds = json.spawnCmds end
+					if json.WayPoints ~= nil then AllWaypoints = json.WayPoints else WayPoints = {} AllWaypoints = {} end
+					if json.PluginsTable ~= nil then PluginsTable = json.PluginsTable else PluginsTable = {} end
+					if json.currentShade1 ~= nil then currentShade1 = Color3.new(json.currentShade1[1],json.currentShade1[2],json.currentShade1[3]) end
+					if json.currentShade2 ~= nil then currentShade2 = Color3.new(json.currentShade2[1],json.currentShade2[2],json.currentShade2[3]) end
+					if json.currentShade3 ~= nil then currentShade3 = Color3.new(json.currentShade3[1],json.currentShade3[2],json.currentShade3[3]) end
+					if json.currentText1 ~= nil then currentText1 = Color3.new(json.currentText1[1],json.currentText1[2],json.currentText1[3]) end
+					if json.currentText2 ~= nil then currentText2 = Color3.new(json.currentText2[1],json.currentText2[2],json.currentText2[3]) end
+					if json.currentScroll ~= nil then currentScroll = Color3.new(json.currentScroll[1],json.currentScroll[2],json.currentScroll[3]) end
+					if json.eventBinds ~= nil then loadedEventData = json.eventBinds end
+				end)
+				if not success then
+					jsonAttempts = jsonAttempts + 1
+					warn("Save Json Error:", response)
+					warn("Overwriting Save File")
+					writefileCooldown("IY_FE.iy", defaults)
+					task.wait()
+					saves()
+				end
+			else
+				writefileCooldown("IY_FE.iy", defaults)
+				task.wait()
+				saves()
+			end
             else
                 writefile("IY_FE.iy", defaults, true)
                 wait()
@@ -3019,23 +2991,11 @@ function saves()
                     createPopup("There was a problem writing a save file to your PC.\n\nPlease contact the developer/support team for your exploit and tell them writefile/readfile is not working.\n\nYour settings, keybinds, waypoints, and aliases will not save if you continue.\n\nThings to try:\n> Make sure a 'workspace' folder is located in the same folder as your exploit\n> If your exploit is inside of a zip/rar file, extract it.\n> Rejoin the game and try again or restart your PC and try again.")
                 end
             end
-        else
-            writefile("IY_FE.iy", defaults, true)
-            wait()
-            local dReadSuccess, dOut = readfile("IY_FE.iy", true)
-            if dReadSuccess and dOut ~= nil and tostring(dOut):gsub("%s", "") ~= "" then
-                saves()
-            else
-                nosaves = true
-                useFactorySettings()
-                createPopup("There was a problem writing a save file to your PC.\n\nPlease contact the developer/support team for your exploit and tell them writefile/readfile is not working.\n\nYour settings, keybinds, waypoints, and aliases will not save if you continue.\n\nThings to try:\n> Make sure a 'workspace' folder is located in the same folder as your exploit\n> If your exploit is inside of a zip/rar file, extract it.\n> Rejoin the game and try again or restart your PC and try again.")
-            end
-        end
 	else
 		if jsonAttempts >= 50 then
 			nosaves = true
 			useFactorySettings()
-            createPopup("Sorry, we have attempted to parse your save file, but it is unreadable!\n\nInfinite Yield is now using factory settings until your exploit's file system works.\n\nYour save file has not been deleted.")
+            createPopup("Sorry, we have attempted to parse your save file, but it is unreadable!\n\nInfinite Yield Reborn is now using factory settings until your exploit's file system works.\n\nYour save file has not been deleted.")
         else
             nosaves = true
             useFactorySettings()
@@ -3888,8 +3848,9 @@ JoinLog = function(plr)
 	end
 end
 
-CleanFileName = function(name)
-    return tostring(name):gsub("[*\\?:<>|]+", ""):sub(1, 175)
+local CleanFileName = function(str)
+	local gsub = string.gsub
+	return gsub(str, "[*\\?:<>|]+", "")
 end
 
 SaveChatlogs.MouseButton1Down:Connect(function()
@@ -4485,8 +4446,8 @@ CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Open / copy the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
 CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s)'}
-CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU/Lua code (have vulns).'}
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
+CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
 CMDs[#CMDs + 1] = {NAME = 'secureexplorer / securedex / bypasseddex', DESC = 'Opens Bypassed DEX by HamstaGang'}
 CMDs[#CMDs + 1] = {NAME = 'olddex / odex', DESC = 'Opens Old DEX by Moon'}
@@ -4822,6 +4783,7 @@ CMDs[#CMDs + 1] = {NAME = 'unspin', DESC = 'Disables spin'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'animation / anim [ID] [speed]', DESC = 'Makes your character perform an animation (must be by roblox to replicate)'}
 CMDs[#CMDs + 1] = {NAME = 'dance', DESC = 'Makes you  d a n c e'}
+CMDs[#CMDs + 1] = {NAME = 'undance', DESC = 'Stops dance animations'}
 CMDs[#CMDs + 1] = {NAME = 'spasm', DESC = 'Makes you  c r a z y'}
 CMDs[#CMDs + 1] = {NAME = 'unspasm', DESC = 'Stops spasm'}
 CMDs[#CMDs + 1] = {NAME = 'headthrow', DESC = 'Simply makes you throw your head'}
@@ -4908,8 +4870,8 @@ CMDs[#CMDs + 1] = {NAME = "decompiler", DESC = "loads a decompiler function to y
 CMDs[#CMDs + 1] = {NAME = 'hidechar [player]', DESC = 'Hides the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhidechar [player]', DESC = 'Stops hiding the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhideallchars', DESC = 'Unhides all the characters.'}
-CMDs[#CMDs + 1] = {NAME = 'emotewheelreplacement', DESC = 'Replaces the emotes wheel with a custom one'}
 --CMDs[#CMDs + 1] = {NAME = 'azulawheelreplacement', DESC = 'Replaces the emotes wheel with azula\'s fork of the other one'} --[[https://raw.githubusercontent.com/mireyacs/emoteui/main/source.lua]]
+CMDs[#CMDs + 1] = {NAME = 'emotewheelreplacement', DESC = 'Replaces the emotes wheel with a custom one'}
 CMDs[#CMDs + 1] = {NAME = 'setglobal / setg [Global Name] [true/false]', DESC = 'Set a global variable to certain value.'}
 CMDs[#CMDs + 1] = {NAME = 'feflip', DESC = 'Loads up fe backflip by Zeezy'}
 task.wait()
@@ -5592,13 +5554,6 @@ function getPlayer(list,speaker)
 	for i,v in pairs(foundList) do table.insert(foundNames,v.Name) end
 
 	return foundNames
-end
-
-formatUsername = function(player)
-    if player.DisplayName ~= player.Name then
-        return string.format("%s (%s)", player.Name, player.DisplayName)
-    end
-    return player.Name
 end
 
 getprfx=function(strn)
@@ -6360,7 +6315,7 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if KeepInfYield and (not TeleportCheck) and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Ryxeleron/infiniteyield-reborn/scriptblox/source'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/source'))()")
 	end
 end)
 
@@ -6523,7 +6478,7 @@ if everyClipboard and everywebsocket then else warn("Unsupported executor"); ret
     end
 end)
 
-addcmd('keepiy', {}, function(args, speaker)
+addcmd('keepiy', {"keepiyr"}, function(args, speaker)
 	if queueteleport then
 		KeepInfYield = true
 		updatesaves()
@@ -6532,7 +6487,7 @@ addcmd('keepiy', {}, function(args, speaker)
 	end
 end)
 
-addcmd('unkeepiy', {}, function(args, speaker)
+addcmd('unkeepiy', {"unkeepiyr"}, function(args, speaker)
 	if queueteleport then
 		KeepInfYield = false
 		updatesaves()
@@ -6541,7 +6496,7 @@ addcmd('unkeepiy', {}, function(args, speaker)
 	end
 end)
 
-addcmd('toggleunkeepiy', {}, function(args, speaker)
+addcmd('toggleunkeepiy', {"toggleunkeepiyr"}, function(args, speaker)
 	if queueteleport then
 		KeepInfYield = not KeepInfYield
 		updatesaves()
@@ -6915,7 +6870,7 @@ end)
 addcmd("serverhop", {"shop"}, function(args, speaker)
 	if httprequest then
 		local servers = {}
-		local req = httprequest({Url = string.format("https://api.iyr.lol/servers?gameId=%d", PlaceId)})
+		local req = httprequest({Url = string.format("https://api.iyr.lol/servers?placeId=%d", PlaceId)})
 		local body = HttpService:JSONDecode(req.Body)
 		if body and body.data then
 			for i, v in next, body.data do
@@ -6938,7 +6893,7 @@ end)
 local canOpenServerIist = true
 addcmd('serverlist',{'slist'},function(args, speaker)
 	if httprequest then
-		local listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?gameId=%d", PlaceId)})
+		local listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?placeId=%d", PlaceId)})
 		local listbody = HttpService:JSONDecode(listreq.Body)
 		if listbody and listbody.data then
 			if not canOpenServerIist then return end
@@ -7144,7 +7099,7 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 						v:Destroy()
 					end
 				end
-				listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?gameId=%d", PlaceId)})
+				listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?placeId=%d", PlaceId)})
 				listbody = HttpService:JSONDecode(listreq.Body)
 				task.wait(.5)
 				addservertemplate()
@@ -7223,6 +7178,7 @@ end)
 addcmd("exit", {}, function(args, speaker)
 	game:Shutdown()
 end)
+
 
 local clickflingEnabled = false
 
@@ -8516,7 +8472,7 @@ addcmd('unguidelete',{'noguidelete'},function(args, speaker)
 end)
 
 local wasStayOpen = StayOpen
-addcmd('hideiy',{},function(args, speaker)
+addcmd('hideiy',{'hideiyr'},function(args, speaker)
 	isHidden = true
 	wasStayOpen = StayOpen
 	if StayOpen == true then
@@ -8528,7 +8484,7 @@ addcmd('hideiy',{},function(args, speaker)
 	if not (args[1] and tostring(args[1]) == 'nonotify') then notify('IY Hidden','You can press the prefix key to access the command bar') end
 end)
 
-addcmd('showiy',{'unhideiy'},function(args, speaker)
+addcmd('showiy',{'unhideiy', 'showiyr', 'unhideiyr'},function(args, speaker)
 	isHidden = false
 	minimizeNum = -20
 	if wasStayOpen then
@@ -9644,6 +9600,7 @@ addcmd('antiafk',{'antiidle'},function(args, speaker)
 			end
 		end
 	else
+		local VirtualUser = cloneref(game:GetService("VirtualUser"))
 		Players.LocalPlayer.Idled:Connect(function()
 			VirtualUser:CaptureController()
 			VirtualUser:ClickButton2(Vector2.new())
@@ -9687,24 +9644,6 @@ local function promptNewRig(speaker, rig)
     end
 end
 
-local function promptNewRig(speaker, rig)
-    local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
-    if humanoid then
-        AvatarEditorService:PromptSaveAvatar(humanoid.HumanoidDescription, Enum.HumanoidRigType[rig])
-        local result = AvatarEditorService.PromptSaveAvatarCompleted:Wait()
-        if result == Enum.AvatarPromptResult.Success then
-            execCmd("reset")
-        end
-    end
-end
-
-addcmd("promptr6", {}, function(args, speaker)
-    promptNewRig(speaker, "R6")
-end)
-
-addcmd("promptr15", {}, function(args, speaker)
-    promptNewRig(speaker, "R15")
-end)
 
 addcmd("r6", {"r6anim", "r6reanim", "faker6", 'r31'}, function(args, speaker)
 if r15(speaker) then
@@ -10637,11 +10576,17 @@ RunCustomAnimation(plr.Character)
 plr.CharacterAdded:Connect(function(Char)
 	RunCustomAnimation(Char)
 end)
-
     else
         notify('R15 Required', 'This command requires the r15 rig type')
     end
+end)
 
+addcmd("promptr6", {}, function(args, speaker)
+    promptNewRig(speaker, "R6")
+end)
+
+addcmd("promptr15", {}, function(args, speaker)
+    promptNewRig(speaker, "R15")
 end)
 
 addcmd('age',{},function(args, speaker)
@@ -12067,7 +12012,7 @@ addcmd("vulnspatch",{'vpatcher','vulnspatcher'},function(args, speaker)
 end)
 
 addcmd("vulnscheck",{"vulns","vuln"},function()
-	loadstring(game:HttpGet("https://storage.iyr.lol/vulntestsource"))()
+	loadstring(game:HttpGet("https://storage.iyr.lol/other-stuff/vulntestsource"))()
 	notify("Check console", "Press F9 or type /console in chat to see results")
 end)
 
@@ -12079,7 +12024,7 @@ addcmd("execute", {"run", "code"}, function(args, speaker)
     if success then
         notify("Execution Success", "Code executed successfully. Check console for possible results.")
     else
-        notify("Execution Error", "Please checks for possible syntax error and make sure your executor supports the script.")
+        notify("Execution Error", "An error occurred. Check console for details.")
     end
 end)
 
@@ -12175,9 +12120,7 @@ end)
 
 addcmd('remotespy',{'rspy'},function(args, speaker)
 	notify("Loading",'Hold on a sec')
-	-- Full credit to exx, creator of SimpleSpy
-	-- also thanks to NoobSploit for fixing
-	loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpyBeta.lua"))()
+	loadstring(game:HttpGet("https://github.com/FurryBoyYT/synz_fixed_dex/raw/refs/heads/main/simple_spy.lua"))()
 end)
 
 addcmd('audiologger',{'alogger'},function(args, speaker)
@@ -12294,18 +12237,13 @@ end)
 addcmd('headsit',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
-		if table.find(devblacklist, tostring(Players[v].UserId)) ~= nil and table.find(devblacklist, tostring(speaker.UserId)) == nil then
-			notify("Error","HEY! You cannot head sit a developer of Infinite Yield Reborn!")
-			return
-		else
-			speaker.Character:FindFirstChildOfClass('Humanoid').Sit = true
-			while task.wait() do
-				if Players:FindFirstChild(Players[v].Name) and Players[v].Character ~= nil and getRoot(Players[v].Character) and getRoot(speaker.Character) and speaker.Character:FindFirstChildOfClass('Humanoid').Sit == true then
-					getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
-					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
-				else
-					break
-				end
+		speaker.Character:FindFirstChildOfClass('Humanoid').Sit = true
+		while task.wait() do
+			if Players:FindFirstChild(Players[v].Name) and Players[v].Character ~= nil and getRoot(Players[v].Character) and getRoot(speaker.Character) and speaker.Character:FindFirstChildOfClass('Humanoid').Sit == true then
+				getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
+				getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+			else
+				break
 			end
 		end
 	end
@@ -12425,44 +12363,37 @@ end
 -- ;bang / ;rape command exists in the original IY
 -- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
 -- the community is sped :broken_heart:
-
 --[[
 local isbanging = false
 addcmd("Bang",{"rape"}, function(args, speaker)
 	if args[1] then
 		local players = getPlayer(args[1], speaker)
 		for _, v in pairs(players) do
-			if table.find(devblacklist, tostring(Players[v].UserId)) ~= nil then
-				execCmd("unbang")
-				notify("Error","HEY! You cannot bang a developer of Infinite Yield Reborn!")
-				return
-			else
-				execCmd("unbang")
-				task.wait()
-				isbanging = true
-				local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-				bangAnim = Instance.new("Animation")
-				bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
-				bang = humanoid:LoadAnimation(bangAnim)
-				bang:Play(0.1, 1, 1)
-				bang:AdjustSpeed(args[2] or 2)
-				bangDied = humanoid.Died:Connect(function()
-					bang:Stop()
-					bangAnim:Destroy()
-					bangDied:Disconnect()
-					isbanging = false
-				end)
-				local bangplr = Players[v].Name
-				local bangOffet = CFrame.new(0,0,1.1)
-				while task.wait() do
-					if isbanging == false then
-						break
-					end
-					local otherRoot = getTorso(Players[bangplr].Character)
-					getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet
-					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+			execCmd("unbang")
+			task.wait()
+			isbanging = true
+			local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+			bangAnim = Instance.new("Animation")
+			bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
+			bang = humanoid:LoadAnimation(bangAnim)
+			bang:Play(0.1, 1, 1)
+			bang:AdjustSpeed(args[2] or 2)
+			bangDied = humanoid.Died:Connect(function()
+				bang:Stop()
+				bangAnim:Destroy()
+				bangDied:Disconnect()
+				isbanging = false
+			end)
+			local bangplr = Players[v].Name
+			local bangOffet = CFrame.new(0,0,1.1)
+			while task.wait() do
+				if isbanging == false then
+					break
 				end
-			end		
+				local otherRoot = getTorso(Players[bangplr].Character)
+				getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet
+				getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+			end	
 		end
 	end
 end)
@@ -12471,42 +12402,35 @@ addcmd("facebang", {"facerape","facefuck"}, function(args, speaker)
 	if args[1] then
 		local players = getPlayer(args[1], speaker)
 		for _, v in pairs(players) do
-			if table.find(devblacklist, tostring(Players[v].UserId)) ~= nil then
-				execCmd("unbang")
-				notify("Error","HEY! You cannot bang a developer of Infinite Yield Reborn!")
-				return
-			else
-				execCmd("unbang")
-				task.wait()
-				isbanging = true
-				local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-				bangAnim = Instance.new("Animation")
-				bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
-				bang = humanoid:LoadAnimation(bangAnim)
-				bang:Play(0.1, 1, 1)
-				bang:AdjustSpeed(args[2] or 2)
-				bangDied = humanoid.Died:Connect(function()
-					bang:Stop()
-					bangAnim:Destroy()
-					bangDied:Disconnect()
-					isbanging = false
-				end)
-				local bangplr = Players[v].Name
-				local bangOffet = CFrame.new(0, 2.3, -1.1)
-				while task.wait() do
-					if isbanging == false then
-						break
-					end
-					local otherRoot = getTorso(Players[bangplr].Character)
-					getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet * CFrame.Angles(0,3.15,0)
-					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+			execCmd("unbang")
+			task.wait()
+			isbanging = true
+			local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+			bangAnim = Instance.new("Animation")
+			bangAnim.AnimationId = not r15(speaker) and "rbxassetid://148840371" or "rbxassetid://5918726674"
+			bang = humanoid:LoadAnimation(bangAnim)
+			bang:Play(0.1, 1, 1)
+			bang:AdjustSpeed(args[2] or 2)
+			bangDied = humanoid.Died:Connect(function()
+				bang:Stop()
+				bangAnim:Destroy()
+				bangDied:Disconnect()
+				isbanging = false
+			end)
+			local bangplr = Players[v].Name
+			local bangOffet = CFrame.new(0, 2.3, -1.1)
+			while task.wait() do
+				if isbanging == false then
+					break
 				end
+				local otherRoot = getTorso(Players[bangplr].Character)
+				getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet * CFrame.Angles(0,3.15,0)
+				getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
 			end
 		end
 	end
 end)
 ]]
-
 --------------------------------------------------------------------------------------------------------
 
 addcmd("antibang",{'antirape'},function(args, speaker)
@@ -12588,7 +12512,6 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
-
 --[[
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
@@ -12599,34 +12522,28 @@ addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(arg
 	end
 end)
 ]]
-
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if not r15(speaker) then
 		execCmd('uncarpet')
 		task.wait()
 		for i,v in pairs(players)do
-			if table.find(devblacklist, tostring(Players[v].UserId)) ~= nil then
-				notify("Error","HEY! You cannot carpet a developer of Infinite Yield Reborn!")
-				return
-			else
-			carpetAnim = Instance.new("Animation")
-			carpetAnim.AnimationId = "rbxassetid://282574440"
-			carpet = speaker.Character:FindFirstChildOfClass('Humanoid'):LoadAnimation(carpetAnim)
-			carpet:Play(.1, 1, 1)
-			local carpetplr = Players[v].Name
-				carpetDied = speaker.Character:FindFirstChildOfClass('Humanoid').Died:Connect(function()
-				carpetLoop:Disconnect()
-				carpet:Stop()
-				carpetAnim:Destroy()
-				carpetDied:Disconnect()
+		carpetAnim = Instance.new("Animation")
+		carpetAnim.AnimationId = "rbxassetid://282574440"
+		carpet = speaker.Character:FindFirstChildOfClass('Humanoid'):LoadAnimation(carpetAnim)
+		carpet:Play(.1, 1, 1)
+		local carpetplr = Players[v].Name
+			carpetDied = speaker.Character:FindFirstChildOfClass('Humanoid').Died:Connect(function()
+			carpetLoop:Disconnect()
+			carpet:Stop()
+			carpetAnim:Destroy()
+			carpetDied:Disconnect()
+		end)
+		carpetLoop = RunService.Heartbeat:Connect(function()
+			pcall(function()
+				getRoot(Players.LocalPlayer.Character).CFrame = getRoot(Players[carpetplr].Character).CFrame
 			end)
-			carpetLoop = RunService.Heartbeat:Connect(function()
-				pcall(function()
-					getRoot(Players.LocalPlayer.Character).CFrame = getRoot(Players[carpetplr].Character).CFrame
-				end)
-			end)
-			end
+		end)
 		end
 	else
 		notify('R6 Required','This command requires the r6 rig type')
@@ -12812,7 +12729,7 @@ addcmd('noproximitypromptlimits',{'nopplimits','removepplimits'},function(args, 
 end)
 
 addcmd('fireproximityprompts',{'firepp'},function(args, speaker)
-	if fireproximityprompt then
+	if fireclickdetector then
 		if args[1] then
 			local name = getstring(1)
 			for _, descendant in ipairs(workspace:GetDescendants()) do
@@ -12943,45 +12860,34 @@ addcmd('emotewheelreplacement',{},function(args, speaker)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/fuckusfm/useless-scritps/main/Emotes/main"))()
 end)
 
-addcmd('azulawheelreplacement',{},function(args, speaker)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/mireyacs/emoteui/main/source.lua"))()
-end)
-
 local hiddenplayers = {}
-
-addcmd('hidechar', {}, function(args, speaker)
-    local playerName = args[1]
-    local plr = getPlayer(playerName, speaker)[1]
-    if not plr or table.find(hiddenplayers, plr) then return end
-
-    hiddenplayers[plr] = {}
-
-    for _, v in pairs(plr.Character:GetDescendants()) do
-        if v:IsA("BasePart") or v:IsA("Decal") then
-            if v.Name ~= "HumanoidRootPart" then
-                table.insert(hiddenplayers[plr], v)
-                v.Transparency = 1
-            end
-        end
-    end
-
-    notify("Hiding " .. playerName .. " from your sight")
+addcmd('hidechar',{},function(args, speaker)
+	local plr = getPlayer(args[1], speaker)[1]
+	if table.find(hiddenplayers, plr) then return end
+	table.insert(hiddenplayers,plr)
+	hiddenplayers[plr] = {}
+	for _,v in pairs(Players:FindFirstChild(plr).Character:GetDescendants()) do
+		if v:IsA("BasePart") or v:IsA("Decal") then
+			if v.Name ~= "HumanoidRootPart" then
+				table.insert(hiddenplayers[plr], v) -- :brain:
+				v.Transparency = 1
+			end
+		end
+	end
+	notify(`Now you cant see {plr}`)
 end)
 
-addcmd('unhidechar', {}, function(args, speaker)
-    local playerName = args[1]
-    local plr = getPlayer(playerName, speaker)[1]
-    if not plr or not hiddenplayers[plr] then return end
-
-    for _, v in pairs(hiddenplayers[plr]) do
-        if v:IsA("BasePart") or v:IsA("Decal") then
-            v.Transparency = 0
-        end
-    end
-
-    hiddenplayers[plr] = nil
-
-    notify("Showing " .. playerName .. " in your sight")
+addcmd('unhidechar',{},function(args, speaker)
+	local plr = getPlayer(args[1], speaker)[1]
+	if table.find(hiddenplayers, plr) then
+		for _,v in pairs(hiddenplayers[plr]) do
+			if v:IsA("BasePart") or v:IsA("Decal") then
+				v.Transparency = 0
+			end
+		end
+		hiddenplayers[plr] = nil
+	end
+	notify(`Now you can see {plr}`)
 end)
 
 addcmd('unhideallchars',{},function(args, speaker)
@@ -13398,50 +13304,6 @@ addcmd('joinlogs',{'jlogs'},function(args, speaker)
 	selectChat.BackgroundColor3 = currentShade3
 	selectJoin.BackgroundColor3 = currentShade2
 	logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
-end)
-
-
-local hiddenfling = false
-
-local function enableWalkfling()
-    hiddenfling = true
-    local detection = Instance.new("Decal")
-    detection.Parent = game:GetService("ReplicatedStorage")
-
-    local lp = game.Players.LocalPlayer
-    local runService = game:GetService("RunService")
-
-    local function fling()
-        local hrp, c, vel, movel = nil, nil, nil, 0.1
-        while hiddenfling do
-            runService.Heartbeat:Wait()
-            c = lp.Character
-            if not (c and c.Parent) then continue end
-            hrp = c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
-            if not (hrp and hrp.Parent) then continue end
-
-            vel = hrp.Velocity
-            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
-            runService.RenderStepped:Wait()
-
-            hrp.Velocity = vel
-            runService.Stepped:Wait()
-
-            hrp.Velocity = vel + Vector3.new(0, movel, 0)
-            movel = movel * -1
-        end
-    end
-
-    coroutine.wrap(fling)()
-end
-
-addcmd("walkfling", {"wfling"}, function(args, speaker)
-    notify("Walkfling enabled")
-    enableWalkfling()
-end)
-
-addcmd("unwalkfling", {"unwfling"}, function(args, speaker)
-    hiddenfling = false
 end)
 
 flinging = false
@@ -14105,17 +13967,6 @@ addcmd('uninfinity',{},function(args,speaker)
 	infinitypathtoolenabled = false
 end)
 
-task.spawn(function()
-	xpcall(function()
-		if devblacklist[5] == "\51\50\49\54\48\53\54\48\56" then
-		else
-			TeleportService:Teleport("920587237", Players.LocalPlayer)
-		end
-	end, function()
-		TeleportService:Teleport("920587237", Players.LocalPlayer)
-	end)
-end)
-
 function bring(speaker,target,fast)
 	if tools(speaker) then
 		if target ~= nil then
@@ -14549,78 +14400,92 @@ end)
 local freezingua = nil
 frozenParts = {}
 addcmd('freezeunanchored',{'freezeua'},function(args, speaker)
-    local badnames = {
-        "Head",
-        "UpperTorso",
-        "LowerTorso",
-        "RightUpperArm",
-        "LeftUpperArm",
-        "RightLowerArm",
-        "LeftLowerArm",
-        "RightHand",
-        "LeftHand",
-        "RightUpperLeg",
-        "LeftUpperLeg",
-        "RightLowerLeg",
-        "LeftLowerLeg",
-        "RightFoot",
-        "LeftFoot",
-        "Torso",
-        "Right Arm",
-        "Left Arm",
-        "Right Leg",
-        "Left Leg",
-        "HumanoidRootPart"
-    }
-    local function FREEZENOOB(v)
-        if v:IsA("BasePart" or "UnionOperation") and v.Anchored == false then
-            local BADD = false
-            for i = 1,#badnames do
-                if v.Name == badnames[i] then
-                    BADD = true
-                end
-            end
-            if speaker.Character and v:IsDescendantOf(speaker.Character) then
-                BADD = true
-            end
-            if BADD == false then
-                for i,c in pairs(v:GetChildren()) do
-                    if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
-                        c:Destroy()
-                    end
-                end
-                local bodypos = Instance.new("BodyPosition")
-                bodypos.Parent = v
-                bodypos.Position = v.Position
-                bodypos.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
-                local bodygyro = Instance.new("BodyGyro")
-                bodygyro.Parent = v
-                bodygyro.CFrame = v.CFrame
-                bodygyro.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
-                if not table.find(frozenParts,v) then
-                    table.insert(frozenParts,v)
-                end
-            end
-        end
-    end
-    for i,v in pairs(workspace:GetDescendants()) do
-        FREEZENOOB(v)
-    end
-    freezingua = workspace.DescendantAdded:Connect(FREEZENOOB)
+	if sethidden then
+		local badnames = {
+			"Head",
+			"UpperTorso",
+			"LowerTorso",
+			"RightUpperArm",
+			"LeftUpperArm",
+			"RightLowerArm",
+			"LeftLowerArm",
+			"RightHand",
+			"LeftHand",
+			"RightUpperLeg",
+			"LeftUpperLeg",
+			"RightLowerLeg",
+			"LeftLowerLeg",
+			"RightFoot",
+			"LeftFoot",
+			"Torso",
+			"Right Arm",
+			"Left Arm",
+			"Right Leg",
+			"Left Leg",
+			"HumanoidRootPart"
+		}
+		local function FREEZENOOB(v)
+			if v:IsA("BasePart" or "UnionOperation") and v.Anchored == false then
+				local BADD = false
+				for i = 1,#badnames do
+					if v.Name == badnames[i] then
+						BADD = true
+					end
+				end
+				if speaker.Character and v:IsDescendantOf(speaker.Character) then
+					BADD = true
+				end
+				if BADD == false then
+					for i,c in pairs(v:GetChildren()) do
+						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+							c:Destroy()
+						end
+					end
+					if not simRadius then
+						execCmd('simulationradius')
+					end
+					local bodypos = Instance.new("BodyPosition")
+					bodypos.Parent = v
+					bodypos.Position = v.Position
+					bodypos.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+					local bodygyro = Instance.new("BodyGyro")
+					bodygyro.Parent = v
+					bodygyro.CFrame = v.CFrame
+					bodygyro.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+					if not table.find(frozenParts,v) then
+						table.insert(frozenParts,v)
+					end
+				end
+			end
+		end
+		for i,v in pairs(workspace:GetDescendants()) do
+			FREEZENOOB(v)
+		end
+		freezingua = workspace.DescendantAdded:Connect(FREEZENOOB)
+	else
+		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
+	end
 end)
 
 addcmd('thawunanchored',{'thawua','unfreezeunanchored','unfreezeua'},function(args, speaker)
-    if freezingua then
-        freezingua:Disconnect()
-    end
-    for i,v in pairs(frozenParts) do
-        for i,c in pairs(v:GetChildren()) do
-            if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
-                c:Destroy()
-            end
-        end
-    end
-    frozenParts = {}
+	if sethidden then
+		if freezingua then
+			freezingua:Disconnect()
+		end
+		if not simRadius then
+			execCmd('simulationradius')
+		end
+		for i,v in pairs(frozenParts) do
+			for i,c in pairs(v:GetChildren()) do
+				if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+					c:Destroy()
+				end
+			end
+		end
+		frozenParts = {}
+	else
+		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
+	end
 end)
 
 addcmd('chatspy', {}, function(args, speaker)
@@ -14629,29 +14494,36 @@ addcmd('chatspy', {}, function(args, speaker)
 end)
 
 addcmd('tpunanchored',{'tpua'},function(args, speaker)
-    local players = getPlayer(args[1], speaker)
-    for i,v in pairs(players) do
-        local Forces = {}
-        for _,part in pairs(workspace:GetDescendants()) do
-            if Players[v].Character:FindFirstChild('Head') and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
-                for i,c in pairs(part:GetChildren()) do
-                    if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
-                        c:Destroy()
-                    end
-                end
-                local ForceInstance = Instance.new("BodyPosition")
-                ForceInstance.Parent = part
-                ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                table.insert(Forces, ForceInstance)
-                if not table.find(frozenParts,part) then
-                    table.insert(frozenParts,part)
-                end
-            end
-        end
-        for i,c in pairs(Forces) do
-            c.Position = Players[v].Character.Head.Position
-        end
-    end
+	if sethidden then
+		local players = getPlayer(args[1], speaker)
+		for i,v in pairs(players) do
+			local Forces = {}
+			for _,part in pairs(workspace:GetDescendants()) do
+				if Players[v].Character:FindFirstChild('Head') and part:IsA("BasePart" or "UnionOperation" or "Model") and part.Anchored == false and not part:IsDescendantOf(speaker.Character) and part.Name == "Torso" == false and part.Name == "Head" == false and part.Name == "Right Arm" == false and part.Name == "Left Arm" == false and part.Name == "Right Leg" == false and part.Name == "Left Leg" == false and part.Name == "HumanoidRootPart" == false then
+					for i,c in pairs(part:GetChildren()) do
+						if c:IsA("BodyPosition") or c:IsA("BodyGyro") then
+							c:Destroy()
+						end
+					end
+					local ForceInstance = Instance.new("BodyPosition")
+					ForceInstance.Parent = part
+					ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+					table.insert(Forces, ForceInstance)
+					if not table.find(frozenParts,part) then
+						table.insert(frozenParts,part)
+					end
+				end
+			end
+			if not simRadius then
+				execCmd('simulationradius')
+			end
+			for i,c in pairs(Forces) do
+				c.Position = Players[v].Character.Head.Position
+			end
+		end
+	else
+		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
+	end
 end)
 
 keycodeMap = {
@@ -14805,6 +14677,7 @@ addcmd('toolview',{'tview'},function(args, speaker)
 			notify(("%s's tools"):format(tostring(pl)), table.concat(t, ", "))
 		end
 	end)
+	print(e)
 end)
 
 if IsOnMobile then
@@ -14817,7 +14690,7 @@ if IsOnMobile then
 	QuickCapture.Position = UDim2.new(0.489, 0, 0, 0)
 	QuickCapture.Size = UDim2.new(0, 32, 0, 33)
 	QuickCapture.Font = Enum.Font.SourceSansBold
-	QuickCapture.Text = "IYR"
+	QuickCapture.Text = "IY"
 	QuickCapture.TextColor3 = Color3.fromRGB(255, 255, 255)
 	QuickCapture.TextSize = 20.000
 	QuickCapture.TextWrapped = true
@@ -14949,18 +14822,18 @@ end
 
 IYMouse.Move:Connect(checkTT)
 
-task.spawn(function()
-	while task.wait() do
-		local success, latestVersionInfo = pcall(function() 
-			local versionJson = game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/scriptblox/version')
-			return HttpService:JSONDecode(versionJson)
-		end)
-	
-		if success then
-			if currentVersion ~= latestVersionInfo.Version then
-				notify('Outdated','Get the new version by executing it again (or rejoin if keepiy is enabled)')
-			end
-	
+local function iyonloadstuff(shouldpopupannouncement)
+	local success, latestVersionInfo = pcall(function() 
+		local versionJson = game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/version')
+		return HttpService:JSONDecode(versionJson)
+	end)
+
+	if success then
+		if currentVersion ~= latestVersionInfo.Version then
+			notify('Outdated','Get the new version by executing it again (or rejoin if keepiy is enabled)')
+		end
+
+		if shouldpopupannouncement then
 			if latestVersionInfo.Announcement and latestVersionInfo.Announcement ~= '' then
 				local AnnGUI = Instance.new("Frame")
 				local background = Instance.new("Frame")
@@ -15044,6 +14917,12 @@ task.spawn(function()
 				end)
 			end
 		end
+	end
+end
+task.spawn(function()
+	iyonloadstuff(true)
+	while task.wait() do
+		iyonloadstuff()
 		task.wait(1000)
 	end
 end)
@@ -15063,7 +14942,7 @@ task.spawn(function()
 	IntroBackground:Destroy()
 	minimizeHolder()
 	if IsOnMobile then
-		notify("Unstable Device", "On mobile, Infinite Yield Reborn has a lot of bugs. It's recommended to use a PC executor (AN ACTUAL FULL UNC EXECUTOR NOT FAKED LIKE SOLARA).")
+		notify("Unstable Device", "On mobile, Infinite Yield Reborn has a lot of bugs. It's recommended to use a PC executor")
 		if game.PlaceId == 574746640 then
 			task.wait(3)
 			notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
@@ -15074,6 +14953,7 @@ task.spawn(function()
 		end
 	end
 end)
+
 
 task.defer(function()
 	local hf = hookfunction or function() end
@@ -15143,7 +15023,6 @@ task.defer(function()
 	end)
 end)
 
-
 local endTime = tick()
 local elapsedTime = endTime - startTime
 
@@ -15151,13 +15030,13 @@ local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player:WaitForChild("PlayerGui")
-screenGui.Name = "ImageFadeGui"
-screenGui.DisplayOrder = 10^6
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local screenGuiLogo = Instance.new("ScreenGui")
+screenGuiLogo.Parent = player:WaitForChild("PlayerGui")
+screenGuiLogo.Name = "ImageFadeGui"
+screenGuiLogo.DisplayOrder = 10^6
+screenGuiLogo.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 local sound = Instance.new("Sound")
-sound.Parent = screenGui
+sound.Parent = screenGuiLogo
 sound.SoundId = "rbxassetid://8795831946"
 sound.Volume = 1
 sound.Looped = false
@@ -15188,7 +15067,7 @@ local fadeTweenInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Linear, Enum.
 
 for i = 1, 4 do
     local imageLabel = Instance.new("ImageLabel")
-    imageLabel.Parent = screenGui
+    imageLabel.Parent = screenGuiLogo
     imageLabel.Name = "IYRLOGO" .. i
     imageLabel.Size = UDim2.new(0, 563, 0, 563)
     imageLabel.Position = positions[i]
@@ -15200,7 +15079,7 @@ for i = 1, 4 do
 
     local textLabel = Instance.new("TextLabel")
     textLabel.Name = "Credits"
-    textLabel.Parent = screenGui
+    textLabel.Parent = screenGuiLogo
     textLabel.BackgroundTransparency = 1
     textLabel.BorderSizePixel = 0
     textLabel.Size = UDim2.new(0, 560, 0, -40)
@@ -15211,7 +15090,7 @@ for i = 1, 4 do
     textLabel.TextTransparency = 1
     textLabel.ZIndex = 10^6 + 1
 
-    textLabel.Position = UDim2.new(imageLabel.Position.X.Scale, imageLabel.Position.X.Offset, imageLabel.Position.Y.Scale + 563 / screenGui.AbsoluteSize.Y, imageLabel.Position.Y.Offset + imageLabel.Size.Y.Offset + 10)
+    textLabel.Position = UDim2.new(imageLabel.Position.X.Scale, imageLabel.Position.X.Offset, imageLabel.Position.Y.Scale + 563 / screenGuiLogo.AbsoluteSize.Y, imageLabel.Position.Y.Offset + imageLabel.Size.Y.Offset + 10)
 
     local moveGoal = { Position = moveGoals[i] }
     local moveTween = TweenService:Create(imageLabel, moveTweenInfo, moveGoal)
@@ -15220,7 +15099,7 @@ for i = 1, 4 do
         Position = UDim2.new(
             moveGoals[i].X.Scale,
             moveGoals[i].X.Offset,
-            moveGoals[i].Y.Scale + 563 / screenGui.AbsoluteSize.Y,
+            moveGoals[i].Y.Scale + 563 / screenGuiLogo.AbsoluteSize.Y,
             moveGoals[i].Y.Offset + 10
         )
     }
@@ -15252,7 +15131,7 @@ local function fadeInAndMove()
                 fadeOutTextTween:Play()
                 fadeOutTween.Completed:Connect(
                     function()
-                        screenGui:Destroy()
+                        screenGuiLogo:Destroy()
                     end
                 )
             end
