@@ -7179,6 +7179,46 @@ addcmd("exit", {}, function(args, speaker)
 	game:Shutdown()
 end)
 
+local function enableWalkfling()
+    hiddenfling = true
+    local detection = Instance.new("Decal")
+    detection.Parent = game:GetService("ReplicatedStorage")
+
+    local lp = game.Players.LocalPlayer
+    local runService = game:GetService("RunService")
+
+    local function fling()
+        local hrp, c, vel, movel = nil, nil, nil, 0.1
+        while hiddenfling do
+            runService.Heartbeat:Wait()
+            c = lp.Character
+            if not (c and c.Parent) then continue end
+            hrp = c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
+            if not (hrp and hrp.Parent) then continue end
+
+            vel = hrp.Velocity
+            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            runService.RenderStepped:Wait()
+
+            hrp.Velocity = vel
+            runService.Stepped:Wait()
+
+            hrp.Velocity = vel + Vector3.new(0, movel, 0)
+            movel = movel * -1
+        end
+    end
+
+    coroutine.wrap(fling)()
+end
+
+addcmd("walkfling", {"wfling"}, function(args, speaker)
+    notify("Walkfling enabled")
+    enableWalkfling()
+end)
+
+addcmd("unwalkfling", {"unwfling"}, function(args, speaker)
+    hiddenfling = false
+end)
 
 local clickflingEnabled = false
 
