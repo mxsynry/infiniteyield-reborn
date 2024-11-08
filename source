@@ -20,8 +20,6 @@
 
 local startTime = tick()
 
--- fun fact: use bang and then hug on someone to do the unimaginable
--- also i might add ;suck cuz i got the hug animation
 
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
