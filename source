@@ -4675,14 +4675,22 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
+--[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
+]]
+CMDs[#CMDs + 1] = {NAME = 'hug [player] [front / back]', DESC = 'Hugs someone.'}
+CMDs[#CMDs + 1] = {NAME = 'unhug / stophug / releasehug', DESC = 'Stops the hugging.'}
+CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
+CMDs[#CMDs + 1] = {NAME = 'unbackpack / detach [player]', DESC = 'Stops being a backpack'}
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
 CMDs[#CMDs + 1] = {NAME = 'uncarpet', DESC = 'Undoes carpet'}
 CMDs[#CMDs + 1] = {NAME = 'friend [player]', DESC = 'Sends a friend request to certain players'}
 CMDs[#CMDs + 1] = {NAME = 'unfriend [player]', DESC = 'Unfriends certain players'}
 CMDs[#CMDs + 1] = {NAME = 'headsit [player]', DESC = 'Sit on a players head'}
+CMDs[#CMDs + 1] = {NAME = 'hairdresser [player]', DESC = 'Does the hairdressing on a player :3'}
+CMDs[#CMDs + 1] = {NAME = 'unhairdresser / stophairdresser', DESC = 'Stops the hairdressing'}
 CMDs[#CMDs + 1] = {NAME = 'walkto / follow [player]', DESC = 'Follow a player'}
 CMDs[#CMDs + 1] = {NAME = 'pathfindwalkto / pathfindfollow [player]', DESC = 'Follow a player using pathfinding'}
 CMDs[#CMDs + 1] = {NAME = 'pathfindwalktowaypoint / pathfindwalktowp [waypoint]', DESC = 'Walk to a waypoint using pathfinding'}
@@ -12335,6 +12343,101 @@ addcmd('headsit',{},function(args, speaker)
 	end
 end)
 
+local ishairdressing = false
+local hair_1, hair_2, sit, sitAnim, hairDied, jumpConnection
+
+addcmd("hairdresser", {'hairdress', 'hair'}, function(args, speaker)
+    if args[1] then
+        local players = getPlayer(args[1], speaker)
+        for _, v in pairs(players) do
+            execCmd("unhairdresser")
+            task.wait()
+            ishairdressing = true
+            local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+
+            if humanoid and humanoid.RigType == Enum.HumanoidRigType.R6 then
+                sitAnim = Instance.new("Animation")
+                sitAnim.AnimationId = "http://www.roblox.com/asset/?id=178130996"
+                sit = humanoid:LoadAnimation(sitAnim)
+
+                local Anim_1 = Instance.new("Animation")
+                local Anim_2 = Instance.new("Animation")
+                Anim_1.AnimationId = "rbxassetid://225975820"
+                Anim_2.AnimationId = "rbxassetid://283545583"
+
+                hair_1 = humanoid:LoadAnimation(Anim_1)
+                hair_2 = humanoid:LoadAnimation(Anim_2)
+
+                sit:Play()
+                hair_1:Play(0.1, 1, 1)
+                hair_2:Play(0.1, 1, 1)
+
+                local speed = args[2] or 1
+                hair_1:AdjustSpeed(speed)
+                hair_2:AdjustSpeed(speed)
+
+                hairDied = humanoid.Died:Connect(function()
+                    execCmd("unhairdresser")
+                end)
+
+                local hairPlayer = Players[v].Name
+                local hairOffset = CFrame.new(0, 1.6, 0.4)
+
+                if jumpConnection then
+                    jumpConnection:Disconnect()
+                end
+                jumpConnection = humanoid.Jumping:Connect(function(active)
+                    if active and ishairdressing then
+                        execCmd("unhairdresser")
+                    end
+                end)
+
+                while ishairdressing and task.wait() do
+                    local targetPlayer = Players:FindFirstChild(hairPlayer)
+                    if not targetPlayer or not targetPlayer.Character then
+                        break
+                    end
+
+                    local otherRoot = getRoot(targetPlayer.Character)
+                    local root = getRoot(speaker.Character)
+                    if otherRoot and root then
+                        root.CFrame = otherRoot.CFrame * hairOffset
+                        root.Velocity = Vector3.zero
+                    end
+                end
+
+                execCmd("unhairdresser")
+
+            else
+                notify("R6 Required", "This command requires the R6 rig type")
+                ishairdressing = false
+            end
+        end
+    end
+end)
+
+addcmd("unhairdresser", {"stophair", "unhair"}, function(_, speaker)
+    if hair_1 then hair_1:Stop() end
+    if hair_2 then hair_2:Stop() end
+    if sit then sit:Stop() end
+
+    if sitAnim then sitAnim:Destroy() end
+    if hair_1 then hair_1.Animation:Destroy() end
+    if hair_2 then hair_2.Animation:Destroy() end
+
+    if hairDied then hairDied:Disconnect() end
+    if jumpConnection then jumpConnection:Disconnect() end
+
+    hair_1, hair_2, sit, sitAnim, hairDied, jumpConnection = nil, nil, nil, nil, nil, nil
+    ishairdressing = false
+
+    local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    local root = humanoid and getRoot(speaker.Character)
+    if root then
+        root.Velocity = Vector3.zero
+    end
+end)
+
 addcmd('chat',{'say'},function(args, speaker)
 	local chatString = getstring(1)
 	chatsend(chatString)
@@ -12518,6 +12621,182 @@ addcmd("facebang", {"facerape","facefuck"}, function(args, speaker)
 end)
 ]]
 --------------------------------------------------------------------------------------------------------
+
+local ishugging = false
+local hug_1, hug_2, hugDied
+
+addcmd("Hug", {"hug"}, function(args, speaker)
+    if args[1] then
+        local players = getPlayer(args[1], speaker)
+        local position = args[2] and args[2]:lower() or "back"
+        for _, v in pairs(players) do
+            execCmd("unhug")
+            task.wait()
+            ishugging = true
+            local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+            
+            local isR6 = humanoid.RigType == Enum.HumanoidRigType.R6
+            
+            if isR6 then
+                local Anim_1 = Instance.new("Animation")
+                local Anim_2 = Instance.new("Animation")
+                Anim_1.AnimationId = "rbxassetid://225975820"
+                Anim_2.AnimationId = "rbxassetid://283545583"
+                
+                hug_1 = humanoid:LoadAnimation(Anim_1)
+                hug_2 = humanoid:LoadAnimation(Anim_2)
+                
+                hug_1:Play(0.1, 1, 1)
+                hug_2:Play(0.1, 1, 1)
+                
+                hug_1:AdjustSpeed(args[3] or 1)
+                hug_2:AdjustSpeed(args[3] or 1)
+                
+                hugDied = humanoid.Died:Connect(function()
+                    hug_1:Stop()
+                    hug_2:Stop()
+                    Anim_1:Destroy()
+                    Anim_2:Destroy()
+                    hugDied:Disconnect()
+                    ishugging = false
+                end)
+
+                local hugPlayer = Players[v].Name
+                local hugOffset, rotationOffset
+                
+                if position == "front" then
+                    hugOffset = CFrame.new(0, 0, -1.1)
+                    rotationOffset = CFrame.Angles(0, math.rad(180), 0)
+                else
+                    hugOffset = CFrame.new(0, 0, 1)
+                    rotationOffset = CFrame.Angles(0, 0, 0)
+                end
+                
+                while task.wait() do
+                    if not ishugging then
+                        break
+                    end
+                    local otherRoot = getTorso(Players[hugPlayer].Character)
+                    getRoot(speaker.Character).CFrame = otherRoot.CFrame * hugOffset * rotationOffset
+                    getRoot(speaker.Character).Velocity = Vector3.new(0, 0, 0)
+                end
+            else
+                notify('R6 Required', 'This command requires the R6 rig type')
+                ishugging = false
+            end
+        end
+    end
+end)
+
+addcmd("unhug", {"stophug", "release"}, function(args, speaker)
+    if hugDied then
+        hugDied:Disconnect()
+    end
+    if hug_1 and hug_2 then
+        hug_1:Stop()
+        hug_2:Stop()
+        hug_1.Animation:Destroy()
+        hug_2.Animation:Destroy()
+        hug_1, hug_2 = nil, nil
+    end
+    ishugging = false
+end)
+local Players = game:GetService("Players")
+
+local isAttached = false
+local attachAnim_1, attachAnim_2, sitAnim, anim_1, anim_2, sit, attachDied, jumpConnection
+
+addcmd("backpack", {"attach"}, function(args, speaker)
+    if args[1] then
+        local players = getPlayer(args[1], speaker)
+
+        for _, v in pairs(players) do
+            execCmd("unbackpack")
+            task.wait()
+            isAttached = true
+
+            local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+
+            if humanoid and humanoid.RigType == Enum.HumanoidRigType.R6 then
+                sitAnim = Instance.new("Animation")
+                sitAnim.AnimationId = "http://www.roblox.com/asset/?id=178130996"
+                sit = humanoid:LoadAnimation(sitAnim)
+
+                attachAnim_1 = Instance.new("Animation")
+                attachAnim_2 = Instance.new("Animation")
+                attachAnim_1.AnimationId = "rbxassetid://225975820"
+                attachAnim_2.AnimationId = "rbxassetid://283545583"
+
+                anim_1 = humanoid:LoadAnimation(attachAnim_1)
+                anim_2 = humanoid:LoadAnimation(attachAnim_2)
+
+                sit:Play()
+                anim_1:Play(0.1, 1, 1)
+                anim_2:Play(0.1, 1, 1)
+
+                anim_1:AdjustSpeed(args[2] or 1)
+                anim_2:AdjustSpeed(args[2] or 1)
+
+                attachDied = humanoid.Died:Connect(function()
+                    execCmd("unbackpack")
+                end)
+
+                local attachPlayer = Players[v].Name
+                local backOffset = CFrame.new(0, 0, 1)
+
+                if jumpConnection then
+                    jumpConnection:Disconnect()
+                end
+                jumpConnection = humanoid.Jumping:Connect(function(active)
+                    if active and isAttached then
+                        execCmd("unbackpack")
+                    end
+                end)
+
+                while isAttached and task.wait() do
+                    local targetPlayer = Players:FindFirstChild(attachPlayer)
+                    if not targetPlayer or not targetPlayer.Character then
+                        break
+                    end
+
+                    local targetRoot = getRoot(targetPlayer.Character)
+                    local root = getRoot(speaker.Character)
+                    if targetRoot and root then
+                        root.CFrame = targetRoot.CFrame * backOffset
+                        root.Velocity = Vector3.zero
+                    end
+                end
+
+                execCmd("unbackpack")
+            else
+                notify("R6 Required", "This command requires the R6 rig type")
+                isAttached = false
+            end
+        end
+    end
+end)
+
+addcmd("unbackpack", {"detach"}, function(_, speaker)
+    if anim_1 then anim_1:Stop() end
+    if anim_2 then anim_2:Stop() end
+    if sit then sit:Stop() end
+
+    if attachAnim_1 then attachAnim_1:Destroy() end
+    if attachAnim_2 then attachAnim_2:Destroy() end
+    if sitAnim then sitAnim:Destroy() end
+
+    if attachDied then attachDied:Disconnect() end
+    if jumpConnection then jumpConnection:Disconnect() end
+
+    attachAnim_1, attachAnim_2, sitAnim, anim_1, anim_2, sit, attachDied, jumpConnection = nil, nil, nil, nil, nil, nil, nil, nil
+    isAttached = false
+
+    local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    local root = humanoid and getRoot(speaker.Character)
+    if root then
+        root.Velocity = Vector3.zero
+    end
+end)
 
 addcmd("antibang",{'antirape'},function(args, speaker)
 	AntiBangEnabled = true
