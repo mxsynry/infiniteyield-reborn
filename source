@@ -20,6 +20,8 @@
 
 local startTime = tick()
 
+-- fun fact: use bang and then hug on someone to do the unimaginable
+-- also i might add ;suck cuz i got the hug animation
 
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
@@ -4677,13 +4679,17 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
+--[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
+CMDs[#CMDs + 1] = {NAME = 'suck / suckon [player] [lower / upper]', DESC = 'Sucks someones private part(s) (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'stopsuck / unsuck / stopsuckon / unsuckon', DESC = 'Stops the sucking.'}
+]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / stophug / releasehug / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
-CMDs[#CMDs + 1] = {NAME = 'unbackpack / detach [player]', DESC = 'Stops being a backpack'}
+CMDs[#CMDs + 1] = {NAME = 'unbackpack / detach', DESC = 'Stops being a backpack'}
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
 CMDs[#CMDs + 1] = {NAME = 'uncarpet', DESC = 'Undoes carpet'}
 CMDs[#CMDs + 1] = {NAME = 'friend [player]', DESC = 'Sends a friend request to certain players'}
@@ -11903,6 +11909,12 @@ addcmd('hugtool', {'kisstool', 'bidentool'}, function(args, speaker)
 
         Play_1:Play()
         Play_2:Play()
+
+        HugTool.Unequipped:Connect(function()
+        HugTool.Name = "Hug Tool\nOff"
+        Play_1:Stop()
+        Play_2:Stop()
+        end)
     end)
 end)
 
@@ -12404,7 +12416,7 @@ addcmd("hairdresser", {'hairdress', 'hair'}, function(args, speaker)
                 end)
 
                 local hairPlayer = Players[v].Name
-                local hairOffset = CFrame.new(0, 1.6, 0.4)
+                local hairOffset = CFrame.new(0, 1.6, 1)
 
                 if jumpConnection then
                     jumpConnection:Disconnect()
@@ -12642,6 +12654,69 @@ addcmd("facebang", {"facerape", "facefuck"}, function(args, speaker)
 		end
 	end
 end)
+
+addcmd("suckon", {"suck"}, function(args, speaker)
+    if args[1] then
+        local players = getPlayer(args[1], speaker)
+        local position = args[2] and args[2]:lower() or "lower"
+        for _, v in pairs(players) do
+            execCmd("unsuck")
+            task.wait()
+            isSuckingOn = true
+            local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+            
+            local isR6 = humanoid.RigType == Enum.HumanoidRigType.R6
+            
+            if isR6 then
+                local SuckAnim_1 = Instance.new("Animation")
+                local SuckAnim_2 = Instance.new("Animation")
+                SuckAnim_1.AnimationId = "rbxassetid://225975820"
+                SuckAnim_2.AnimationId = "rbxassetid://283545583"
+                
+                suck_1 = humanoid:LoadAnimation(SuckAnim_1)
+                suck_2 = humanoid:LoadAnimation(SuckAnim_2)
+                
+                suck_1:Play(0.1, 1, 1)
+                suck_2:Play(0.1, 1, 1)
+                
+                suck_1:AdjustSpeed(args[3] or 1)
+                suck_2:AdjustSpeed(args[3] or 1)
+                
+                suckDied = humanoid.Died:Connect(function()
+                    suck_1:Stop()
+                    suck_2:Stop()
+                    SuckAnim_1:Destroy()
+                    SuckAnim_2:Destroy()
+                    suckDied:Disconnect()
+                    isSuckingOn = false
+                end)
+
+                local suckPlayer = Players[v].Name
+                local suckOffset, rotationOffset
+                
+                if position == "upper" then
+                    suckOffset = CFrame.new(0, -1, -1.1)
+                    rotationOffset = CFrame.Angles(0, math.rad(180), 0)
+                else
+                    suckOffset = CFrame.new(0, -2.5, -1.1)
+                    rotationOffset = CFrame.Angles(0, math.rad(180), 0)
+                end
+                
+                while task.wait() do
+                    if not isSuckingOn then
+                        break
+                    end
+                    local otherRoot = getTorso(Players[suckPlayer].Character)
+                    getRoot(speaker.Character).CFrame = otherRoot.CFrame * suckOffset * rotationOffset
+                    getRoot(speaker.Character).Velocity = Vector3.new(0, 0, 0)
+                end
+            else
+                notify('R6 Required', 'This command requires the R6 rig type')
+                isSuckingOn = false
+            end
+        end
+    end
+end)
 ]]
 --------------------------------------------------------------------------------------------------------
 
@@ -12711,7 +12786,7 @@ addcmd("hug", {"kiss", "biden"}, function(args, speaker)
     end
 end)
 
-addcmd("unhug", {"stophug", "releasehug", "unbiden"}, function(args, speaker)
+addcmd("unhug", {"stophug", "unkiss", "releasehug", "unbiden"}, function(args, speaker)
     if hugDied then
         hugDied:Disconnect()
     end
@@ -12907,6 +12982,20 @@ addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(arg
 		bangAnim:Destroy()
 		isbanging = false
 	end
+end)
+
+addcmd("unsuck", {"stopsuck", "unsuckon", "stopsuckon"}, function(args, speaker)
+    if suckDied then
+        suckDied:Disconnect()
+    end
+    if suck_1 and suck_2 then
+        suck_1:Stop()
+        suck_2:Stop()
+        suck_1.Animation:Destroy()
+        suck_2.Animation:Destroy()
+        suck_1, suck_2 = nil, nil
+    end
+    isSuckingOn = false
 end)
 ]]
 addcmd('carpet',{},function(args, speaker)
