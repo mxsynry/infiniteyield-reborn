@@ -20,6 +20,9 @@
 
 local startTime = tick()
 
+-- fun fact: use bang and then hug on someone to do the unimaginable
+-- also i might add ;suck cuz i got the hug animation
+
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
 	return
@@ -4563,6 +4566,7 @@ CMDs[#CMDs + 1] = {NAME = 'flashback / diedtp', DESC = 'Teleports you to where y
 CMDs[#CMDs + 1] = {NAME = 'walltp', DESC = 'Teleports you above/over any wall you run into'}
 CMDs[#CMDs + 1] = {NAME = 'nowalltp / unwalltp', DESC = 'Disables walltp'}
 CMDs[#CMDs + 1] = {NAME = 'teleporttool / tptool', DESC = 'Gives you a teleport tool'}
+CMDs[#CMDs + 1] = {NAME = 'hugtool / kisstool / bidentool', DESC = 'Gives you a hug tool'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'logs', DESC = 'Opens the logs GUI'}
 CMDs[#CMDs + 1] = {NAME = 'chatlogs / clogs', DESC = 'Log what people say or whisper'}
@@ -4675,13 +4679,11 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
---[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
-]]
-CMDs[#CMDs + 1] = {NAME = 'hug [player] [front / back]', DESC = 'Hugs someone.'}
-CMDs[#CMDs + 1] = {NAME = 'unhug / stophug / releasehug', DESC = 'Stops the hugging.'}
+CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
+CMDs[#CMDs + 1] = {NAME = 'unhug / stophug / releasehug / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
 CMDs[#CMDs + 1] = {NAME = 'unbackpack / detach [player]', DESC = 'Stops being a backpack'}
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
@@ -11883,6 +11885,29 @@ addcmd('tptool', {'teleporttool'}, function(args, speaker)
 	end)
 end)
 
+addcmd('hugtool', {'kisstool', 'bidentool'}, function(args, speaker)
+    local HugTool = Instance.new("Tool")
+    HugTool.Name = "Hug Tool\nOff"
+    HugTool.RequiresHandle = false
+    HugTool.ToolTip = "Hug Tool R6"
+    HugTool.Parent = game.Players.LocalPlayer.Backpack
+
+    HugTool.Equipped:Connect(function()
+        HugTool.Name = "Hug Tool\nOn"
+        
+        local Anim_1 = Instance.new("Animation")
+        Anim_1.AnimationId = "rbxassetid://283545583"
+        local Play_1 = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim_1)
+
+        local Anim_2 = Instance.new("Animation")
+        Anim_2.AnimationId = "rbxassetid://225975820"
+        local Play_2 = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim_2)
+
+        Play_1:Play()
+        Play_2:Play()
+    end)
+end)
+
 addcmd('clickdelete',{},function(args, speaker)
 	if speaker == Players.LocalPlayer then
 		notify('Click Delete','Go to Settings>Keybinds>Add to set up click delete')
@@ -12554,7 +12579,7 @@ end
 -- the community is sped :broken_heart:
 --[[
 local isbanging = false
-addcmd("Bang",{"rape"}, function(args, speaker)
+addcmd("bang", {"rape"}, function(args, speaker)
 	if args[1] then
 		local players = getPlayer(args[1], speaker)
 		for _, v in pairs(players) do
@@ -12587,7 +12612,7 @@ addcmd("Bang",{"rape"}, function(args, speaker)
 	end
 end)
 
-addcmd("facebang", {"facerape","facefuck"}, function(args, speaker)
+addcmd("facebang", {"facerape", "facefuck"}, function(args, speaker)
 	if args[1] then
 		local players = getPlayer(args[1], speaker)
 		for _, v in pairs(players) do
@@ -12625,7 +12650,7 @@ end)
 local ishugging = false
 local hug_1, hug_2, hugDied
 
-addcmd("Hug", {"hug"}, function(args, speaker)
+addcmd("hug", {"kiss", "biden"}, function(args, speaker)
     if args[1] then
         local players = getPlayer(args[1], speaker)
         local position = args[2] and args[2]:lower() or "back"
@@ -12688,7 +12713,7 @@ addcmd("Hug", {"hug"}, function(args, speaker)
     end
 end)
 
-addcmd("unhug", {"stophug", "release"}, function(args, speaker)
+addcmd("unhug", {"stophug", "releasehug", "unbiden"}, function(args, speaker)
     if hugDied then
         hugDied:Disconnect()
     end
@@ -12701,7 +12726,6 @@ addcmd("unhug", {"stophug", "release"}, function(args, speaker)
     end
     ishugging = false
 end)
-local Players = game:GetService("Players")
 
 local isAttached = false
 local attachAnim_1, attachAnim_2, sitAnim, anim_1, anim_2, sit, attachDied, jumpConnection
