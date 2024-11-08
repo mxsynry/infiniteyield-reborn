@@ -87,7 +87,7 @@ else
     Message.Position = UDim2.new(0, 0, 0, 0)
     Message.BackgroundTransparency = 1
     Message.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Message.Text = "IYCommandLine is already executed. If you want to pair it with both IYR and IYStore, you will need to rejoin and execute the script. IYCommandLine will NOT automatically pair with IYR or IYR x IYStore."
+    Message.Text = "IYR is already executed. If you want to pair it with both IYR and IYStore, you will need to rejoin and execute the script. IYCommandLine will NOT automatically pair with IYR or IYR x IYStore."
     Message.ZIndex = 10
     Message.TextWrapped = true
     Message.Font = Enum.Font.SourceSans
