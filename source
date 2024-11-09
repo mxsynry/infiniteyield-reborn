@@ -4683,8 +4683,8 @@ CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a p
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
-CMDs[#CMDs + 1] = {NAME = 'suck / suckon [player] [lower / upper]', DESC = 'Sucks someones private part(s) (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'stopsuck / unsuck / stopsuckon / unsuckon', DESC = 'Stops the sucking.'}
+CMDs[#CMDs + 1] = {NAME = 'chokeon / suckon [player] [lower / upper]', DESC = 'Sucks someones private part(s) (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'stopchokeon / unchokeon / stopsuckon / unsuckon', DESC = 'Stops the sucking.'}
 ]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / stophug / releasehug / unbiden', DESC = 'Stops the hugging.'}
@@ -12655,7 +12655,7 @@ addcmd("facebang", {"facerape", "facefuck"}, function(args, speaker)
 	end
 end)
 
-addcmd("suckon", {"suck"}, function(args, speaker)
+addcmd("chokeon", {"suckon"}, function(args, speaker)
     if args[1] then
         local players = getPlayer(args[1], speaker)
         local position = args[2] and args[2]:lower() or "lower"
@@ -12984,7 +12984,7 @@ addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(arg
 	end
 end)
 
-addcmd("unsuck", {"stopsuck", "unsuckon", "stopsuckon"}, function(args, speaker)
+addcmd("unchokeon", {"stopchokeon", "unsuckon", "stopsuckon"}, function(args, speaker)
     if suckDied then
         suckDied:Disconnect()
     end
