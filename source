@@ -7203,22 +7203,22 @@ local function enableWalkfling()
     local runService = game:GetService("RunService")
 
     local function fling()
-        local hrp, c, vel, movel = nil, nil, nil, 0.1
+        local root, c, vel, movel = nil, nil, nil, 0.1
         while hiddenfling do
             runService.Heartbeat:Wait()
             c = lp.Character
             if not (c and c.Parent) then continue end
-            hrp = c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
-            if not (hrp and hrp.Parent) then continue end
+            root = c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
+            if not (root and root.Parent) then continue end
 
-            vel = hrp.Velocity
-            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            vel = root.Velocity
+            root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
             runService.RenderStepped:Wait()
 
-            hrp.Velocity = vel
+            root.Velocity = vel
             runService.Stepped:Wait()
 
-            hrp.Velocity = vel + Vector3.new(0, movel, 0)
+            root.Velocity = vel + Vector3.new(0, movel, 0)
             movel = movel * -1
         end
     end
@@ -13849,13 +13849,13 @@ addcmd('togglefling',{},function(args, speaker)
 end)
 
 addcmd("flyfling", {}, function(args, speaker)
-	execCmd("unvehiclefly\\unfling\\unnoclip")
-	task.wait()
-	execCmd("vehiclefly\\fling\\noclip")
+    execCmd("unvehiclefly\\unwalkfling")
+    wait()
+    execCmd("vehiclefly\\walkfling")
 end)
 
 addcmd("unflyfling", {}, function(args, speaker)
-	execCmd("unvehiclefly\\unfling\\unnoclip\\breakvelocity")
+    execCmd("unvehiclefly\\unwalkfling\\breakvelocity")
 end)
 
 addcmd("toggleflyfling", {}, function(args, speaker)
