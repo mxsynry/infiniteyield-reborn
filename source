@@ -20,8 +20,10 @@
 
 local startTime = tick()
 
--- fun fact: use bang and then hug on someone to do the unimaginable
--- also i might add ;suck cuz i got the hug animation
+--[[ things to add:
+     earrape
+	 r15 support for backpack
+  ]]
 
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
@@ -8799,7 +8801,7 @@ addcmd('setfpscap', {'fpscap', 'maxfps'}, function(args, speaker)
 	end
 end)
 
-addcmd("printglobals", {"printgs", 'getglobals', 'getgs'}, function(args, speaker)
+addcmd("printglobals", {"printg", 'getglobals', 'getg'}, function(args, speaker)
     for k, v in pairs(getgenv()) do
        print(k, v)
     end
@@ -12668,11 +12670,10 @@ addcmd("facebang", {"facerape", "facefuck"}, function(args, speaker)
 		end
 	end
 end)
+
 local isBlowing = false
-local jumpConnection
 
 addcmd("blower", {'blow', 'blowbang', 'blowjob'}, function(args, speaker)
-    -- Ensure the humanoid exists and the rig type is R6
     local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
     if not humanoid then
         notify("Error", "Humanoid not found in your character.")
@@ -12690,16 +12691,6 @@ addcmd("blower", {'blow', 'blowbang', 'blowjob'}, function(args, speaker)
     end
 
     isBlowing = true
-
-    if jumpConnection then
-        jumpConnection:Disconnect()
-    end
-
-    jumpConnection = humanoid.Jumping:Connect(function(active)
-        if active and isBlowing then
-            execCmd("unblower")
-        end
-    end)
 
     if not args[1] then
         notify("Error", "You must specify a player name.")
@@ -12720,7 +12711,6 @@ addcmd("blower", {'blow', 'blowbang', 'blowjob'}, function(args, speaker)
         isBlowing = false
     end)
 end)
-
 
 addcmd("chokeon", {"suckon"}, function(args, speaker)
     if args[1] then
@@ -12868,63 +12858,69 @@ addcmd("unhug", {"unkiss", "unbiden"}, function(args, speaker)
 end)
 
 local isAttached = false
-local attachAnim_1, attachAnim_2, sitAnim, anim_1, anim_2, sit, attachDied, jumpConnection
+local animations = {
+    attachAnim_1 = nil,
+    attachAnim_2 = nil,
+    sitAnim = nil,
+    anim_1 = nil,
+    anim_2 = nil,
+}
+local connections = {
+    attachDied = nil,
+    jumpConnection = nil
+}
 
 addcmd("backpack", {"attach"}, function(args, speaker)
     if args[1] then
         local players = getPlayer(args[1], speaker)
 
-        for _, v in pairs(players) do
+        for _, target in pairs(players) do
             execCmd("unbackpack")
             task.wait()
             isAttached = true
 
             local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+            local root = humanoid and getRoot(speaker.Character)
 
-            if humanoid and humanoid.RigType == Enum.HumanoidRigType.R6 then
-                sitAnim = Instance.new("Animation")
-                sitAnim.AnimationId = "http://www.roblox.com/asset/?id=178130996"
-                sit = humanoid:LoadAnimation(sitAnim)
+            if humanoid and root then
+                humanoid.Sit = true
 
-                attachAnim_1 = Instance.new("Animation")
-                attachAnim_2 = Instance.new("Animation")
-                attachAnim_1.AnimationId = "rbxassetid://225975820"
-                attachAnim_2.AnimationId = "rbxassetid://283545583"
+                if humanoid.RigType == Enum.HumanoidRigType.R6 then
+                    animations.attachAnim_1 = Instance.new("Animation")
+                    animations.attachAnim_2 = Instance.new("Animation")
+                    animations.attachAnim_1.AnimationId = "rbxassetid://225975820"
+                    animations.attachAnim_2.AnimationId = "rbxassetid://283545583"
 
-                anim_1 = humanoid:LoadAnimation(attachAnim_1)
-                anim_2 = humanoid:LoadAnimation(attachAnim_2)
+                    animations.anim_1 = humanoid:LoadAnimation(animations.attachAnim_1)
+                    animations.anim_2 = humanoid:LoadAnimation(animations.attachAnim_2)
 
-                sit:Play()
-                anim_1:Play(0.1, 1, 1)
-                anim_2:Play(0.1, 1, 1)
+                    animations.anim_1:Play(0.1, 1, 1)
+                    animations.anim_2:Play(0.1, 1, 1)
 
-                anim_1:AdjustSpeed(args[2] or 1)
-                anim_2:AdjustSpeed(args[2] or 1)
+                    animations.anim_1:AdjustSpeed(args[2] or 1)
+                    animations.anim_2:AdjustSpeed(args[2] or 1)
+                end
 
-                attachDied = humanoid.Died:Connect(function()
+                connections.attachDied = humanoid.Died:Connect(function()
                     execCmd("unbackpack")
                 end)
 
-                local attachPlayer = Players[v].Name
-                local backOffset = CFrame.new(0, 0, 1)
+                local attachPlayerName = Players[target].Name
+                local backOffset = CFrame.new(0, 0, 1) * CFrame.Angles(0, math.pi, 0)
 
-                if jumpConnection then
-                    jumpConnection:Disconnect()
-                end
-                jumpConnection = humanoid.Jumping:Connect(function(active)
+                connections.jumpConnection = humanoid.Jumping:Connect(function(active)
                     if active and isAttached then
                         execCmd("unbackpack")
                     end
                 end)
 
                 while isAttached and task.wait() do
-                    local targetPlayer = Players:FindFirstChild(attachPlayer)
+                    local targetPlayer = Players:FindFirstChild(attachPlayerName)
                     if not targetPlayer or not targetPlayer.Character then
                         break
                     end
 
                     local targetRoot = getRoot(targetPlayer.Character)
-                    local root = getRoot(speaker.Character)
                     if targetRoot and root then
                         root.CFrame = targetRoot.CFrame * backOffset
                         root.Velocity = Vector3.zero
@@ -12933,7 +12929,7 @@ addcmd("backpack", {"attach"}, function(args, speaker)
 
                 execCmd("unbackpack")
             else
-                notify("R6 Required", "This command requires the R6 rig type")
+                notify("backpack", "Character not found")
                 isAttached = false
             end
         end
@@ -12941,22 +12937,54 @@ addcmd("backpack", {"attach"}, function(args, speaker)
 end)
 
 addcmd("unbackpack", {"detach"}, function(_, speaker)
-    if anim_1 then anim_1:Stop() end
-    if anim_2 then anim_2:Stop() end
-    if sit then sit:Stop() end
-
-    if attachAnim_1 then attachAnim_1:Destroy() end
-    if attachAnim_2 then attachAnim_2:Destroy() end
-    if sitAnim then sitAnim:Destroy() end
-
-    if attachDied then attachDied:Disconnect() end
-    if jumpConnection then jumpConnection:Disconnect() end
-
-    attachAnim_1, attachAnim_2, sitAnim, anim_1, anim_2, sit, attachDied, jumpConnection = nil, nil, nil, nil, nil, nil, nil, nil
     isAttached = false
+
+    if animations.anim_1 then
+        animations.anim_1:Stop()
+        animations.anim_1:Destroy()
+        animations.anim_1 = nil
+    end
+
+    if animations.anim_2 then
+        animations.anim_2:Stop()
+        animations.anim_2:Destroy()
+        animations.anim_2 = nil
+    end
+
+    if animations.attachAnim_1 then
+        animations.attachAnim_1:Destroy()
+        animations.attachAnim_1 = nil
+    end
+
+    if animations.attachAnim_2 then
+        animations.attachAnim_2:Destroy()
+        animations.attachAnim_2 = nil
+    end
+
+    for _, conn in pairs(connections) do
+        if conn then
+            conn:Disconnect()
+        end
+    end
+
+    animations = {
+        attachAnim_1 = nil,
+        attachAnim_2 = nil,
+        anim_1 = nil,
+        anim_2 = nil,
+    }
+    connections = {
+        attachDied = nil,
+        jumpConnection = nil,
+    }
 
     local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
     local root = humanoid and getRoot(speaker.Character)
+    
+    if humanoid then
+        humanoid.Sit = false
+    end
+
     if root then
         root.Velocity = Vector3.zero
     end
