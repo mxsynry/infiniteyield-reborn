@@ -6454,9 +6454,6 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 		return
 	end
 	
-	everyClipboard(token)
-	notify("Client Token", "Token copied to clipboard: " .. token)
-	
 	pcall(function()
 		_G.ws = everyWebSocket.connect(url)
 	end)
@@ -6464,6 +6461,9 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 	local ws = _G.ws
 	if ws then
 		notify("WebSocket", "Successfully connected to WebSocket server.")
+
+		everyClipboard(token)
+		notify("Client Token", "Token copied to clipboard: " .. token)	
 			
 		ws:Send(token)
 	
