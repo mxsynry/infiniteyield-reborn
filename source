@@ -9723,24 +9723,25 @@ end
 addcmd("r6", {"r6anim", "r6reanim", "faker6", 'r31'}, function(args, speaker)
 if r15(speaker) then
 local plr = game:GetService("Players").LocalPlayer
+
 function RunCustomAnimation(Char)
-    if Char:WaitForChild("Animate") ~= nil then
-        Char.Animate.Disabled = true
-        for _, child in ipairs(Char.Animate:GetChildren()) do
-            if child:IsA("Animation") then
-                child.AnimationId = "0"
-            end
-        end
-    end
+	if Char:WaitForChild("Animate") ~= nil then
+		Char.Animate.Disabled = true
+	end
+	
 	Char:WaitForChild("Humanoid")
 
 	for i,v in next, Char.Humanoid:GetPlayingAnimationTracks() do
 		v:Stop()
 	end
+
+	--fake script
 	local script = Char.Animate
+
 	local Character = Char
 	local Humanoid = Character:WaitForChild("Humanoid")
 	local pose = "Standing"
+
 	local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
 	local userNoUpdateOnLoopSuccess, userNoUpdateOnLoopValue = pcall(function() return UserSettings():IsUserFeatureEnabled("UserNoUpdateOnLoop") end)
@@ -9865,6 +9866,9 @@ function RunCustomAnimation(Char)
 		animTable[name].totalWeight = 0
 		animTable[name].connections = {}
 
+		-- uncomment this section to allow players to load with their
+		-- own (non-classic) animations
+        --[[
         local config = script:FindFirstChild(name)
         if (config ~= nil) then
             table.insert(animTable[name].connections, config.ChildAdded:connect(function(child) configureAnimationSet(name, fileList) end))
@@ -9908,6 +9912,7 @@ function RunCustomAnimation(Char)
                 end
             end
         end
+        ]]
 
 		-- if you uncomment the above section, comment out this "if"-block
 		if name == "run" or name == "walk" then
