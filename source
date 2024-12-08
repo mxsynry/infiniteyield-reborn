@@ -20,11 +20,6 @@
 
 local startTime = tick()
 
---[[ things to add:
-     earrape
-	 r15 support for backpack
-  ]]
-
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
 	return
