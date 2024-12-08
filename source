@@ -4447,6 +4447,7 @@ CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Give you the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
 CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s)'}
+CMDs[#CMDs + 1] = {NAME = 'identitytest / testidentity / validateidentity', DESC = 'Tests the executors identity if its faked or not'}
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
@@ -12191,6 +12192,10 @@ addcmd("addunc", {'addmoreunc', 'adduncevn'}, function(args, speaker)
     notify("Adding some UNC (Thanks to the community) (WARNING THIS MAY REMOVE SOME UNC)")
 end)
 
+addcmd("identitytest", {'testidentity', 'validateidentity'}, function(args, speaker)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/InfernusScripts/Executor-Tests/refs/heads/main/Identity/Test.lua"))()
+    notify("Identity Test", 'Check console for more details (F9)')
+end)
 
 addcmd("vulnspatch",{'vpatcher','vulnspatcher'},function(args, speaker)
 	loadstring(game:HttpGet("https://github.com/FurryBoyYT/moreunc/raw/main/vulnpatch"))()
