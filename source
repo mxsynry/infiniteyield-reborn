@@ -4455,6 +4455,7 @@ CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some U
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
+CMDs[#CMDs + 1] = {NAME = 'solaraexplorer / solaradex', DESC = 'Opens DEX by Moon for Solara'}
 CMDs[#CMDs + 1] = {NAME = 'secureexplorer / securedex / bypasseddex', DESC = 'Opens Bypassed DEX by HamstaGang'}
 CMDs[#CMDs + 1] = {NAME = 'olddex / odex', DESC = 'Opens Old DEX by Moon'}
 CMDs[#CMDs + 1] = {NAME = 'remotespy / rspy', DESC = 'Opens Simple Spy V3'}
@@ -4808,6 +4809,8 @@ CMDs[#CMDs + 1] = {NAME = 'headthrow', DESC = 'Simply makes you throw your head'
 CMDs[#CMDs + 1] = {NAME = 'noanim', DESC = 'Disables your animations'}
 CMDs[#CMDs + 1] = {NAME = 'reanim', DESC = 'Restores your animations'}
 CMDs[#CMDs + 1] = {NAME = 'animspeed [num]', DESC = 'Changes the speed of your current animation'}
+CMDs[#CMDs + 1] = {NAME = 'animspeedloop / loopanimspeed [num]', DESC = 'Loops the speed of your current animation'}
+CMDs[#CMDs + 1] = {NAME = 'stopanimspeed / stopanimspeedloop / unanimspeedloop / unanimspeed', DESC = 'Changes the speed of your current animation'}
 CMDs[#CMDs + 1] = {NAME = 'copyanimation / copyanim / copyemote [player]', DESC = 'Copies someone elses animation'}
 CMDs[#CMDs + 1] = {NAME = 'loopanimation / loopanim', DESC = 'Loops your current animation'}
 CMDs[#CMDs + 1] = {NAME = 'stopanimations / stopanims', DESC = 'Stops running animations'}
@@ -8452,16 +8455,20 @@ addcmd('disable',{},function(args, speaker)
 	end
 end)
 
-addcmd("report", {},function(args, speaker)
-	local players = getPlayer(args[1], speaker)
-	for _, rplayer in pairs(players) do
-		local rreason = args[2] or "Bullying"
-		local adinfo = args[3] or "He is breaking Roblox TOS."
-
-		Players:ReportAbuse(game.Players[rplayer], rreason, adinfo)
-
-		notify("Report Abuse", "Reported "..rplayer.." for "..rreason..". ["..adinfo.."]")
-	end
+addcmd("report", {}, function(args, speaker)
+    local players = getPlayer(args[1], speaker)
+    for _, rplayer in pairs(players) do
+        local rreason = args[2] or "Bullying"
+        local adinfo = args[3] or "He is breaking Roblox TOS."
+        
+        local success, err = pcall(function()
+            Players:ReportAbuse(game.Players[rplayer], rreason, adinfo)
+        end)
+        
+        if not success then
+            notify("Report Abuse Failed", "Failed to report " .. tostring(rplayer) .. ". Error: " .. tostring(err))
+        end
+    end
 end)
 
 local invisGUIS = {}
@@ -10653,11 +10660,21 @@ end)
 end)
 
 addcmd("promptr6", {}, function(args, speaker)
-    promptNewRig(speaker, "R6")
+    local success, err = pcall(function()
+        promptNewRig(speaker, "R6")
+    end)
+    if not success then
+        notify("Prompt", "Failed to prompt: " .. tostring(err))
+    end
 end)
 
 addcmd("promptr15", {}, function(args, speaker)
-    promptNewRig(speaker, "R15")
+    local success, err = pcall(function()
+        promptNewRig(speaker, "R15")
+    end)
+    if not success then
+        notify("Prompt", "Failed to prompt: " .. tostring(err))
+    end
 end)
 
 addcmd('age',{},function(args, speaker)
@@ -11769,6 +11786,35 @@ addcmd('animspeed',{},function(args, speaker)
 	end
 end)
 
+local Speed = 2
+local Playing = false
+
+addcmd('animspeedloop', {'loopanimspeed'}, function(args, speaker)
+    Speed = tonumber(args[1]) or Speed
+    local v = speaker.Character and speaker.Character:FindFirstChild("Humanoid")
+
+    if v then
+        Playing = true
+
+        task.spawn(function()
+            while Playing do
+                task.wait()
+                for _, animTrack in ipairs(v.Animator:GetPlayingAnimationTracks()) do
+                    animTrack:AdjustSpeed(Speed)
+                end
+            end
+        end)
+    --[[
+    else
+        notify('Error', 'Humanoid not found, try respawning?')
+	]]
+    end
+end)
+
+addcmd('stopanimspeed', {'stoploopanimspeed', 'unanimspeedloop', 'unloopanimspeed'}, function(args, speaker)
+    Playing = false
+end)
+
 addcmd('copyanimation',{'copyanim','copyemote'},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for _,v in ipairs(players)do
@@ -12176,6 +12222,11 @@ end)
 addcmd('explorer', {'dex'}, function(args, speaker)
 	notify('Loading', 'Hold on a sec')
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+end)
+
+addcmd('solaraexplorer', {'solaradex'}, function(args, speaker)
+	notify('Loading', 'Hold on a sec')
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/Dex"))()
 end)
 
 addcmd('secureexplorer', {'securedex', "bypasseddex"}, function(args, speaker)
@@ -13069,6 +13120,7 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
+
 --[[
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
@@ -13357,36 +13409,50 @@ end)
 
 
 simRadius = false
-addcmd('simulationradius',{'simradius','setsimradius'},function(args, speaker)
-	if sethidden then		
-		simRadLoop = game:GetService('RunService').Stepped:Connect(function()
-			if setsimulation then
-				setsimulation(1e308, 1/0)
-			else	
-				sethidden(speaker,"MaximumSimulationRadius",1/0)
-				sethidden(speaker,"SimulationRadius", 1e308)
-			end
-		end)
-		simRadius = true
-	else
-		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
-	end
+addcmd('simulationradius', {'simradius', 'setsimradius'}, function(args, speaker)
+    if sethidden then
+        local success, err = pcall(function()
+            simRadLoop = game:GetService('RunService').Stepped:Connect(function()
+                if setsimulation then
+                    setsimulation(1e308, 1 / 0)
+                else
+                    sethidden(speaker, "MaximumSimulationRadius", 1 / 0)
+                    sethidden(speaker, "SimulationRadius", 1e308)
+                end
+            end)
+        end)
+
+        if success then
+            simRadius = true
+        else
+            notify('Error', 'Failed to set simulation radius: ' .. tostring(err))
+        end
+    else
+        notify('Incompatible Exploit', 'Your exploit does not support this command (missing sethiddenproperty)')
+    end
 end)
 
-addcmd('nosimulationradius',{'nosimradius','unsimradius'},function(args, speaker)
-	if sethidden then		
-		if simRadLoop then simRadLoop:Disconnect() end
-		wait()
-		if setsimulation then
-			setsimulation(139,139)
-		else	
-			sethidden(speaker,"MaximumSimulationRadius",139)
-			sethidden(speaker,"SimulationRadius", 139)
-		end
-		simRadius = false
-	else
-		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
-	end
+addcmd('nosimulationradius', {'nosimradius', 'unsimradius'}, function(args, speaker)
+    if sethidden then
+        local success, err = pcall(function()
+            if simRadLoop then simRadLoop:Disconnect() end
+            task.wait()
+            if setsimulation then
+                setsimulation(139, 139)
+            else
+                sethidden(speaker, "MaximumSimulationRadius", 139)
+                sethidden(speaker, "SimulationRadius", 139)
+            end
+        end)
+
+        if success then
+            simRadius = false
+        else
+            notify('Error', 'Failed to reset simulation radius: ' .. tostring(err))
+        end
+    else
+        notify('Incompatible Exploit', 'Your exploit does not support this command (missing sethiddenproperty)')
+    end
 end)
 
 addcmd('grabtools', {}, function(args, speaker)
