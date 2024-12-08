@@ -6418,7 +6418,7 @@ local success, err =
             toClipboard("https://iyr.lol")
 		    notify('Website', 'Copied to clipboard!\nhttp://iyr.lol')
         else
-            notify("No method to open URL or copy to clipboard is available.")
+            notify("Website Link", "https://iyr.lol")
         end
     end)
     if not success then
@@ -6429,7 +6429,11 @@ end)
 addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 	if _G.ws then return end
 
+	local everyWebSocket = WebSocket or websocket or (Krnl and Krnl.WebSocket) or (syn and syn.websocket)
+	local everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
+	local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
 	local url = "ws://api.iyr.lol:0/"
+	
 	local function generateRandomString(length)
 		local charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 		local result = ''
@@ -6442,22 +6446,21 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 	
 	local username = game.Players.LocalPlayer.Name
 	local userId = game.Players.LocalPlayer.UserId
-	local randomString = generateRandomString(8)
+	local randomString = generateRandomString(9)
 	local randomNumber = Random.new():NextInteger(100000000, 999999999)
 	local token = string.format("%s-%d-%s-%d", username, userId, randomString, randomNumber)
-	local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
 	
 	if not everyClipboard then
-		notify("Missing UNC(s)", "No clipboard functions found.")
+		notify("Missing Functionality", "Clipboard function is not supported on this executor.")
 		return
 	end
 	if not everyWebSocket then
-		notify("Missing WebSockets", "No WebSocket functions found.")
+		notify("Missing Functionality", "WebSocket function is not supported on this executor.")
 		return
 	end
 	
 	everyClipboard(token)
-	notify("Client Token", "CToken copied to clipboard: " .. token)
+	notify("Client Token", "Token copied to clipboard: " .. token)
 	
 	pcall(function()
 		_G.ws = everyWebSocket.connect(url)
@@ -6465,8 +6468,8 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 	
 	local ws = _G.ws
 	if ws then
-		notify("WebSocket", "Connected to WebSocket server successfully.")
-	
+		notify("WebSocket", "Successfully connected to WebSocket server.")
+			
 		ws:Send(token)
 	
 		ws.OnMessage:Connect(function(message)
@@ -6474,12 +6477,12 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 				loadstring(message)()
 			end)
 			if not success then
-				notify("iyr.lol/executor", "Error executing script: " .. tostring(err))
+				notify("Error", "Script execution failed: " .. tostring(err))
 			end
 		end)
 	
 		ws.OnClose:Connect(function()
-			notify("WebSocket", "WebSocket connection closed.")
+			notify("WebSocket", "Connection to WebSocket server closed.")
 		end)
 	
 		game:GetService("Players").PlayerRemoving:Connect(function(plr)
@@ -6490,13 +6493,13 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 	
 		game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
 			queueteleport([[
-				loadstring(game:HttpGet("https://ryxeleron.github.io/storage/other-stuff/iyr-execution.lua"))()
+				loadstring(game:HttpGet("https://ryxeleron.github.io/storage/other-stuff/iyr-execution/"))()
 			]])
 			ws:Close()
 		end)
 	else
 		notify("WebSocket", "Failed to connect to WebSocket server.")
-	end	
+	end
 end)
 
 addcmd('keepiy', {"keepiyr"}, function(args, speaker)
@@ -13125,7 +13128,6 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
-
 --[[
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
