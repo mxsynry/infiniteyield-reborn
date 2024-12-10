@@ -3245,11 +3245,17 @@ function CreateJoinLabel(plr,ID)
 	scroll_3.CanvasSize = UDim2.new(0, 0, 0, listlayout.AbsoluteContentSize.Y)
 	scroll_3.CanvasPosition = Vector2.new(0,scroll_2.CanvasPosition.Y+infoFrame.AbsoluteSize.Y)
 	task.wait()
-	local user = game:HttpGet("https://users.roblox.com/v1/users/"..ID)
-	local json = HttpService:JSONDecode(user)
-	local date = json["created"]:sub(1,10)
-	local splitDates = string.split(date,"-")
-	info2.Text = string.gsub(info2.Text, "Loading...",splitDates[2].."/"..splitDates[3].."/"..splitDates[1])
+    local success, err = pcall(function()
+        local user = game:HttpGet("https://users.roblox.com/v1/users/"..ID)
+        local json = HttpService:JSONDecode(user)
+        local date = json["created"]:sub(1, 10)
+        local splitDates = string.split(date, "-")
+        info2.Text = string.gsub(info2.Text, "Loading...", splitDates[2].."/"..splitDates[3].."/"..splitDates[1])
+    end)
+
+    if not success then
+    info2.Text = "Failed to load user information: ".. err
+    end
 end
 
 IYMouse.KeyDown:Connect(function(Key)
