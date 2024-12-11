@@ -4743,8 +4743,8 @@ if game.PlaceId == 574746640 then
 end
 CMDs[#CMDs + 1] = {NAME = 'walkfling / wfling', DESC = 'Fling people while walking around.'}
 CMDs[#CMDs + 1] = {NAME = 'unwalkfling / unwfling', DESC = 'Fling people while walking around.'}
-CMDs[#CMDs + 1] = {NAME = 'clickfling / cfling', DESC = 'Click to fling players, the chance of success will depends on your ping'}
-CMDs[#CMDs + 1] = {NAME = 'unclickfling / uncfling', DESC = 'Turn off clickfling'}
+CMDs[#CMDs + 1] = {NAME = 'clickfling / cfling / mousefling', DESC = 'Click to fling players, the chance of success will depends on your ping'}
+CMDs[#CMDs + 1] = {NAME = 'unclickfling / uncfling / unmousefling', DESC = 'Turn off clickfling'}
 CMDs[#CMDs + 1] = {NAME = 'fling', DESC = 'Flings anyone you touch'}
 CMDs[#CMDs + 1] = {NAME = 'unfling', DESC = 'Disables the fling command'}
 CMDs[#CMDs + 1] = {NAME = 'flyfling', DESC = 'Basically the invisfling command but not invisible'}
@@ -7387,7 +7387,7 @@ local function clickfling(TargetPlayer, speaker)
     end
 end
 
-addcmd("clickfling", {"mousefling"}, function(args, speaker)
+addcmd("clickfling", {"cfling", "mousefling"}, function(args, speaker)
     clickflingEnabled = true
     IYMouse.Button1Down:Connect(function()
         if not clickflingEnabled then return end
@@ -7448,7 +7448,7 @@ addcmd("unwalkfling", {"unwfling"}, function(args, speaker)
     hiddenfling = false
 end)
 
-addcmd("unclickfling", {"unclickfling"}, function(args, speaker)
+addcmd("unclickfling", {"uncfling", 'unmousefling'}, function(args, speaker)
     clickflingEnabled = false
 end)
 
