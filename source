@@ -4497,10 +4497,10 @@ CMDs[#CMDs + 1] = {NAME = 'savegame / saveplace', DESC = 'Uses saveinstance to s
 CMDs[#CMDs + 1] = {NAME = 'savelogs', DESC = 'Saves Roblox logs as a file'}
 CMDs[#CMDs + 1] = {NAME = 'clearerror', DESC = 'Clears the annoying box and blur when a game kicks you'}
 CMDs[#CMDs + 1] = {NAME = 'antichatlogger / acl / anthony', DESC = 'Prevents AutoMod from detecting you bypassing chatfilter.'}
-CMDs[#CMDs + 1] = {NAME = 'removeanticheat / antianticheat (LOCALSCRIPT)', DESC = 'Prevents Anticheats from detecting you.'}
+CMDs[#CMDs + 1] = {NAME = 'removeanticheat / antianticheat (LOCALSCRIPT)', DESC = 'Deletes some simple anticheats.'}
 CMDs[#CMDs + 1] = {NAME = 'clientantikick / antikick (LOCALSCRIPT)', DESC = 'Prevents localscripts from kicking you'}
 CMDs[#CMDs + 1] = {NAME = 'clientantiteleport / antiteleport (LOCALSCRIPT)', DESC = 'Prevents localscripts from teleporting you'}
-CMDs[#CMDs + 1] = {NAME = 'cancelteleport / canceltp', DESC = 'Cancels teleports in progress'}
+CMDs[#CMDs + 1] = {NAME = 'cancelteleport / canceltp / clearteleport / cleartp', DESC = 'Cancels teleports in progress'}
 CMDs[#CMDs + 1] = {NAME = 'volume / vol [0-10]', DESC = 'Adjusts your game volume on a scale of 0 to 10'}
 CMDs[#CMDs + 1] = {NAME = 'antilag / boostfps / lowgraphics', DESC = 'Lowers game quality to boost FPS'}
 CMDs[#CMDs + 1] = {NAME = 'record / rec', DESC = 'Starts roblox recorder'}
@@ -4685,7 +4685,6 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
---[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
@@ -4693,7 +4692,6 @@ CMDs[#CMDs + 1] = {NAME = 'unblow / unblower / unblowjob [player] [speed]', DESC
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
 CMDs[#CMDs + 1] = {NAME = 'chokeon / suckon [player] [lower / upper]', DESC = 'Chokes someones private part(s) (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unchokeon / unsuckon', DESC = 'Stops the choking.'}
-]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / unkiss / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
@@ -8647,7 +8645,7 @@ addcmd("decompiler", {}, function(args, speaker)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Edward-Bill/Scripts/main/DecompilerForShitSploits"))()
 end)
 
-addcmd('removeanticheat',{'antianticheat'},function(args, speaker)
+addcmd('removeanticheat',{'deleteanticheat'},function(args, speaker)
 function AntiAntiBang(parent)
     for _, child in pairs(parent:GetChildren()) do
         local name = child.Name:lower()
@@ -8757,7 +8755,7 @@ addcmd('clientantiteleport',{'antiteleport'},function(args, speaker)
 	notify('Client AntiTP','Client anti teleport is now active (only effective on localscript teleport)')
 end)
 
-addcmd('cancelteleport',{'canceltp'},function(args, speaker)
+addcmd('cancelteleport',{'canceltp', 'clearteleport', 'cleartp'},function(args, speaker)
 	TeleportService:TeleportCancel()
 end)
 
@@ -11497,7 +11495,7 @@ end)
 
 addcmd("dance", {}, function(args, speaker)
 	pcall(execCmd, "undance")
-	local dances = {"27789359", "30196114", "248263260", "45834924", "33796059", "28488254", "52155728"}
+	local dances = {"27789359", "30196114", "248263260", "45834924", "33796059", "28488254", "52155728", "248335946"}
 	if r15(speaker) then
 		dances = {"3333432454", "4555808220", "4049037604", "4555782893", "10214311282", "10714010337", "10713981723", "10714372526", "10714076981", "10714392151", "11444443576"}
 	end
@@ -12668,7 +12666,7 @@ end
 -- ;bang / ;rape command exists in the original IY
 -- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
 -- the community is sped :broken_heart:
---[[
+
 local isbanging = false
 addcmd("bang", {"rape"}, function(args, speaker)
 	if args[1] then
@@ -12839,7 +12837,68 @@ addcmd("chokeon", {"suckon"}, function(args, speaker)
         end
     end
 end)
-]]
+
+local ismasturbating = false
+local mstrbt_1, mstrbt_2, mstrbtDied, loopConnection1, loopConnection2
+
+addcmd("masturbate", {"jerkoff", "meatbeat"}, function(args, speaker)
+    local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    if not humanoid then
+        -- 
+        return
+    end
+
+    if ismasturbating then
+        execCmd('unmasturbate')
+        return
+    end
+
+    if humanoid.RigType ~= Enum.HumanoidRigType.R6 then
+        notify("R6 Required", "This command requires the R6 rig type.")
+        return
+    end
+
+    local Anim_1 = Instance.new("Animation")
+    local Anim_2 = Instance.new("Animation")
+    Anim_1.AnimationId = "rbxassetid://72042024"
+    Anim_2.AnimationId = "rbxassetid://168268306"
+
+    mstrbt_1 = humanoid:LoadAnimation(Anim_1)
+    mstrbt_2 = humanoid:LoadAnimation(Anim_2)
+
+    local loopStart = 0.6
+    local loopEnd = 2.0
+
+    local function manageLoop(animation)
+        return animation:GetMarkerReachedSignal("LoopEnd"):Connect(function()
+            animation.TimePosition = loopStart
+            animation:Play()
+        end)
+    end
+
+    mstrbt_1.TimePosition = loopStart
+    mstrbt_1:Play()
+    loopConnection1 = manageLoop(mstrbt_1)
+
+    mstrbt_2.TimePosition = loopStart
+    mstrbt_2:Play()
+    loopConnection2 = manageLoop(mstrbt_2)
+    execCmd('loopanim')
+
+    ismasturbating = true
+
+    mstrbtDied = humanoid.Died:Connect(function()
+        if loopConnection1 then loopConnection1:Disconnect() end
+        if loopConnection2 then loopConnection2:Disconnect() end
+        mstrbt_1:Stop()
+        mstrbt_2:Stop()
+        Anim_1:Destroy()
+        Anim_2:Destroy()
+        mstrbtDied:Disconnect()
+        ismasturbating = false
+    end)
+end)
+
 --------------------------------------------------------------------------------------------------------
 
 local ishugging = false
@@ -13134,7 +13193,7 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
---[[
+
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
 		bangDied:Disconnect()
@@ -13168,7 +13227,7 @@ addcmd("unblower", {'unblow', 'unblowbang', 'unblowjob'}, function()
         end
     end
 end)
-]]
+
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if not r15(speaker) then
@@ -13195,6 +13254,26 @@ addcmd('carpet',{},function(args, speaker)
 	else
 		notify('R6 Required','This command requires the r6 rig type')
 	end
+end)
+
+addcmd("unmasturbate", {"stopjerkoff", "stopmeatbeat"}, function(args, speaker)
+    if loopConnection1 then loopConnection1:Disconnect() end
+    if loopConnection2 then loopConnection2:Disconnect() end
+
+    if mstrbt_1 and mstrbt_2 then
+        mstrbt_1:Stop()
+        mstrbt_2:Stop()
+        mstrbt_1.Animation:Destroy()
+        mstrbt_2.Animation:Destroy()
+        mstrbt_1, mstrbt_2 = nil, nil
+    end
+
+    if mstrbtDied then
+        mstrbtDied:Disconnect()
+        mstrbtDied = nil
+    end
+
+    ismasturbating = false
 end)
 
 addcmd('uncarpet',{'nocarpet'},function(args, speaker)
