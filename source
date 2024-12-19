@@ -4457,7 +4457,7 @@ CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
 CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Give you the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
-CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s)'}
+CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), credit: vxsty'}
 CMDs[#CMDs + 1] = {NAME = 'identitytest / testidentity / validateidentity', DESC = 'Tests the executors identity if its faked or not'}
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
@@ -4493,6 +4493,7 @@ CMDs[#CMDs + 1] = {NAME = 'hideguis', DESC = 'Hides any GUIs in PlayerGui'}
 CMDs[#CMDs + 1] = {NAME = 'unhideguis', DESC = 'Undoes hideguis'}
 CMDs[#CMDs + 1] = {NAME = 'guidelete', DESC = 'Enables backspace to delete GUI'}
 CMDs[#CMDs + 1] = {NAME = 'unguidelete / noguidelete', DESC = 'Disables guidelete'}
+CMDs[#CMDs + 1] = {NAME = 'stealgui / stealguis [path] [name]', DESC = "Steals the game's gui, i love you bat/vxsty."}
 CMDs[#CMDs + 1] = {NAME = 'hideiy / hideiyr', DESC = 'Hides the main IYR GUI'}
 CMDs[#CMDs + 1] = {NAME = 'showiy / unhideiy / showiyr / unhideiyr', DESC = 'Shows IYR again'}
 CMDs[#CMDs + 1] = {NAME = 'keepiy / keepiyr', DESC = 'Auto execute IYR when you teleport through servers'}
@@ -8549,9 +8550,65 @@ addcmd('guidelete',{},function(args, speaker)
 	notify('GUI Delete Enabled','Hover over a GUI and press backspace to delete it')
 end)
 
-addcmd('unguidelete',{'noguidelete'},function(args, speaker)
+addcmd('unguidelete', {'noguidelete'},function(args, speaker)
 	if deleteGuiInput then deleteGuiInput:Disconnect() end
 	notify('GUI Delete Disabled','GUI backspace delete has been disabled')
+end)
+
+addcmd('stealgui', {'stealguis'}, function(args, speaker)
+    if not args[1] then
+        notify('stealgui', 'Usage: stealgui <UI> <FileName>')
+        return
+    end
+
+    local UI = args[1]
+    local FileName = args[2]
+
+    if not writefile and isfile then
+        notify('stealgui', 'writefile not supported!')
+        return
+    end
+
+    local function getAvailableFileName(baseName)
+        local counter = 0
+        local extension = ".rbxm"
+        local nameWithoutExtension = baseName or "IYRsavedgui"
+
+        if baseName:find("%.") then
+            nameWithoutExtension = baseName:match("^(.*)%..+$")
+            extension = baseName:match("%..+$")
+        end
+
+        local newName = baseName
+
+        while isfile(newName) do
+            counter += 1
+            newName = string.format("%s (%d)%s", nameWithoutExtension, counter, extension)
+        end
+
+        return newName
+    end
+
+    local success, StealGUI = pcall(function()
+        return loadstring(game:HttpGet("https://scriptblox.com/raw/Universal-Script-GuiStealer-12751/"))()
+    end)
+
+    if not success or not StealGUI then
+        notify('stealgui', 'Failed to load GUI stealer.')
+        return
+    end
+
+    local filtName = getAvailableFileName(FileName)
+
+    local writeSuccess, errorMsg = pcall(function()
+        writefile(filtName, StealGUI(UI))
+    end)
+
+    if writeSuccess then
+        notify('stealgui', 'GUI successfully saved as ' .. filtName)
+    else
+        notify('stealgui', 'Failed to save GUI: ' .. tostring(errorMsg))
+    end
 end)
 
 local wasStayOpen = StayOpen
@@ -13257,7 +13314,6 @@ addcmd("unmasturbate", {"stopjerkoff", "stopmeatbeat"}, function(args, speaker)
     ismasturbating = false
 end)
 ]]
-
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if not r15(speaker) then
