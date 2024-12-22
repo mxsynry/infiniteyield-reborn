@@ -6459,7 +6459,6 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
 	
 	local username = game.Players.LocalPlayer.Name
 	local userId = game.Players.LocalPlayer.UserId
-	local randomString = generateRandomString(9)
 	local randomNumber = Random.new():NextInteger(100000000, 999999999)
 	local token = string.format("%s-%d-%s-%d", username, userId, randomString, randomNumber)
 	
@@ -7520,109 +7519,87 @@ end)
 local flying = false
 local flySpeed = 1
 local flyKeyDown, flyKeyUp
+
+local function getRoot(character)
+    return character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart
+end
+
 local function startFly()
-	repeat task.wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-	repeat task.wait() until Mouse
+    if not Player.Character or not getRoot(Player.Character) then
+        return
+    end
 
-	if flyKeyDown or flyKeyUp then
-		flyKeyDown:Disconnect()
-		flyKeyUp:Disconnect()
-	end
+    local root = getRoot(Player.Character)
+    local control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+    local speed = 0
 
-	local root = getRoot(Players.LocalPlayer.Character)
-	local control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-	local lastControl = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-	local speed = 0
+    if flyKeyDown or flyKeyUp then
+        flyKeyDown:Disconnect()
+        flyKeyUp:Disconnect()
+    end
 
-	local function fly()
-		flying = true
+    local function fly()
+        flying = true
 
-		local bodyGyro = Instance.new("BodyGyro")
-		local bodyVelocity = Instance.new("BodyVelocity")
+        local bodyGyro = Instance.new("BodyGyro")
+        local bodyVelocity = Instance.new("BodyVelocity")
 
-		bodyGyro.P = 90000
-		bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-		bodyGyro.cframe = root.CFrame
-		bodyGyro.Parent = root
+        bodyGyro.P = 90000
+        bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.CFrame = root.CFrame
+        bodyGyro.Parent = root
 
-		bodyVelocity.velocity = Vector3.new(0, 0, 0)
-		bodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
-		bodyVelocity.Parent = root
+        bodyVelocity.velocity = Vector3.zero
+        bodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        bodyVelocity.Parent = root
 
-		task.spawn(function()
-			while flying do
-				task.wait()
+        local flyLoop = RunService.RenderStepped:Connect(function()
+            if flying and Player.Character:FindFirstChildOfClass("Humanoid") then
+                Player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
 
-				if Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-					Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
-				end
+                speed = (control.F + control.B ~= 0 or control.L + control.R ~= 0 or control.Q + control.E ~= 0) and 50 or 0
 
-				if control.F + control.B ~= 0 or control.L + control.R ~= 0 or control.Q + control.E ~= 0 then
-					speed = 50
-				else
-					speed = 0
-				end
+                local targetVelocity = 
+                    (workspace.CurrentCamera.CFrame.LookVector * (control.F + control.B) +
+                    workspace.CurrentCamera.CFrame.RightVector * (control.L + control.R)) * speed
 
-				local targetVelocity = ((workspace.CurrentCamera.CFrame.lookVector * (control.F + control.B)) + 
-					(workspace.CurrentCamera.CFrame.rightVector * (control.L + control.R))) * speed
+                TweenService:Create(bodyVelocity, TweenInfo.new(0.3), {velocity = targetVelocity}):Play()
+                TweenService:Create(bodyGyro, TweenInfo.new(0.5), {CFrame = workspace.CurrentCamera.CFrame}):Play()
+            else
+                flyloop = nil
+                bodyGyro:Destroy()
+                bodyVelocity:Destroy()
 
-				if control.F + control.B + control.L + control.R + control.Q + control.E ~= 0 then
-					lastControl = {F = control.F, B = control.B, L = control.L, R = control.R}
-				end
+                if Player.Character:FindFirstChildOfClass("Humanoid") then
+                    Player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+                end
 
-				TweenService:Create(bodyVelocity, TweenInfo.new(0.3), {velocity = targetVelocity}):Play()
-				TweenService:Create(bodyGyro, TweenInfo.new(0.5), {cframe = workspace.CurrentCamera.CFrame}):Play()
-			end
+                flying = false
+            end
+        end)
+    end
 
-			control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-			lastControl = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-			
-			speed = 0
-			
-			bodyGyro:Destroy()
-			bodyVelocity:Destroy()
-			
-			if Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-				Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
-			end
-		end)
-	end
+    flyKeyDown = Player:GetMouse().KeyDown:Connect(function(key)
+        key = key:lower()
+        if key == "w" then control.F = flySpeed
+        elseif key == "s" then control.B = -flySpeed
+        elseif key == "a" then control.L = -flySpeed
+        elseif key == "d" then control.R = flySpeed
+        elseif key == "e" then control.Q = flySpeed * 2
+        elseif key == "q" then control.E = -flySpeed * 2 end
+    end)
 
-	flyKeyDown = Mouse.KeyDown:Connect(function(key)
-		key = key:lower()
-		if key == "w" then
-			control.F = flySpeed
-		elseif key == "s" then
-			control.B = -flySpeed
-		elseif key == "a" then
-			control.L = -flySpeed
-		elseif key == "d" then
-			control.R = flySpeed
-		elseif key == "e" then
-			control.Q = flySpeed * 2
-		elseif key == "q" then
-			control.E = -flySpeed * 2
-		end
-	end)
+    flyKeyUp = Player:GetMouse().KeyUp:Connect(function(key)
+        key = key:lower()
+        if key == "w" then control.F = 0
+        elseif key == "s" then control.B = 0
+        elseif key == "a" then control.L = 0
+        elseif key == "d" then control.R = 0
+        elseif key == "e" then control.Q = 0
+        elseif key == "q" then control.E = 0 end
+    end)
 
-	flyKeyUp = Mouse.KeyUp:Connect(function(key)
-		key = key:lower()
-		if key == "w" then
-			control.F = 0
-		elseif key == "s" then
-			control.B = 0
-		elseif key == "a" then
-			control.L = 0
-		elseif key == "d" then
-			control.R = 0
-		elseif key == "e" then
-			control.Q = 0
-		elseif key == "q" then
-			control.E = 0
-		end
-	end)
-
-	fly()
+    fly()
 end
 
 local velocityHandlerName = randomString()
@@ -7701,7 +7678,6 @@ function mobileStartFly()
 	end)
 end
 
-
 local function stopFlying()
 	if isOnMobile then
 		pcall(function()
@@ -7709,10 +7685,17 @@ local function stopFlying()
 			
 			local root = getRoot(Players.LocalPlayer.Character)
 			
-			root:FindFirstChild(velocityHandlerName):Destroy()
-			root:FindFirstChild(gyroHandlerName):Destroy()
-			
-			Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+			if root and root:FindFirstChild(velocityHandlerName) then
+				root:FindFirstChild(velocityHandlerName):Destroy()
+			end
+			if root and root:FindFirstChild(gyroHandlerName) then
+				root:FindFirstChild(gyroHandlerName):Destroy()
+			end
+
+			local humanoid = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid.PlatformStand = false
+			end
 
 			if flyConnection1 then flyConnection1:Disconnect() end
 			if flyConnection2 then flyConnection2:Disconnect() end
@@ -7720,10 +7703,12 @@ local function stopFlying()
 	else
 		flying = false
 		
-		if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
+		if flyKeyDown then flyKeyDown:Disconnect() end
+		if flyKeyUp then flyKeyUp:Disconnect() end
 		
-		if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-			Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+		local humanoid = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.PlatformStand = false
 		end
 		
 		pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
@@ -14360,7 +14345,7 @@ addcmd('fling',{},function(args, speaker)
 			child.CustomPhysicalProperties = PhysicalProperties.new(math.huge, 0.3, 0.5)
 		end
 	end
-	execCmd('noclip')
+	execCmd('noclip nonotify')
 	task.wait(.1)
 	local bambam = Instance.new("BodyAngularVelocity")
 	bambam.Name = randomString()
@@ -14378,7 +14363,7 @@ addcmd('fling',{},function(args, speaker)
 	end
 	flinging = true
 	local function flingDiedF()
-		execCmd("noclip nonotify")
+		execCmd('unfling')
 	end
 	flingDied = speaker.Character:FindFirstChildOfClass('Humanoid').Died:Connect(flingDiedF)
 	repeat
@@ -14390,7 +14375,7 @@ addcmd('fling',{},function(args, speaker)
 end)
 
 addcmd('unfling',{'nofling'},function(args, speaker)
-	execCmd('clip')
+	execCmd('clip nonotify')
 	if flingDied then
 		flingDied:Disconnect()
 	end
@@ -15062,8 +15047,6 @@ function teleport(speaker,target,target2,fast)
 		notify('Tool Required','You need to have an item in your inventory to use this command')
 	end
 end
-
-
 
 addcmd('spin',{},function(args, speaker)
 	local spinSpeed = 20
