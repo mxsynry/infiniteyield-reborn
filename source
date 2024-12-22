@@ -7492,6 +7492,8 @@ addcmd('noclip',{},function(args, speaker)
 		end
 	end
 	Noclipping = RunService.Stepped:Connect(NoclipLoop)
+	if args[1] and args[1] == 'nonotify' then return end
+	notify('Noclip','Noclip Enabled')
 end)
 
 addcmd('clip',{'unnoclip'},function(args, speaker)
@@ -7503,6 +7505,8 @@ addcmd('clip',{'unnoclip'},function(args, speaker)
 		nclipparts = {}
 	end
 	Clip = true
+	if args[1] and args[1] == 'nonotify' then return end
+	notify('Noclip','Noclip Disabled')
 end)
 
 addcmd('togglenoclip',{},function(args, speaker)
@@ -14374,7 +14378,7 @@ addcmd('fling',{},function(args, speaker)
 	end
 	flinging = true
 	local function flingDiedF()
-		execCmd('unfling')
+		execCmd("noclip nonotify")
 	end
 	flingDied = speaker.Character:FindFirstChildOfClass('Humanoid').Died:Connect(flingDiedF)
 	repeat
