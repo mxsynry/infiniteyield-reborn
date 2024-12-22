@@ -26,7 +26,7 @@ local startTime = tick()
   ]]
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/uselessscriptthatexistsinthisrepoiwin'))()
 	return
 end
 
@@ -4694,7 +4694,7 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
---[[
+-[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
@@ -6351,7 +6351,7 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if KeepInfYield and (not TeleportCheck) and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/source'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/source'))()")
 	end
 end)
 
@@ -7901,6 +7901,8 @@ local mobilefly = function(speaker, vfly)
 end
 
 addcmd('fly',{},function(args, speaker)
+    execCmd('untweenfly//unfly//unvfly//uncfly')
+    wait(2)
 	if not IsOnMobile then
 		NOFLY()
 		task.wait()
@@ -7913,15 +7915,18 @@ addcmd('fly',{},function(args, speaker)
 	end
 end)
 
-addcmd('flyspeed',{'flysp'},function(args, speaker)
+addcmd('flyspeed',{'flysp', 'tweenflyspeed', 'tweenflysp', 'vflysp','vehicleflyspeed','vehicleflysp', 'vflyspeed'},function(args, speaker)
 	local speed = args[1] or 1
 	if isNumber(speed) then
 		iyflyspeed = speed
+        flySpeed = speed
+        vehicleflyspeed = speed
 	end
 end)
 
-addcmd("tweenfly",{},function(args, LocalPlayer)
-	if flying then stopFlying() end
+addcmd("tweenfly",{"tfly", 'twfly'},function(args, LocalPlayer)
+    execCmd('untweenfly//unfly//unvfly//uncfly')
+    wait()
 	flySpeed = tonumber(args[1]) or 1
 	if isOnMobile then
 		mobileStartFly()
@@ -7930,15 +7935,14 @@ addcmd("tweenfly",{},function(args, LocalPlayer)
 	end
 end)
 
-addcmd("untweenfly",{"notweenfly"},function()
-	stopFlying()
-end)
-
-addcmd('unfly',{'nofly','novfly','unvehiclefly','novehiclefly','unvfly'},function(args, speaker)
+addcmd('unfly',{'nofly','novfly','unvehiclefly','novehiclefly','unvfly', 'notweenfly', 'untweenfly'},function(args, speaker)
 	if not IsOnMobile then NOFLY() else unmobilefly(speaker) end
+    stopFlying()
 end)
 
 addcmd('vfly',{'vehiclefly'},function(args, speaker)
+    execCmd('untweenfly//unfly//unvfly//uncfly')
+    wait()
 	if not IsOnMobile then
 		NOFLY()
 		task.wait()
@@ -7956,13 +7960,6 @@ addcmd('togglevfly',{},function(args, speaker)
 		if not IsOnMobile then NOFLY() else unmobilefly(speaker) end
 	else
 		if not IsOnMobile then sFLY(true) else mobilefly(speaker, true) end
-	end
-end)
-
-addcmd('vflyspeed',{'vflysp','vehicleflyspeed','vehicleflysp'},function(args, speaker)
-	local speed = args[1] or 1
-	if isNumber(speed) then
-		vehicleflyspeed = speed
 	end
 end)
 
@@ -15857,7 +15854,7 @@ IYMouse.Move:Connect(checkTT)
 
 local function iyonloadstuff(shouldpopupannouncement)
 	local success, latestVersionInfo = pcall(function() 
-		local versionJson = game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/version')
+		local versionJson = game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/version')
 		return HttpService:JSONDecode(versionJson)
 	end)
 
