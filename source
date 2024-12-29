@@ -4529,7 +4529,7 @@ CMDs[#CMDs + 1] = {NAME = 'togglekeepiy / togglekeepiyr', DESC = 'Toggle keepiy'
 CMDs[#CMDs + 1] = {NAME = 'savegame / saveplace', DESC = 'Uses saveinstance to save the game'}
 CMDs[#CMDs + 1] = {NAME = 'savelogs', DESC = 'Saves Roblox logs as a file'}
 CMDs[#CMDs + 1] = {NAME = 'clearerror', DESC = 'Clears the annoying box and blur when a game kicks you'}
-CMDs[#CMDs + 1] = {NAME = 'antichatlogger / acl / anthony', DESC = 'Prevents AutoMod from detecting you bypassing chatfilter.'}
+CMDs[#CMDs + 1] = {NAME = 'antichatlogger / acl / antichatlogs', DESC = 'Prevents AutoMod from detecting you bypassing chatfilter.'}
 CMDs[#CMDs + 1] = {NAME = 'removeanticheat / antianticheat (LOCALSCRIPT)', DESC = 'Deletes some simple anticheats.'}
 CMDs[#CMDs + 1] = {NAME = 'clientantikick / antikick (LOCALSCRIPT)', DESC = 'Prevents localscripts from kicking you'}
 CMDs[#CMDs + 1] = {NAME = 'clientantiteleport / antiteleport (LOCALSCRIPT)', DESC = 'Prevents localscripts from teleporting you'}
