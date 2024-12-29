@@ -1982,6 +1982,12 @@ local textChannels = TextChatService:FindFirstChild("TextChannels")
 local RBXGeneral = if textChannels then textChannels:FindFirstChild("RBXGeneral") else nil
 local chatChannel = not isChatLegacy and RBXGeneral
 
+function vtype(o, t)
+    if o == nil then return false end
+    if type(o) == "userdata" then return typeof(o) == t end
+    return type(o) == t
+end
+
 function chatsend(str)
 	if isChatLegacy then
 		chatRemote:FireServer(str, "All")
@@ -2836,6 +2842,7 @@ defaultsettings = {
 	keepIY = true;
 	logsEnabled = false;
 	jLogsEnabled = false;
+	logsWebhook = nil
 	aliases = {};
 	binds = {};
 	WayPoints = {};
@@ -2953,24 +2960,25 @@ function saves()
 			if readfile("IY_FE.iy") ~= nil then
 				local success, response = pcall(function()
 					local json = HttpService:JSONDecode(readfile("IY_FE.iy"))
-					if json.prefix ~= nil then prefix = json.prefix else prefix = ';' end
-					if json.StayOpen ~= nil then StayOpen = json.StayOpen else StayOpen = false end
-					if json.keepIY ~= nil then KeepInfYield = json.keepIY else KeepInfYield = true end
-					if json.espTransparency ~= nil then espTransparency = json.espTransparency else espTransparency = 0.3 end
-					if json.logsEnabled ~= nil then logsEnabled = json.logsEnabled else logsEnabled = false end
-					if json.jLogsEnabled ~= nil then jLogsEnabled = json.jLogsEnabled else jLogsEnabled = false end
-					if json.aliases ~= nil then aliases = json.aliases else aliases = {} end
-					if json.binds ~= nil then binds = (json.binds or {}) else binds = {} end
-					if json.spawnCmds ~= nil then spawnCmds = json.spawnCmds end
-					if json.WayPoints ~= nil then AllWaypoints = json.WayPoints else WayPoints = {} AllWaypoints = {} end
-					if json.PluginsTable ~= nil then PluginsTable = json.PluginsTable else PluginsTable = {} end
-					if json.currentShade1 ~= nil then currentShade1 = Color3.new(json.currentShade1[1],json.currentShade1[2],json.currentShade1[3]) end
-					if json.currentShade2 ~= nil then currentShade2 = Color3.new(json.currentShade2[1],json.currentShade2[2],json.currentShade2[3]) end
-					if json.currentShade3 ~= nil then currentShade3 = Color3.new(json.currentShade3[1],json.currentShade3[2],json.currentShade3[3]) end
-					if json.currentText1 ~= nil then currentText1 = Color3.new(json.currentText1[1],json.currentText1[2],json.currentText1[3]) end
-					if json.currentText2 ~= nil then currentText2 = Color3.new(json.currentText2[1],json.currentText2[2],json.currentText2[3]) end
-					if json.currentScroll ~= nil then currentScroll = Color3.new(json.currentScroll[1],json.currentScroll[2],json.currentScroll[3]) end
-					if json.eventBinds ~= nil then loadedEventData = json.eventBinds end
+                    if vtype(json.prefix, "string") then prefix = json.prefix else prefix = ';' end
+                    if vtype(json.StayOpen, "boolean") then StayOpen = json.StayOpen else StayOpen = false end
+                    if vtype(json.keepIY, "boolean") then KeepInfYield = json.keepIY else KeepInfYield = true end
+                    if vtype(json.espTransparency, "number") then espTransparency = json.espTransparency else espTransparency = 0.3 end
+                    if vtype(json.logsEnabled, "boolean") then logsEnabled = json.logsEnabled else logsEnabled = false end
+                    if vtype(json.jLogsEnabled, "boolean") then jLogsEnabled = json.jLogsEnabled else jLogsEnabled = false end
+                    if vtype(json.logsWebhook, "string") then logsWebhook = json.logsWebhook else logsWebhook = nil end
+                    if vtype(json.aliases, "table") then aliases = json.aliases else aliases = {} end
+                    if vtype(json.binds, "table") then binds = json.binds else binds = {} end
+                    if vtype(json.spawnCmds, "table") then spawnCmds = json.spawnCmds end
+                    if vtype(json.WayPoints, "table") then AllWaypoints = json.WayPoints else WayPoints = {} AllWaypoints = {} end
+                    if vtype(json.PluginsTable, "table") then PluginsTable = json.PluginsTable else PluginsTable = {} end
+                    if vtype(json.currentShade1, "table") then currentShade1 = Color3.new(json.currentShade1[1],json.currentShade1[2],json.currentShade1[3]) end
+                    if vtype(json.currentShade2, "table") then currentShade2 = Color3.new(json.currentShade2[1],json.currentShade2[2],json.currentShade2[3]) end
+                    if vtype(json.currentShade3, "table") then currentShade3 = Color3.new(json.currentShade3[1],json.currentShade3[2],json.currentShade3[3]) end
+                    if vtype(json.currentText1, "table") then currentText1 = Color3.new(json.currentText1[1],json.currentText1[2],json.currentText1[3]) end
+                    if vtype(json.currentText2, "table") then currentText2 = Color3.new(json.currentText2[1],json.currentText2[2],json.currentText2[3]) end
+                    if vtype(json.currentScroll, "table") then currentScroll = Color3.new(json.currentScroll[1],json.currentScroll[2],json.currentScroll[3]) end
+                    if vtype(json.eventBinds, "string") then loadedEventData = json.eventBinds end
 				end)
 				if not success then
 					jsonAttempts = jsonAttempts + 1
@@ -3020,6 +3028,7 @@ function updatesaves()
 			espTransparency = espTransparency;
 			logsEnabled = logsEnabled;
 			jLogsEnabled = jLogsEnabled;
+			logsWebhook = logsWebhook;
 			aliases = aliases;
 			binds = binds or {};
 			WayPoints = AllWaypoints;
@@ -3846,6 +3855,24 @@ if not writefileExploit() then
 	notify('Saves','Your exploit does not support read/write file. Your settings will not save.')
 end
 
+function sendChatWebhook(player, message)
+    if httprequest and vtype(logsWebhook, "string") then
+        local log = HttpService:JSONEncode({
+            content = message,
+            avatar_url = "https://files.catbox.moe/i968v2.jpg",
+            username = formatUsername(player),
+            allowed_mentions = {parse = {}}
+        })
+
+        httprequest({
+            Url = logsWebhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = log
+        })
+    end
+end
+
 ChatLog = function(plr)
 	plr.Chatted:Connect(function(Message)
 		if logsEnabled == true then
@@ -4585,6 +4612,7 @@ CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'logs', DESC = 'Opens the logs GUI'}
 CMDs[#CMDs + 1] = {NAME = 'chatlogs / clogs', DESC = 'Log what people say or whisper'}
 CMDs[#CMDs + 1] = {NAME = 'joinlogs / jlogs', DESC = 'Log when people join'}
+CMDs[#CMDs + 1] = {NAME = 'chatlogswebhook / logswebhook [url]', DESC = 'Set a discord webhook for chatlogs to go to (provide no url to disable this)'}
 CMDs[#CMDs + 1] = {NAME = 'chat / say [text]', DESC = 'Makes you chat a string (possible mute bypass)'}
 CMDs[#CMDs + 1] = {NAME = 'clearchat', DESC = 'Clears the chat serversidely (ONLY WORKS WITH NEW TEXTCHAT)'}
 CMDs[#CMDs + 1] = {NAME = 'spam [text]', DESC = 'Makes you spam the chat'}
@@ -4749,16 +4777,16 @@ CMDs[#CMDs + 1] = {NAME = 'walkfling / wfling', DESC = 'Fling people while walki
 CMDs[#CMDs + 1] = {NAME = 'unwalkfling / unwfling', DESC = 'Fling people while walking around.'}
 CMDs[#CMDs + 1] = {NAME = 'clickfling / cfling / mousefling', DESC = 'Click to fling players, the chance of success will depends on your ping'}
 CMDs[#CMDs + 1] = {NAME = 'unclickfling / uncfling / unmousefling', DESC = 'Turn off clickfling'}
-CMDs[#CMDs + 1] = {NAME = 'fling', DESC = 'Flings anyone you touch'}
-CMDs[#CMDs + 1] = {NAME = 'unfling', DESC = 'Disables the fling command'}
-CMDs[#CMDs + 1] = {NAME = 'flyfling', DESC = 'Basically the invisfling command but not invisible'}
+CMDs[#CMDs + 1] = {NAME = 'fling / spinfling', DESC = 'Flings anyone you touch'}
+CMDs[#CMDs + 1] = {NAME = 'unfling / unspinfling', DESC = 'Disables the fling command'}
+CMDs[#CMDs + 1] = {NAME = 'flyfling [speed]', DESC = 'Basically the invisfling command but not invisible'}
 CMDs[#CMDs + 1] = {NAME = 'unflyfling', DESC = 'Disables the flyfling command'}
 CMDs[#CMDs + 1] = {NAME = 'invisfling', DESC = 'Enables invisible fling'}
 CMDs[#CMDs + 1] = {NAME = 'loopoof', DESC = 'Loops everyones character sounds (everyone can hear)'}
 CMDs[#CMDs + 1] = {NAME = 'unloopoof', DESC = 'Stops the oof chaos'}
 CMDs[#CMDs + 1] = {NAME = 'muteboombox [player]', DESC = 'Mutes someones boombox'}
 CMDs[#CMDs + 1] = {NAME = 'unmuteboombox [player]', DESC = 'Unmutes someones boombox'}
-CMDs[#CMDs + 1] = {NAME = 'hitbox [player] [size]', DESC = 'Expands the hitbox for players HumanoidRootPart (default is 1)'}
+CMDs[#CMDs + 1] = {NAME = 'hitbox [player] [size] [transparency]', DESC = 'Expands the hitbox for players HumanoidRootPart (default is 1)'}
 CMDs[#CMDs + 1] = {NAME = 'headsize [player] [size]', DESC = 'Expands the head size for players Head (default is 1)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'reset', DESC = 'Resets your character normally'}
@@ -7215,10 +7243,10 @@ addcmd("exit", {}, function(args, speaker)
 	game:Shutdown()
 end)
 
-local hiddenfling = false
+local walkflinging = false
 
 local function enableWalkfling()
-    hiddenfling = true
+    walkflinging = true
     local detection = Instance.new("Decal")
     detection.Parent = game:GetService("ReplicatedStorage")
 
@@ -7227,7 +7255,7 @@ local function enableWalkfling()
 
     local function fling()
         local root, c, vel, movel = nil, nil, nil, 0.1
-        while hiddenfling do
+        while walkflinging do
             runService.Heartbeat:Wait()
             c = lp.Character
             if not (c and c.Parent) then continue end
@@ -7255,7 +7283,7 @@ addcmd("walkfling", {"wfling"}, function(args, speaker)
 end)
 
 addcmd("unwalkfling", {"unwfling"}, function(args, speaker)
-    hiddenfling = false
+    walkflinging = false
 end)
 
 local clickflingEnabled = false
@@ -7448,7 +7476,7 @@ addcmd("clickfling", {"cfling", "mousefling"}, function(args, speaker)
 end)
 
 addcmd("unwalkfling", {"unwfling"}, function(args, speaker)
-    hiddenfling = false
+    walkflinging = false
 end)
 
 addcmd("unclickfling", {"uncfling", 'unmousefling'}, function(args, speaker)
@@ -7470,9 +7498,18 @@ addcmd("toggleantifling", {"tganfl"}, function(args, speaker)
 	if (AntiFlingEnabled) then notify("Anti-fling", "Anti-fling has been enabled.") else notify("Anti-fling", "Anti-fling has been disabled.") end
 end)
 
-addcmd("antichatlogger",{"acl", "anthony"}, function(args, speaker)
+addcmd("antichatlogs",{"acl", "antichatlogger"}, function(args, speaker)
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/AnthonyIsntHere/anthonysrepository/main/scripts/AntiChatLogger.lua",true))()
         notify("Anthony's AntiChatLogger", "Loaded, only works on LegacyChatService")
+end)
+
+addcmd("chatlogswebhook", {"logswebhook"}, function(args, speaker)
+    if httprequest then
+        logsWebhook = args[1] or nil
+        updatesaves()
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command (missing httprequest)")
+    end
 end)
 
 local Noclipping = nil
@@ -11499,10 +11536,14 @@ end)
 
 
 addcmd('respawn',{},function(args, speaker)
+	execCmd("reset")
+	wait()
 	respawn(speaker)
 end)
 
 addcmd('refresh',{'re'},function(args, speaker)
+	execCmd("reset")
+	wait()
 	refresh(speaker)
 end)
 
@@ -14334,7 +14375,7 @@ addcmd('joinlogs',{'jlogs'},function(args, speaker)
 end)
 
 flinging = false
-addcmd('fling',{},function(args, speaker)
+addcmd('fling',{'spinfling'},function(args, speaker)
 	flinging = false
 	for _, child in pairs(speaker.Character:GetDescendants()) do
 		if child:IsA("BasePart") then
@@ -14370,7 +14411,7 @@ addcmd('fling',{},function(args, speaker)
 	until flinging == false
 end)
 
-addcmd('unfling',{'nofling'},function(args, speaker)
+addcmd('unfling',{'nofling', 'unspinfling', 'nospinfling'},function(args, speaker)
 	execCmd('clip nonotify')
 	if flingDied then
 		flingDied:Disconnect()
@@ -14402,10 +14443,13 @@ end)
 addcmd("flyfling", {}, function(args, speaker)
     execCmd("unvehiclefly\\unwalkfling")
     wait()
+	if args[1] and isNumber(args[1]) then
+        vehicleflyspeed = args[1]
+    end
     execCmd("vehiclefly\\walkfling")
 end)
 
-addcmd("unflyfling", {}, function(args, speaker)
+addcmd("unflyfling", {'noflyfling'}, function(args, speaker)
     execCmd("unvehiclefly\\unwalkfling\\breakvelocity")
 end)
 
@@ -15313,6 +15357,7 @@ end)
 
 addcmd('hitbox',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
+	local transparency = args[3] and tonumber(args[3]) or 0.4
 	for i,v in pairs(players) do
 		if Players[v] ~= speaker and Players[v].Character:FindFirstChild('HumanoidRootPart') then
 			local sizeArg = tonumber(args[2])
@@ -15321,10 +15366,10 @@ addcmd('hitbox',{},function(args, speaker)
 			if Root:IsA("BasePart") then
 				if not args[2] or sizeArg == 1 then
 					Root.Size = Vector3.new(2,1,1)
-					Root.Transparency = 0.4
+					Root.Transparency = transparency
 				else
 					Root.Size = Size
-					Root.Transparency = 0.4
+					Root.Transparency = transparency
 				end
 			end
 		end
