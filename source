@@ -26,7 +26,7 @@ local startTime = tick()
   ]]
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/uselessscriptthatexistsinthisrepoiwin'))()
+	loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/uselessscriptthatexistsinthisrepoiwin' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/scriptblox/uselessscriptbloxthatexistsinthisrepoiwin')))()
 	return
 end
 
@@ -4722,7 +4722,6 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
---[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
@@ -4732,7 +4731,6 @@ CMDs[#CMDs + 1] = {NAME = 'masturbate / jerkoff / meatbeat [speed]', DESC = 'Mas
 CMDs[#CMDs + 1] = {NAME = 'unmasturbate / stopjerkoff / stopmeatbeat', DESC = 'Masturbates. (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
 CMDs[#CMDs + 1] = {NAME = 'unchokeon / unsuckon', DESC = 'Stops the choking.'}
-]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / unkiss / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
@@ -6379,7 +6377,7 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if KeepInfYield and (not TeleportCheck) and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/source'))()")
+		queueteleport("loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/source' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/scriptblox/source')))()")
 	end
 end)
 
@@ -12560,7 +12558,7 @@ end)
 
 addcmd('solaraexplorer', {'solaradex'}, function(args, speaker)
 	notify('Loading', 'Hold on a sec')
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/SolaraDex"))()
+	loadstring(game:HttpGet(("https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/SolaraDex" or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/SolaraDex')))()
 end)
 
 addcmd('secureexplorer', {'securedex', "bypasseddex"}, function(args, speaker)
@@ -12994,7 +12992,7 @@ end
 -- ;bang / ;rape command exists in the original IY
 -- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
 -- the community is sped :broken_heart:
---[[
+
 local isbanging = false
 addcmd("bang", {"rape"}, function(args, speaker)
 	if args[1] then
@@ -13226,7 +13224,7 @@ addcmd("masturbate", {"jerkoff", "meatbeat"}, function(args, speaker)
         ismasturbating = false
     end)
 end)
-]]
+
 --------------------------------------------------------------------------------------------------------
 
 local ishugging = false
@@ -13521,7 +13519,7 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
---[[
+
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
 		bangDied:Disconnect()
@@ -13575,7 +13573,7 @@ addcmd("unmasturbate", {"stopjerkoff", "stopmeatbeat"}, function(args, speaker)
 
     ismasturbating = false
 end)
-]]
+
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if not r15(speaker) then
@@ -15898,7 +15896,7 @@ IYMouse.Move:Connect(checkTT)
 
 local function iyonloadstuff(shouldpopupannouncement)
 	local success, latestVersionInfo = pcall(function() 
-		local versionJson = game:HttpGet('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/version')
+		local versionJson = game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/version' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/scriptblox/version'))
 		return HttpService:JSONDecode(versionJson)
 	end)
 
