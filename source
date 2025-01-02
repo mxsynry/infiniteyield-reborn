@@ -12850,7 +12850,7 @@ addcmd("hairdresser", {'hairdress', 'hair'}, function(args, speaker)
     end
 end)
 
-addcmd("unhairdresser", {"stophair", "unhair"}, function(_, speaker)
+addcmd("unhairdresser", {"unhairdress", "unhair"}, function(_, speaker)
     if hair_1 then hair_1:Stop() end
     if hair_2 then hair_2:Stop() end
     if sit then sit:Stop() end
