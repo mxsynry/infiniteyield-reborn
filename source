@@ -26,7 +26,7 @@ local startTime = tick()
   ]]
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-	loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/uselessscriptthatexistsinthisrepoiwin' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/scriptblox/uselessscriptbloxthatexistsinthisrepoiwin')))()
+	loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/uselessscriptthatexistsinthisrepoiwin' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/uselessscriptbloxthatexistsinthisrepoiwin')))()
 	return
 end
 
@@ -4484,8 +4484,9 @@ CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
 CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Give you the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
-CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), credit: vxsty'}
+CMDs[#CMDs + 1] = {NAME = 'luarmor / luarmortest / luarmorcheck', DESC = "Tests the executor's luarmor compatibility, credit: Luarmor themselves"}
 CMDs[#CMDs + 1] = {NAME = 'identitytest / testidentity / validateidentity', DESC = 'Tests the executors identity if its faked or not'}
+CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), credit: vxsty'}
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
@@ -16098,12 +16099,93 @@ end)
 local endTime = tick()
 local elapsedTime = endTime - startTime
 
-local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+local Modules = {
+    Colors = {
+        ["Green"] = "0,255,0",
+        ["Cyan"] = "33,161,163",
+        ["White"] = "255,255,255",
+        ["Pink"] = "255,102,153",
+    },
+    Services = {
+        RunService = game:GetService("RunService"),
+        CoreGui = game:GetService("CoreGui"),
+    },
+}
+
+Modules.ChangeColor = function()
+    local Loop
+    Loop = Modules.Services.RunService.Heartbeat:Connect(function()
+        local success, err = pcall(function()
+            local masterGui = Modules.Services.CoreGui:FindFirstChild("DevConsoleMaster")
+            if masterGui then
+                for _, label in pairs(masterGui:GetDescendants()) do
+                    if label:IsA("TextLabel") then
+                        label.RichText = true
+                    end
+                end
+            else
+                Loop:Disconnect()
+            end
+        end)
+
+        if not success then
+            Loop:Disconnect()
+        end
+    end)
+end
+
+Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
+    delay = delay or 0.1
+
+    local timestamp = os.date("[%H:%M:%S]")
+    local Text = watermark .. tostring(math.random(500, 20000))
+
+    warn(string.format("%s %s started...", timestamp, Text))
+
+    local loadingLabel = nil
+    local progress = ""
+
+    repeat
+        task.wait()
+        local consoleMaster = Modules.Services.CoreGui:FindFirstChild("DevConsoleMaster")
+        if consoleMaster then
+            for _, label in pairs(consoleMaster:GetDescendants()) do
+                if label:IsA("TextLabel") and string.find(label.Text:lower(), Text:lower()) then
+                    loadingLabel = label
+                    break
+                end
+            end
+        else
+            break
+        end
+    until loadingLabel
+
+
+    for i = 1, 50 do
+        progress = progress .. loadingsymbol
+        loadingLabel.Text = string.format(
+            "<font color='rgb(%s)' size='15'>[%s] [%d%% loaded] %s</font>",
+            Modules.Colors["White"],
+            watermark,
+            i * 2,
+            progress
+        )
+        task.wait(delay)
+    end
+
+    loadingLabel.Text = string.format(
+        "<font color='rgb(%s)' size='15'>✅ ".. timestamp .." -- [%s]: Successfully loaded in ".. "".. elapsedTime .."</font>",
+        Modules.Colors[color],
+        watermark,
+        elapsedTime
+    )
+end
+
+Modules.ChangeColor()
+Modules.LoadingBar("IYR", "Green", 0.001, "#")
 
 local screenGuiLogo = Instance.new("ScreenGui")
-screenGuiLogo.Parent = player:WaitForChild("PlayerGui")
+screenGuiLogo.Parent = COREGUI
 screenGuiLogo.Name = "ImageFadeGui"
 screenGuiLogo.DisplayOrder = 10^6
 screenGuiLogo.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
