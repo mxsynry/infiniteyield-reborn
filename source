@@ -25,6 +25,13 @@ local startTime = tick()
 	 r15 support for backpack
   ]]
 
+local getconnections = getconnections or get_signal_cons
+if getconnections then
+	for _, v in pairs(getconnections(game:GetService("ScriptContext").Error)) do
+		v:Disable()
+	end
+end
+
 if IY_LOADED and not _G.IY_DEBUG == true then
 	loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/uselessscriptthatexistsinthisrepoiwin' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/uselessscriptbloxthatexistsinthisrepoiwin')))()
 	return
@@ -4723,6 +4730,7 @@ CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players use
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
+--[[
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
@@ -4732,6 +4740,7 @@ CMDs[#CMDs + 1] = {NAME = 'masturbate / jerkoff / meatbeat [speed]', DESC = 'Mas
 CMDs[#CMDs + 1] = {NAME = 'unmasturbate / stopjerkoff / stopmeatbeat', DESC = 'Masturbates. (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
 CMDs[#CMDs + 1] = {NAME = 'unchokeon / unsuckon', DESC = 'Stops the choking.'}
+]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / unkiss / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
@@ -12083,18 +12092,14 @@ addcmd('headthrow',{},function(args, speaker)
 end)
 
 addcmd('animation',{'anim'},function(args, speaker)
-	if not r15(speaker) then
-		local pchar=speaker.Character
-		local AnimationId = tostring(args[1])
-		local Anim = Instance.new("Animation")
-		Anim.AnimationId = "rbxassetid://"..AnimationId
-		local k = pchar:FindFirstChildOfClass('Humanoid'):LoadAnimation(Anim)
-		k:Play()
-		if args[2] then
-			k:AdjustSpeed(tostring(args[2]))
-		end
-	else
-		notify('R6 Required','This command requires the r6 rig type')
+	local pchar=speaker.Character
+	local AnimationId = tostring(args[1])
+	local Anim = Instance.new("Animation")
+	Anim.AnimationId = "rbxassetid://"..AnimationId
+	local k = pchar:FindFirstChildOfClass('Humanoid'):LoadAnimation(Anim)
+	k:Play()
+	if args[2] then
+		k:AdjustSpeed(tostring(args[2]))
 	end
 end)
 
@@ -12790,15 +12795,11 @@ addcmd("hairdresser", {'hairdress', 'hair'}, function(args, speaker)
             ishairdressing = true
             local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
 
-            if humanoid and humanoid.RigType == Enum.HumanoidRigType.R6 then
-                sitAnim = Instance.new("Animation")
-                sitAnim.AnimationId = "http://www.roblox.com/asset/?id=178130996"
-                sit = humanoid:LoadAnimation(sitAnim)
-
+            if humanoid then
                 local Anim_1 = Instance.new("Animation")
                 local Anim_2 = Instance.new("Animation")
-                Anim_1.AnimationId = "rbxassetid://225975820"
-                Anim_2.AnimationId = "rbxassetid://283545583"
+                Anim_1.AnimationId = "rbxassetid://225975820" or "rbxassetid://4940563117"
+                Anim_2.AnimationId = "rbxassetid://283545583" or "rbxassetid://4940563117"
 
                 hair_1 = humanoid:LoadAnimation(Anim_1)
                 hair_2 = humanoid:LoadAnimation(Anim_2)
@@ -12993,7 +12994,7 @@ end
 -- ;bang / ;rape command exists in the original IY
 -- and I. FB_REAL GET FUCKING BANNED BECAUSE OF 2 NSFW SCRIPTS ITS NOT EVEN "MORE" ITS JUST 1 EXTRA COMMAND
 -- the community is sped :broken_heart:
-
+--[[
 local isbanging = false
 addcmd("bang", {"rape"}, function(args, speaker)
 	if args[1] then
@@ -13111,14 +13112,14 @@ addcmd("chokeon", {"suckon"}, function(args, speaker)
             task.wait()
             isSuckingOn = true
             local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-            
-            local isR6 = humanoid.RigType == Enum.HumanoidRigType.R6
-            
-            if isR6 then
+            local root = humanoid and getRoot(speaker.Character)
+
+            if humanoid and root then
+                humanoid.Sit = true
                 local SuckAnim_1 = Instance.new("Animation")
                 local SuckAnim_2 = Instance.new("Animation")
-                SuckAnim_1.AnimationId = "rbxassetid://225975820"
-                SuckAnim_2.AnimationId = "rbxassetid://283545583"
+                SuckAnim_1.AnimationId = not r15(speaker) and "rbxassetid://225975820" or "rbxassetid://4940563117"
+                SuckAnim_2.AnimationId = not r15(speaker) and "rbxassetid://283545583" or "rbxassetid://4940563117"
                 
                 suck_1 = humanoid:LoadAnimation(SuckAnim_1)
                 suck_2 = humanoid:LoadAnimation(SuckAnim_2)
@@ -13158,7 +13159,6 @@ addcmd("chokeon", {"suckon"}, function(args, speaker)
                     getRoot(speaker.Character).Velocity = Vector3.new(0, 0, 0)
                 end
             else
-                notify('R6 Required', 'This command requires the R6 rig type')
                 isSuckingOn = false
             end
         end
@@ -13225,7 +13225,7 @@ addcmd("masturbate", {"jerkoff", "meatbeat"}, function(args, speaker)
         ismasturbating = false
     end)
 end)
-
+]]
 --------------------------------------------------------------------------------------------------------
 
 local ishugging = false
@@ -13241,13 +13241,11 @@ addcmd("hug", {"kiss", "biden"}, function(args, speaker)
             ishugging = true
             local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
             
-            local isR6 = humanoid.RigType == Enum.HumanoidRigType.R6
-            
-            if isR6 then
+            if humanoid then
                 local Anim_1 = Instance.new("Animation")
                 local Anim_2 = Instance.new("Animation")
-                Anim_1.AnimationId = "rbxassetid://225975820"
-                Anim_2.AnimationId = "rbxassetid://283545583"
+                Anim_1.AnimationId = not r15(speaker) and "rbxassetid://225975820" or "rbxassetid://4940563117"
+                Anim_2.AnimationId = not r15(speaker) and "rbxassetid://283545583" or "rbxassetid://4940563117"
                 
                 hug_1 = humanoid:LoadAnimation(Anim_1)
                 hug_2 = humanoid:LoadAnimation(Anim_2)
@@ -13287,7 +13285,6 @@ addcmd("hug", {"kiss", "biden"}, function(args, speaker)
                     getRoot(speaker.Character).Velocity = Vector3.new(0, 0, 0)
                 end
             else
-                notify('R6 Required', 'This command requires the R6 rig type')
                 ishugging = false
             end
         end
@@ -13336,11 +13333,11 @@ addcmd("backpack", {"attach"}, function(args, speaker)
             if humanoid and root then
                 humanoid.Sit = true
 
-                if humanoid.RigType == Enum.HumanoidRigType.R6 then
+                if humanoid then
                     animations.attachAnim_1 = Instance.new("Animation")
                     animations.attachAnim_2 = Instance.new("Animation")
-                    animations.attachAnim_1.AnimationId = "rbxassetid://225975820"
-                    animations.attachAnim_2.AnimationId = "rbxassetid://283545583"
+                    animations.attachAnim_1.AnimationId = not r15(speaker) and "rbxassetid://225975820" or "rbxassetid://4940563117"
+                    animations.attachAnim_2.AnimationId = not r15(speaker) and "rbxassetid://283545583" or "rbxassetid://4940563117"
 
                     animations.anim_1 = humanoid:LoadAnimation(animations.attachAnim_1)
                     animations.anim_2 = humanoid:LoadAnimation(animations.attachAnim_2)
@@ -13520,7 +13517,7 @@ addcmd("abdelay", {"ardistance"}, function(args, speaker)
 	AbDelay = tonumber(rdelay)
 	notify("Anti-Bang Delay", "The delay has been set to "..AbDelay)
 end)
-
+--[[
 addcmd("unbang", {"unrape","unfacebang","unfacerape","unfacefuck"}, function(args, speaker)
 	if bangDied then
 		bangDied:Disconnect()
@@ -13542,6 +13539,7 @@ addcmd("unchokeon", {"unsuckon"}, function(args, speaker)
         suck_1, suck_2 = nil, nil
     end
     isSuckingOn = false
+    humanoid.sit = false
 end)
 
 addcmd("unblower", {'unblow', 'unblowbang', 'unblowjob'}, function()
@@ -13574,7 +13572,7 @@ addcmd("unmasturbate", {"stopjerkoff", "stopmeatbeat"}, function(args, speaker)
 
     ismasturbating = false
 end)
-
+]]
 addcmd('carpet',{},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	if not r15(speaker) then
@@ -16138,9 +16136,9 @@ Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
     delay = delay or 0.1
 
     local timestamp = os.date("[%H:%M:%S]")
-    local Text = watermark .. tostring(math.random(500, 20000))
+    local Text = watermark
 
-    warn(string.format("%s %s started...", timestamp, Text))
+    warn(string.format("%s %s", timestamp, Text))
 
     local loadingLabel = nil
     local progress = ""
