@@ -20,11 +20,6 @@
 
 local startTime = tick()
 
---[[ things to add:
-     earrape
-	 r15 support for backpack
-  ]]
-
 local getconnections = getconnections or get_signal_cons
 if getconnections then
 	for _, v in pairs(getconnections(game:GetService("ScriptContext").Error)) do
@@ -33,7 +28,7 @@ if getconnections then
 end
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-	loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/uselessscriptthatexistsinthisrepoiwin' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/uselessscriptbloxthatexistsinthisrepoiwin')))()
+	loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/uselessscriptthatexistsinthisrepoiwin' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/scriptblox/uselessscriptthatexistsinthisrepoiwin')))()
 	return
 end
 
