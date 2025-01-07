@@ -15720,6 +15720,10 @@ addcmd('reloadplugin',{},function(args, speaker)
 	addPlugin(pluginName)
 end)
 
+addcmd('removecmd',{'deletecmd'},function(args, speaker)
+	removecmd(args[1])
+end)
+
 addcmd("addallplugins", {"loadallplugins"}, function(args, speaker)
     if not listfiles or not isfolder then
         notify("Incompatible Exploit", "Your exploit does not support this command (missing listfiles/isfolder)")
@@ -15737,10 +15741,6 @@ addcmd("addallplugins", {"loadallplugins"}, function(args, speaker)
             addPlugin(fileName)
         end
     end
-end)
-
-addcmd('removecmd',{'deletecmd'},function(args, speaker)
-	removecmd(args[1])
 end)
 
 addcmd('joinjobid',{'jjobid', 'jjid'},function(args, speaker)
