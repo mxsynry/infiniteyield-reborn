@@ -1979,6 +1979,7 @@ setsimulation = setsimulationradius or set_simulation_radius
 queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
 httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 PlaceId, JobId = game.PlaceId, game.JobId
+local DevConsoleMaster = COREGUI:WaitForChild("DevConsoleMaster")
 local IsOnMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform())
 everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
 everyWebSocket = (syn and syn.websocket and syn.websocket.connect) or (WebSocket and WebSocket.connect)
@@ -16094,7 +16095,6 @@ end)
 
 local endTime = tick()
 local elapsedTime = endTime - startTime
-
 local Modules = {
     Colors = {
         ["Green"] = "0,255,0",
@@ -16102,19 +16102,14 @@ local Modules = {
         ["White"] = "255,255,255",
         ["Pink"] = "255,102,153",
     },
-    Services = {
-        RunService = game:GetService("RunService"),
-        CoreGui = game:GetService("CoreGui"),
-    },
 }
 
 Modules.ChangeColor = function()
     local Loop
-    Loop = Modules.Services.RunService.Heartbeat:Connect(function()
+    Loop = RunService.Heartbeat:Connect(function()
         local success, err = pcall(function()
-            local masterGui = Modules.Services.CoreGui:FindFirstChild("DevConsoleMaster")
-            if masterGui then
-                for _, label in pairs(masterGui:GetDescendants()) do
+            if DevConsoleMaster then
+                for _, label in pairs(DevConsoleMaster:GetDescendants()) do
                     if label:IsA("TextLabel") then
                         label.RichText = true
                     end
@@ -16134,34 +16129,25 @@ Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
     delay = delay or 0.1
 
     local timestamp = os.date("[%H:%M:%S]")
-    local Text = watermark
-
-    warn(string.format("%s %s", timestamp, Text))
-
-    local loadingLabel = nil
     local progress = ""
+    local loadingLabel = nil
+    warn(string.format("%s %s", timestamp, watermark))
 
     repeat
         task.wait()
-        local consoleMaster = Modules.Services.CoreGui:FindFirstChild("DevConsoleMaster")
-        if consoleMaster then
-            for _, label in pairs(consoleMaster:GetDescendants()) do
-                if label:IsA("TextLabel") and string.find(label.Text:lower(), Text:lower()) then
-                    loadingLabel = label
-                    break
-                end
+            for _, label in pairs(DevConsoleMaster:GetDescendants()) do
+                if label:IsA("TextLabel") and string.find(label.Text:lower(), watermark:lower()) then
+                loadingLabel = label
+                break
             end
-        else
-            break
         end
     until loadingLabel
-
 
     for i = 1, 50 do
         progress = progress .. loadingsymbol
         loadingLabel.Text = string.format(
             "<font color='rgb(%s)' size='15'>[%s] [%d%% loaded] %s</font>",
-            Modules.Colors["White"],
+            Modules.Colors[color],
             watermark,
             i * 2,
             progress
@@ -16169,9 +16155,11 @@ Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
         task.wait(delay)
     end
 
+    local elapsedTime = tick() - startTime
     loadingLabel.Text = string.format(
-        "<font color='rgb(%s)' size='15'>✅ ".. timestamp .." -- [%s]: Successfully loaded in ".. "".. elapsedTime .."</font>",
+        "<font color='rgb(%s)' size='15'>✅ %s -- [%s]: Successfully loaded in %.2f seconds</font>",
         Modules.Colors[color],
+        timestamp,
         watermark,
         elapsedTime
     )
