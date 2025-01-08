@@ -4265,76 +4265,93 @@ IndexContents = function(str,bool,cmdbar,Ianim)
 end
 
 task.spawn(function()
-	local chatbox
-	local success, result = pcall(function() chatbox = COREGUI.ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox or game.WaitForChild(PlayerGui, "Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar end)
-	if success then
-		local function chatboxFocused()
-			canvasPos = CMDsF.CanvasPosition
-		end
-		local chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
+    local chatbox
+    local customChatDetected = false
 
-		local function Index()
-			if chatbox.Text:lower():sub(1,1) == prefix then
-				if SettingsOpen == true then
-					task.wait(0.2)
-					CMDsF.Visible = true
-					Settings:TweenPosition(UDim2.new(0, 0, 0, 220), "InOut", "Quart", 0.2, true, nil)
-				end
-				IndexContents(chatbox.Text:lower():sub(2),true)
-			else
-				minimizeHolder()
-				if SettingsOpen == true then
-					task.wait(0.2)
-					Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.2, true, nil)
-					CMDsF.Visible = false
-				end
-			end
-		end
-		local chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
+    for _, descendant in pairs(PlayerScripts:GetDescendants()) do
+        if descendant.Name:lower():match("betterchat") or descendant.Name:lower():match("chatv3") then
+            customChatDetected = true
+            notify("Custom chat system detected: " .. descendant.Name .. ". Will not provide suggestions for commands typed in the chat.")
+            return
+        end
+    end
 
-		local function chatboxFocusLost(enterpressed)
-			if not enterpressed or chatbox.Text:lower():sub(1,1) ~= prefix then
-				IndexContents('',true)
-			end
-			if enterpressed and chatbox.Text:lower():sub(1,1) == prefix then
-				execCmd(chatbox.Text:gsub("^"..prefix,""),Players.LocalPlayer,true)
-			end
-			CMDsF.CanvasPosition = canvasPos
-			minimizeHolder()
-		end
-		local chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+    if not customChatDetected then
+        local success, result = pcall(function()
+            chatbox = COREGUI.ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox
+                or game.WaitForChild(PlayerGui, "Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
+        end)
 
-		task.spawn(function()
-			PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.ChildAdded:Connect(function(newbar)
-				task.wait()
-				if newbar:FindFirstChild('BoxFrame') then
-					chatbox = PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
-					if chatboxFocusedC then chatboxFocusedC:Disconnect() end
-					chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
-					if chatboxFunc then chatboxFunc:Disconnect() end
-					chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
-					if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
-					chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
-				end
-			end)
-		end)
+        if success then
+            local canvasPos
 
-		COREGUI.ExperienceChat.appLayout.ChildAdded:Connect(function(newbar)
-			task.wait()
-			if newbar:FindFirstChild('TextBoxContainer') then
-				chatbox = COREGUI.ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox
-				if chatboxFocusedC then chatboxFocusedC:Disconnect() end
-				chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
-				if chatboxFunc then chatboxFunc:Disconnect() end
-				chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
-				if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
-				chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
-			end
-		end)
+            local function chatboxFocused()
+                canvasPos = CMDsF.CanvasPosition
+            end
+            local chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
 
-		--else
-		--print('Custom chat detected. Will not provide suggestions for commands typed in the chat.')
-	end
+            local function Index()
+                if chatbox.Text:lower():sub(1, 1) == prefix then
+                    if SettingsOpen == true then
+                        task.wait(0.2)
+                        CMDsF.Visible = true
+                        Settings:TweenPosition(UDim2.new(0, 0, 0, 220), "InOut", "Quart", 0.2, true, nil)
+                    end
+                    IndexContents(chatbox.Text:lower():sub(2), true)
+                else
+                    minimizeHolder()
+                    if SettingsOpen == true then
+                        task.wait(0.2)
+                        Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.2, true, nil)
+                        CMDsF.Visible = false
+                    end
+                end
+            end
+            local chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
+
+            local function chatboxFocusLost(enterpressed)
+                if not enterpressed or chatbox.Text:lower():sub(1, 1) ~= prefix then
+                    IndexContents("", true)
+                end
+                if enterpressed and chatbox.Text:lower():sub(1, 1) == prefix then
+                    execCmd(chatbox.Text:gsub("^" .. prefix, ""), Players.LocalPlayer, true)
+                end
+                CMDsF.CanvasPosition = canvasPos
+                minimizeHolder()
+            end
+            local chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+
+            task.spawn(function()
+                PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.ChildAdded:Connect(function(newbar)
+                    task.wait()
+                    if newbar:FindFirstChild("BoxFrame") then
+                        chatbox = PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
+                        if chatboxFocusedC then chatboxFocusedC:Disconnect() end
+                        chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
+                        if chatboxFunc then chatboxFunc:Disconnect() end
+                        chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
+                        if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
+                        chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+                    end
+                end)
+            end)
+
+            COREGUI.ExperienceChat.appLayout.ChildAdded:Connect(function(newbar)
+                task.wait()
+                if newbar:FindFirstChild("TextBoxContainer") then
+                    chatbox = COREGUI.ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox
+                    if chatboxFocusedC then chatboxFocusedC:Disconnect() end
+                    chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
+                    if chatboxFunc then chatboxFunc:Disconnect() end
+                    chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
+                    if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
+                    chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+                end
+            end)
+        else
+            notify('Custom chat detected. Will not provide suggestions for commands typed in the chat.') 
+        end
+    end
 end)
 
 function autoComplete(str,curText)
@@ -4575,6 +4592,8 @@ CMDs[#CMDs + 1] = {NAME = 'float /  platform', DESC = 'Spawns a platform beneath
 CMDs[#CMDs + 1] = {NAME = 'unfloat / noplatform', DESC = 'Removes the platform'}
 CMDs[#CMDs + 1] = {NAME = 'swim', DESC = 'Allows you to swim in the air'}
 CMDs[#CMDs + 1] = {NAME = 'unswim / noswim', DESC = 'Stops you from swimming everywhere'}
+CMDs[#CMDs + 1] = {NAME = 'marble / ball [size]', DESC = 'Turns you into a marble'}
+CMDs[#CMDs + 1] = {NAME = 'unmarble / unball [size]', DESC = 'Turns you back from being a marble'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'setwaypoint / swp [name]', DESC = 'Sets a waypoint at your position'}
 CMDs[#CMDs + 1] = {NAME = 'waypointpos / wpp [name] [X Y Z]', DESC = 'Sets a waypoint with specified coordinates'}
@@ -8194,6 +8213,95 @@ addcmd('unswim',{'noswim'},function(args, speaker)
 			Humanoid:SetStateEnabled(v, true)
 		end
 	end
+end)
+
+local SPEED_MULTIPLIER = 30
+local JUMP_POWER = 60
+local JUMP_GAP = 0.3
+local originalSize
+local originalShape
+local originalCameraSubject
+local marbleConnection
+
+addcmd('marble', {'ball'}, function(args, speaker)
+    local character = game.Players.LocalPlayer.Character
+
+    local ball = character.HumanoidRootPart
+    originalSize = ball.Size
+    originalShape = ball.Shape
+    originalCameraSubject = workspace.CurrentCamera.CameraSubject
+
+    for i, v in ipairs(character:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = false
+        end
+    end
+
+    ball.Shape = Enum.PartType.Ball
+    local size = tonumber(args[1]) or 5
+    ball.Size = Vector3.new(size, size, size)
+    local humanoid = character:WaitForChild("Humanoid")
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Blacklist
+    params.FilterDescendantsInstances = { character }
+
+    marbleConnection = RunService.RenderStepped:Connect(function(delta)
+        ball.CanCollide = true
+        humanoid.PlatformStand = true
+        if UserInputService:GetFocusedTextBox() then
+            return
+        end
+        if UserInputService:IsKeyDown("W") then
+            ball.RotVelocity -= Camera.CFrame.RightVector * delta * SPEED_MULTIPLIER
+        end
+        if UserInputService:IsKeyDown("A") then
+            ball.RotVelocity -= Camera.CFrame.LookVector * delta * SPEED_MULTIPLIER
+        end
+        if UserInputService:IsKeyDown("S") then
+            ball.RotVelocity += Camera.CFrame.RightVector * delta * SPEED_MULTIPLIER
+        end
+        if UserInputService:IsKeyDown("D") then
+            ball.RotVelocity += Camera.CFrame.LookVector * delta * SPEED_MULTIPLIER
+        end
+    end)
+
+    UserInputService.JumpRequest:Connect(function()
+        local result =
+            workspace:Raycast(ball.Position, Vector3.new(0, -((ball.Size.Y / 2) + JUMP_GAP), 0), params)
+        if result then
+            ball.Velocity = ball.Velocity + Vector3.new(0, JUMP_POWER, 0)
+        end
+    end)
+
+    Camera.CameraSubject = ball
+    humanoid.Died:Connect(function()
+        if marbleConnection then
+            marbleConnection:Disconnect()
+        end
+    end)
+end)
+
+addcmd('unmarble', {'unball'}, function()
+    local character = game.Players.LocalPlayer.Character
+    local humanoid = character:WaitForChild("Humanoid")
+    local ball = character.HumanoidRootPart
+
+    if originalSize and originalShape then
+        ball.Size = originalSize
+        ball.Shape = originalShape
+    end
+
+    humanoid.PlatformStand = false
+
+    if originalCameraSubject then
+        workspace.CurrentCamera.CameraSubject = originalCameraSubject
+    else
+        workspace.CurrentCamera.CameraSubject = humanoid
+    end
+
+    if marbleConnection then
+        marbleConnection:Disconnect()
+    end
 end)
 
 local watchingrobloxstaff = false
@@ -16163,6 +16271,10 @@ Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
             end
         end
     until loadingLabel
+
+	if not loadingLabel then 
+		return
+	end
 
     for i = 1, 50 do
         progress = progress .. loadingsymbol
