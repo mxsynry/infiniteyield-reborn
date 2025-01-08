@@ -16273,15 +16273,17 @@ Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
     local loadingLabel = nil
     warn(string.format("%s %s", timestamp, watermark))
 
-    repeat
-        task.wait()
-            for _, label in pairs(DevConsoleMaster:GetDescendants()) do
-                if label:IsA("TextLabel") and string.find(label.Text:lower(), watermark:lower()) then
-                loadingLabel = label
+    if DevConsoleMaster then
+        repeat
+            task.wait()
+                for _, label in pairs(DevConsoleMaster:GetDescendants()) do
+                    if label:IsA("TextLabel") and string.find(label.Text:lower(), watermark:lower()) then
+                    loadingLabel = label
                 break
             end
         end
-    until loadingLabel
+        until loadingLabel
+    else end
 
 	if not loadingLabel then 
 		return
