@@ -4268,11 +4268,13 @@ task.spawn(function()
     local chatbox
     local customChatDetected = false
 
-    for _, descendant in pairs(PlayerScripts:GetDescendants()) do
+    for _, descendant in pairs(Players.PlayerScripts:GetDescendants()) do
         if descendant.Name:lower():match("betterchat") or descendant.Name:lower():match("chatv3") then
             customChatDetected = true
             notify("Custom chat system detected: " .. descendant.Name .. ". Will not provide suggestions for commands typed in the chat.")
             return
+		else
+			
         end
     end
 
