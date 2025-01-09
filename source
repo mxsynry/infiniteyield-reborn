@@ -4266,9 +4266,8 @@ IndexContents = function(str,bool,cmdbar,Ianim)
 end
 
 task.spawn(function()
-	if not isLegacyChat then return end
 	local chatbox
-	local success, result = pcall(function() chatbox = game.WaitForChild(PlayerGui, "Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar end)
+	local success, result = pcall(function() chatbox = COREGUI.ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox or game.WaitForChild(PlayerGui, "Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar end)
 	if success then
 		local function chatboxFocused()
 			canvasPos = CMDsF.CanvasPosition
@@ -4278,15 +4277,15 @@ task.spawn(function()
 		local function Index()
 			if chatbox.Text:lower():sub(1,1) == prefix then
 				if SettingsOpen == true then
-					wait(0.2)
+					task.wait(0.2)
 					CMDsF.Visible = true
 					Settings:TweenPosition(UDim2.new(0, 0, 0, 220), "InOut", "Quart", 0.2, true, nil)
 				end
-				IndexContents(PlayerGui.Chat.Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar.Text:lower():sub(2),true)
+				IndexContents(chatbox.Text:lower():sub(2),true)
 			else
 				minimizeHolder()
 				if SettingsOpen == true then
-					wait(0.2)
+					task.wait(0.2)
 					Settings:TweenPosition(UDim2.new(0, 0, 0, 45), "InOut", "Quart", 0.2, true, nil)
 					CMDsF.Visible = false
 				end
@@ -4298,15 +4297,33 @@ task.spawn(function()
 			if not enterpressed or chatbox.Text:lower():sub(1,1) ~= prefix then
 				IndexContents('',true)
 			end
+			if enterpressed and chatbox.Text:lower():sub(1,1) == prefix then
+				execCmd(chatbox.Text:gsub("^"..prefix,""),Players.LocalPlayer,true)
+			end
 			CMDsF.CanvasPosition = canvasPos
 			minimizeHolder()
 		end
 		local chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
 
-		PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.ChildAdded:Connect(function(newbar)
-			wait()
-			if newbar:FindFirstChild('BoxFrame') then
-				chatbox = PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
+		task.spawn(function()
+			PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.ChildAdded:Connect(function(newbar)
+				task.wait()
+				if newbar:FindFirstChild('BoxFrame') then
+					chatbox = PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
+					if chatboxFocusedC then chatboxFocusedC:Disconnect() end
+					chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
+					if chatboxFunc then chatboxFunc:Disconnect() end
+					chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
+					if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
+					chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+				end
+			end)
+		end)
+
+		COREGUI.ExperienceChat.appLayout.ChildAdded:Connect(function(newbar)
+			task.wait()
+			if newbar:FindFirstChild('TextBoxContainer') then
+				chatbox = COREGUI.ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox
 				if chatboxFocusedC then chatboxFocusedC:Disconnect() end
 				chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
 				if chatboxFunc then chatboxFunc:Disconnect() end
@@ -4315,6 +4332,7 @@ task.spawn(function()
 				chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
 			end
 		end)
+
 		--else
 		--print('Custom chat detected. Will not provide suggestions for commands typed in the chat.')
 	end
