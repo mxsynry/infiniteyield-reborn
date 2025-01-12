@@ -4306,19 +4306,23 @@ task.spawn(function()
 		local chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
 
 		task.spawn(function()
-			PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.ChildAdded:Connect(function(newbar)
-				task.wait()
-				if newbar:FindFirstChild('BoxFrame') then
-					chatbox = PlayerGui:WaitForChild("Chat").Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
-					if chatboxFocusedC then chatboxFocusedC:Disconnect() end
-					chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
-					if chatboxFunc then chatboxFunc:Disconnect() end
-					chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
-					if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
-					chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+			local chatBarParent = PlayerGui:FindFirstChild("Chat") and PlayerGui.Chat.Frame:FindFirstChild("ChatBarParentFrame")
+			if not chatBarParent then return end
+			chatBarParent.ChildAdded:Connect(function(newbar)
+				if newbar:IsA("Frame") and newbar:FindFirstChild("BoxFrame") then
+					local chatbox = newbar:FindFirstChild("BoxFrame") 
+						and newbar.BoxFrame.Frame:FindFirstChild("ChatBar")
+					if chatbox then
+						if chatboxFocusedC then chatboxFocusedC:Disconnect() end
+						chatboxFocusedC = chatbox.Focused:Connect(chatboxFocused)
+						if chatboxFunc then chatboxFunc:Disconnect() end
+						chatboxFunc = chatbox:GetPropertyChangedSignal("Text"):Connect(Index)
+						if chatboxFocusLostC then chatboxFocusLostC:Disconnect() end
+						chatboxFocusLostC = chatbox.FocusLost:Connect(chatboxFocusLost)
+					end
 				end
 			end)
-		end)
+		end)	
 
 		COREGUI.ExperienceChat.appLayout.ChildAdded:Connect(function(newbar)
 			task.wait()
@@ -4493,10 +4497,11 @@ CMDs[#CMDs + 1] = {NAME = 'discord / dc', DESC = 'Invite to the Discord server.'
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
 CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Give you the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
-CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment'}
-CMDs[#CMDs + 1] = {NAME = 'luarmor / luarmortest / luarmorcheck', DESC = "Tests the executor's luarmor compatibility, credit: Luarmor themselves"}
+CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment, credits to vxsty'}
+CMDs[#CMDs + 1] = {NAME = 'sunc / sunctest / sunccheckevn', DESC = 'Tests all sUNC Environment, credits will be printed'}
+CMDs[#CMDs + 1] = {NAME = 'luarmor / luarmortest / luarmorcheck', DESC = "Tests the executor's luarmor compatibility, credits to Luarmor themselves"}
 CMDs[#CMDs + 1] = {NAME = 'identitytest / testidentity / validateidentity', DESC = 'Tests the executors identity if its faked or not'}
-CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), credit: vxsty'}
+CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), credits to vxsty'}
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
@@ -7969,6 +7974,7 @@ addcmd('flyspeed',{'flysp', 'tweenflyspeed', 'tweenflysp', 'vflysp','vehicleflys
 		iyflyspeed = speed
         flySpeed = speed
         vehicleflyspeed = speed
+        CFspeed = speed
 	end
 end)
 
@@ -8027,15 +8033,18 @@ addcmd('togglefly',{},function(args, speaker)
 	end
 end)
 
-CFspeed = 50
+CFspeed = 5
+CFing = false
 addcmd('cframefly', {'cfly'}, function(args, speaker)
 	-- Full credit to peyton#9148 (apeyton)
+    execCmd('untweenfly\\unfly\\unvfly\\uncfly')
+	CFing = true
 	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
 	local Head = speaker.Character:WaitForChild("Head")
 	Head.Anchored = true
 	if CFloop then CFloop:Disconnect() end
 	CFloop = RunService.Heartbeat:Connect(function(deltaTime)
-		local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * deltaTime)
+		local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * 10 * deltaTime)
 		local headCFrame = Head.CFrame
 		local cameraCFrame = workspace.CurrentCamera.CFrame
 		local cameraOffset = headCFrame:ToObjectSpace(cameraCFrame).Position
@@ -8049,6 +8058,7 @@ addcmd('cframefly', {'cfly'}, function(args, speaker)
 end)
 
 addcmd('uncframefly',{'uncfly'},function(args, speaker)
+    CFing = false
 	if CFloop then
 		CFloop:Disconnect()
 		speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
@@ -11523,35 +11533,44 @@ addcmd('unwalkto',{'nowalkto','unfollow','nofollow'},function(args, speaker)
 	waypointwalkto = false
 end)
 
-addcmd('freeze',{'fr'},function(args, speaker)
-	local players = getPlayer(args[1], speaker)
-	if players ~= nil then
-		for i,v in pairs(players) do
-			task.spawn(function()
-				for i, x in next, Players[v].Character:GetDescendants() do
-					if x:IsA("BasePart") and not x.Anchored then
-						x.Anchored = true
-					end
-				end
-			end)
-		end
-	end
+addcmd('freeze', {'fr'}, function(args, speaker)
+    local players = getPlayer(args[1], speaker)
+    if players ~= nil then
+        for i, v in pairs(players) do
+            task.spawn(function()
+                if (v == speaker.Name or args[1] == nil or args[1]:lower() == "me") and CFing then
+                    notify("freeze", "Cannot freeze yourself while cfly is active.")
+                    return
+                end
+
+                for _, x in next, Players[v].Character:GetDescendants() do
+                    if x:IsA("BasePart") and not x.Anchored then
+                        x.Anchored = true
+                    end
+                end
+            end)
+        end
+    end
 end)
 
+addcmd('thaw', {'unfreeze', 'unfr'}, function(args, speaker)
+    local players = getPlayer(args[1], speaker)
+    if players ~= nil then
+        for i, v in pairs(players) do
+            task.spawn(function()
+                if (v == speaker.Name or args[1] == nil or args[1]:lower() == "me") and CFing then
+                    notify("thaw", "Cannot thaw yourself while cfly is active.")
+                    return
+                end
 
-addcmd('thaw',{'unfreeze','unfr'},function(args, speaker)
-	local players = getPlayer(args[1], speaker)
-	if players ~= nil then
-		for i,v in pairs(players) do
-			task.spawn(function()
-				for i, x in next, Players[v].Character:GetDescendants() do
-					if x.Name ~= floatName and x:IsA("BasePart") and x.Anchored then
-						x.Anchored = false
-					end
-				end
-			end)
-		end
-	end
+                for _, x in next, Players[v].Character:GetDescendants() do
+                    if x.Name ~= floatName and x:IsA("BasePart") and x.Anchored then
+                        x.Anchored = false
+                    end
+                end
+            end)
+        end
+    end
 end)
 
 oofing = false
@@ -12607,6 +12626,11 @@ end)
 
 addcmd("unc",{"unctest","unccheckevn"},function(args, speaker)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/unified-naming-convention/NamingStandard/main/UNCCheckEnv.lua"))()
+	notify("Check console", "Press F9 or type /console in chat to see results")
+end)
+
+addcmd("sunc",{"sunctest","sunccheckevn"},function(args, speaker)
+    loadstring(game:HttpGet("https://gitlab.com/sens3/nebunu/-/raw/main/HummingBird8's_sUNC_yes_i_moved_to_gitlab_because_my_github_acc_got_brickedd/sUNCm0m3n7.lua"))()
 	notify("Check console", "Press F9 or type /console in chat to see results")
 end)
 
