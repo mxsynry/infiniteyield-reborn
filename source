@@ -8039,12 +8039,12 @@ CFspeed = 5
 CFing = false
 local lastGravity=workspace.Gravity
 addcmd('cframefly', {'cfly'}, function(args, speaker)
-	-- Full credit to peyton#9148 (apeyton)
+	-- credit to peyton#9148 (apeyton)
     execCmd('untweenfly\\unfly\\unvfly\\uncfly')
 	CFing = true
 	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
 	local Head = speaker.Character:WaitForChild("Head")
-	workspace.Gravity=0 -- this part was by tatsuki
+	execCmd("grav 0") -- this part was by tatsuki
 	if CFloop then CFloop:Disconnect() end
 	CFloop = RunService.Heartbeat:Connect(function(deltaTime)
 		local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * 10 * deltaTime)
@@ -15938,7 +15938,7 @@ if IsOnMobile then
 	QuickCapture.Position = UDim2.new(0.489, 0, 0, 0)
 	QuickCapture.Size = UDim2.new(0, 32, 0, 33)
 	QuickCapture.Font = Enum.Font.SourceSansBold
-	QuickCapture.Text = "IY"
+	QuickCapture.Text = "IYR"
 	QuickCapture.TextColor3 = Color3.fromRGB(255, 255, 255)
 	QuickCapture.TextSize = 20
 	QuickCapture.TextWrapped = true
