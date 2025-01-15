@@ -8037,13 +8037,14 @@ end)
 
 CFspeed = 5
 CFing = false
+local lastGravity=workspace.Gravity
 addcmd('cframefly', {'cfly'}, function(args, speaker)
 	-- Full credit to peyton#9148 (apeyton)
     execCmd('untweenfly\\unfly\\unvfly\\uncfly')
 	CFing = true
 	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
 	local Head = speaker.Character:WaitForChild("Head")
-	Head.Anchored = true
+	workspace.Gravity=0 -- this part was by tatsuki
 	if CFloop then CFloop:Disconnect() end
 	CFloop = RunService.Heartbeat:Connect(function(deltaTime)
 		local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * 10 * deltaTime)
@@ -8061,6 +8062,8 @@ end)
 
 addcmd('uncframefly',{'uncfly'},function(args, speaker)
     CFing = false
+	workspace.Gravity=lastGravity
+	lastGravity=workspace.Gravity
 	if CFloop then
 		CFloop:Disconnect()
 		speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
