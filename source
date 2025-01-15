@@ -4363,7 +4363,7 @@ function autoComplete(str,curText)
 	end
 	if curText:sub(subPos+1,subPos+1) == "!" then subPos += 1 end
 	Cmdbar.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
-	task.wait()
+	RunService.RenderStepped:Wait()
 	Cmdbar.Text = Cmdbar.Text:gsub( '\t', '' )
 	Cmdbar.CursorPosition = #Cmdbar.Text+1--1020
 end
@@ -4935,6 +4935,8 @@ CMDs[#CMDs + 1] = {NAME = 'abdistance / ardistance [distance]', DESC = 'Sets the
 CMDs[#CMDs + 1] = {NAME = 'abdepth / ardepth [depth]', DESC = 'Sets how deep you should go when you are voiding someone that is banging you'}
 CMDs[#CMDs + 1] = {NAME = 'abdelay / ardelay [distance]', DESC = 'Sets the delay for how long to be voided until the person banging you should be nullified.'}
 CMDs[#CMDs + 1] = {NAME = 'wallwalk / walkonwalls', DESC = 'Walk on walls'}
+CMDs[#CMDs + 1] = {NAME = 'removeads / adblock', DESC = 'Automatically removes ad billboards'}
+CMDs[#CMDs + 1] = {NAME = 'scare / spook [player]', DESC = 'Teleports in front of a player for half a second'}
 CMDs[#CMDs + 1] = {NAME = 'whatexpsareonline / whatexploitsareonline / weao', DESC = 'Tells you what exploits are online'}
 CMDs[#CMDs + 1] = {NAME = 'robloxstaffwatch', DESC = 'Notify if a roblox staff member joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'unrobloxstaffwatch', DESC = 'Disable roblox staff watch'}
@@ -15585,6 +15587,42 @@ addcmd('trip',{},function(args, speaker)
 	end
 end)
 
+addcmd("removeads", {"adblock"}, function(args, speaker)
+    while wait() do
+        pcall(function()
+            for i, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("PackageLink") then
+                    if v.Parent:FindFirstChild("ADpart") then
+                        v.Parent:Destroy()
+                    end
+                    if v.Parent:FindFirstChild("AdGuiAdornee") then
+                        v.Parent.Parent:Destroy()
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+addcmd("scare", {"spook"}, function(args, speaker)
+    local players = getPlayer(args[1], speaker)
+    local oldpos = nil
+
+    for _, v in pairs(players) do
+        local root = speaker.Character and getRoot(speaker.Character)
+        local target = Players[v]
+        local targetRoot = target and target.Character and getRoot(target.Character)
+
+        if root and targetRoot and target ~= speaker then
+            oldpos = root.CFrame
+            root.CFrame = targetRoot.CFrame + targetRoot.CFrame.lookVector * 2
+            root.CFrame = CFrame.new(root.Position, targetRoot.Position)
+            task.wait(0.5)
+            root.CFrame = oldpos
+        end
+    end
+end)
+
 local freezingua = nil
 frozenParts = {}
 addcmd('freezeunanchored',{'freezeua'},function(args, speaker)
@@ -15897,10 +15935,11 @@ if IsOnMobile then
 	QuickCapture.Position = UDim2.new(0.489, 0, 0, 0)
 	QuickCapture.Size = UDim2.new(0, 32, 0, 33)
 	QuickCapture.Font = Enum.Font.SourceSansBold
-	QuickCapture.Text = "IYR"
+	QuickCapture.Text = "IY"
 	QuickCapture.TextColor3 = Color3.fromRGB(255, 255, 255)
-	QuickCapture.TextSize = 20.000
+	QuickCapture.TextSize = 20
 	QuickCapture.TextWrapped = true
+	QuickCapture.ZIndex = 10
 	QuickCapture.Draggable = true
 	UICorner.Name = randomString()
 	UICorner.CornerRadius = UDim.new(0.5, 0)
