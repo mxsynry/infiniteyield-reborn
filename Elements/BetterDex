@@ -16,7 +16,7 @@ local ServicesMt = {
   end
 }
 
-local _ENV = (getgenv and getgenv()) or _G
+local _ENV = ((getgenv and getgenv()) or getrenv or getfenv or G_)()
 local selection = nil
 local nodes = {}
 
