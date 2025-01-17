@@ -25,7 +25,6 @@ local startTime = tick()
 	 r15 support for backpack
   ]]
 
--- // this thing disables most errors except for syntaxes and variables shits i guess
 local getconnections = getconnections or get_signal_cons
 if getconnections then
 	for _, v in pairs(getconnections(game:GetService("ScriptContext").Error)) do
@@ -1983,6 +1982,7 @@ PlaceId, JobId = game.PlaceId, game.JobId
 
 local DevConsoleMaster = COREGUI:FindFirstChild("DevConsoleMaster") or COREGUI:WaitForChild("DevConsoleMaster", 5)
 local IsOnMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform())
+--local _ENV = _ENV or (getgenv and getgenv()) or getrenv or getfenv or G_
 everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
 everyWebSocket = (syn and syn.websocket and syn.websocket.connect) or (WebSocket and WebSocket.connect)
 
@@ -4363,7 +4363,7 @@ function autoComplete(str,curText)
 	end
 	if curText:sub(subPos+1,subPos+1) == "!" then subPos += 1 end
 	Cmdbar.Text = curText:sub(1,subPos) .. str:sub(1, stop - 1)..' '
-	task.wait()
+	RunService.RenderStepped:Wait()
 	Cmdbar.Text = Cmdbar.Text:gsub( '\t', '' )
 	Cmdbar.CursorPosition = #Cmdbar.Text+1--1020
 end
@@ -4497,15 +4497,16 @@ CMDs[#CMDs + 1] = {NAME = 'discord / dc', DESC = 'Invite to the Discord server.'
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
 CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Give you the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox instance'}
-CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment, credits to vxsty'}
+CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment, by vxsty'}
 CMDs[#CMDs + 1] = {NAME = 'sunc / sunctest / sunccheckevn', DESC = 'Tests all sUNC Environment, credits will be printed'}
-CMDs[#CMDs + 1] = {NAME = 'luarmor / luarmortest / luarmorcheck', DESC = "Tests the executor's luarmor compatibility, credits to Luarmor themselves"}
+CMDs[#CMDs + 1] = {NAME = 'luarmor / luarmortest / luarmorcheck', DESC = "Tests the executor's luarmor compatibility, by Luarmor themselves"}
 CMDs[#CMDs + 1] = {NAME = 'identitytest / testidentity / validateidentity', DESC = 'Tests the executors identity if its faked or not'}
-CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), credits to vxsty'}
+CMDs[#CMDs + 1] = {NAME = 'addunc / addmoreunc / adduncevn', DESC = 'Adds some UNC Environment(s), by vxsty'}
 CMDs[#CMDs + 1] = {NAME = 'clienttoken / ctoken', DESC = 'Copy your client token.'}
 CMDs[#CMDs + 1] = {NAME = 'execute / run / code', DESC = 'Execute a LuaU code.'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
-CMDs[#CMDs + 1] = {NAME = 'solaraexplorer / solaradex', DESC = 'Opens DEX by Moon for Solara'}
+CMDs[#CMDs + 1] = {NAME = 'betterexplorer / betterdex', DESC = 'Opens BetterDEX by REDz'}
+CMDs[#CMDs + 1] = {NAME = 'solaraexplorer / solaradex', DESC = 'Opens SolaraDEX by Iflorisme'}
 CMDs[#CMDs + 1] = {NAME = 'secureexplorer / securedex / bypasseddex', DESC = 'Opens Bypassed DEX by HamstaGang'}
 CMDs[#CMDs + 1] = {NAME = 'olddex / odex', DESC = 'Opens Old DEX by Moon'}
 CMDs[#CMDs + 1] = {NAME = 'remotespy / rspy', DESC = 'Opens Simple Spy V3'}
@@ -4937,6 +4938,8 @@ CMDs[#CMDs + 1] = {NAME = 'abdistance / ardistance [distance]', DESC = 'Sets the
 CMDs[#CMDs + 1] = {NAME = 'abdepth / ardepth [depth]', DESC = 'Sets how deep you should go when you are voiding someone that is banging you'}
 CMDs[#CMDs + 1] = {NAME = 'abdelay / ardelay [distance]', DESC = 'Sets the delay for how long to be voided until the person banging you should be nullified.'}
 CMDs[#CMDs + 1] = {NAME = 'wallwalk / walkonwalls', DESC = 'Walk on walls'}
+CMDs[#CMDs + 1] = {NAME = 'removeads / adblock', DESC = 'Automatically removes ad billboards'}
+CMDs[#CMDs + 1] = {NAME = 'scare / spook [player]', DESC = 'Teleports in front of a player for half a second'}
 CMDs[#CMDs + 1] = {NAME = 'whatexpsareonline / whatexploitsareonline / weao', DESC = 'Tells you what exploits are online'}
 CMDs[#CMDs + 1] = {NAME = 'robloxstaffwatch', DESC = 'Notify if a roblox staff member joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'unrobloxstaffwatch', DESC = 'Disable roblox staff watch'}
@@ -4948,7 +4951,7 @@ CMDs[#CMDs + 1] = {NAME = 'windowfocus', DESC = 'Detects if Roblox is focused or
 CMDs[#CMDs + 1] = {NAME = 'unwindowfocus', DESC = 'Stops detecting if Roblox is focused or not'}
 CMDs[#CMDs + 1] = {NAME = 'infinity', DESC = 'Makes your tools go in a infinity path'}
 CMDs[#CMDs + 1] = {NAME = 'uninfinity', DESC = ''}
-CMDs[#CMDs + 1] = {NAME = "decompiler", DESC = "loads a decompiler function to your exploit environment"}
+CMDs[#CMDs + 1] = {NAME = "decompiler [1-3]", DESC = "chooses to load a decompiler function to your exploit environment"}
 CMDs[#CMDs + 1] = {NAME = 'hidechar [player]', DESC = 'Hides the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhidechar [player]', DESC = 'Stops hiding the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhideallchars', DESC = 'Unhides all the characters.'}
@@ -8037,13 +8040,14 @@ end)
 
 CFspeed = 5
 CFing = false
+local lastGravity=workspace.Gravity
 addcmd('cframefly', {'cfly'}, function(args, speaker)
-	-- Full credit to peyton#9148 (apeyton)
+	-- credit to peyton#9148 (apeyton)
     execCmd('untweenfly\\unfly\\unvfly\\uncfly')
 	CFing = true
 	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
 	local Head = speaker.Character:WaitForChild("Head")
-	Head.Anchored = true
+	execCmd("grav 0") -- this part was by tatsuki
 	if CFloop then CFloop:Disconnect() end
 	CFloop = RunService.Heartbeat:Connect(function(deltaTime)
 		local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * 10 * deltaTime)
@@ -8061,6 +8065,8 @@ end)
 
 addcmd('uncframefly',{'uncfly'},function(args, speaker)
     CFing = false
+	execCmd("grav".. lastGravity)
+	lastGravity=workspace.Gravity
 	if CFloop then
 		CFloop:Disconnect()
 		speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
@@ -9071,24 +9077,125 @@ addcmd('clearerror',{'clearerrors'},function(args, speaker)
 	GuiService:ClearError()
 end)
 
--- REMINDER: Replace this with konstant
-addcmd("decompiler", {}, function(args, speaker)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Edward-Bill/Scripts/main/DecompilerForShitSploits"))()
+-- REMINDER: Replace this with konstant --Ry: bish where can i find konstant?!
+addcmd("decompile", {"decompiler"}, function(args, speaker)
+    local option = tonumber(args[1]) or 1
+    local Decompile = nil
+
+    if option == 1 then
+        local Success, Decompile_Source = pcall(function()
+            return game:HttpGet("https://raw.githubusercontent.com/w-a-e/Advanced-Decompiler-V3/main/init.lua", true)
+        end)
+        
+        if Success then
+            local CONSTANTS = [[
+            local ENABLED_REMARKS = {
+            NATIVE_REMARK = true,
+            INLINE_REMARK = true
+			}
+
+            local DECOMPILER_TIMEOUT = 10
+
+            local READER_FLOAT_PRECISION = 7 -- up to 99
+            local SHOW_INSTRUCTION_LINES = false
+            local SHOW_REFERENCES = true
+            local SHOW_OPERATION_NAMES = false
+            local SHOW_MISC_OPERATIONS = false
+            local LIST_USED_GLOBALS = true
+            local RETURN_ELAPSED_TIME = false]]
+            
+            xpcall(function()loadstring(string.gsub(string.gsub(Decompile_Source, "return %(x %% 2^32%) // %(2^disp%)", "return math.floor((x %% 2^32) / (2^disp))", 1), ";;CONSTANTS HERE;;", CONSTANTS), "Advanced-Decompiler-V3")() end, notify)
+            Decompile = _ENV.decompile
+            notify("Decompiler 1 Loaded", "Advanced Decompiler V3 is now loaded and ready to use.")
+        else
+            notify("Error", "Failed to load Decompiler 1.")
+        end
+
+    elseif option == 2 then
+        local Success, Result = pcall(function()
+            return loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/Decompile/main/MobileV2.Lua"))()
+        end)
+        
+        if Success then
+            Decompile = Result
+            Decompile.setclipboard = true
+            Decompile.getupvalues = false
+            Decompile.getconstants = false
+            Decompile.antiloop = false
+            notify("Decompiler 2 Loaded", "REDzHUB MobileV2 Decompiler is now loaded and ready to use.")
+        else
+            notify("Error", "Failed to load Decompiler 2.")
+        end
+
+    elseif option == 3 then
+        local Success, Decompile_Source = pcall(function()
+            return game:HttpGet("https://raw.githubusercontent.com/OfficiallyMelon/BetterDecompiler/refs/heads/main/main.lua")
+        end)
+        
+        if Success then
+            Decompile = loadstring(Decompile_Source)
+            notify("Decompiler 3 Loaded", "OfficiallyMelon's BetterDecompiler is now loaded and ready to use.")
+        else
+            notify("Error", "Failed to load Decompiler 3.")
+        end
+    else
+        notify("Error", "Invalid decompiler option. Use 1, 2, or 3.")
+    end
 end)
 
-addcmd('removeanticheat',{'deleteanticheat'},function(args, speaker)
-function AntiAntiBang(parent)
-    for _, child in pairs(parent:GetChildren()) do
-        local name = child.Name:lower()
-        if (name:find("anti") or name:find("exploit") or name:find("dll")) and child:IsA("LocalScript") then
-            child:Destroy()
-        end
-        AntiAntiBang(child)
+addcmd('removeanticheat', {'deleteanticheat'}, function(args, speaker)
+    local checkcaller = checkcaller
+    if not checkcaller then
+        notify('Client Antikick', "Your executor doesn't support checkcaller. Scripts run by your executor may still kick you.")
+        checkcaller = function() return false end
+        task.wait(2)
     end
-end
 
-    AntiAntiBang(game)
-	notify('Client AntiAntiCheat','Client AntiAntiCheat is now active (only effective on localscript anticheats)')
+    function BasicAntiAntiCheat(parent)
+        for _, child in pairs(parent:GetChildren()) do
+            local name = child.Name:lower()
+            if (name:find("anti") or name:find("exploit") or name:find("dll")) and child:IsA("LocalScript") then
+                child:Destroy()
+            end
+            BasicAntiAntiCheat(child)
+        end
+    end
+
+    function AdonisAntiCheatBypass()
+        if not hookfunction then
+			task.wait(2)
+            notify('Adonis AntiCheat', "Failed to bypass Adonis: `hookfunction` is not supported by your executor.")
+            return false
+        end
+
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua"))()
+
+        local badFunctions = {"Crash", "HardCrash", "GPUCrash", "RAMCrash", "KillClient", "SetFPS"}
+
+        for i, v in pairs(getgc()) do
+            if type(v) == "function" then
+                local info = debug.getinfo(v)
+                local functionName = info.name
+
+                if info.source:find('=.Core.Functions') and table.find(badFunctions, functionName) then
+                    print("Hooked \"" .. functionName .. "\"")
+                    hookfunction(v, function()
+                        print("Stopped \"" .. functionName .. "\" from running")
+                    end)
+                end
+            end
+        end
+		wait(2)
+        notify('Adonis AntiCheat', 'Adonis AntiCheat bypass is now active.')
+        return true
+    end
+
+    BasicAntiAntiCheat(game)
+    notify('Client AntiCheat', 'Basic client-sided AntiCheat removal is now active (only effective on LocalScript anticheats).')
+
+    if not AdonisAntiCheatBypass() then
+        notify('AntiCheat Status', 'Basic client-sided AntiCheat removal loaded (only effective on LocalScript anticheats), but failed to load Adonis Bypasses.')
+    end
 end)
 
 addcmd('clientantikick',{'antikick'},function(args, speaker)
@@ -12670,15 +12777,20 @@ addcmd("execute", {"run", "code"}, function(args, speaker)
         return loadstring(code)()
     end)
     if success then
-        notify("Execution Success", "Code executed successfully. Check console for possible results.")
+        notify("Execution Success", "Code executed successfully. Result: " .. tostring(result or "nil"))
     else
-        notify("Execution Error", "An error occurred. Check console for details.")
+        notify("Execution Error", "Error: " .. tostring(result))
     end
 end)
 
 addcmd('explorer', {'dex'}, function(args, speaker)
 	notify('Loading', 'Hold on a sec')
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+end)
+
+addcmd('betterexplorer', {'betterdex'}, function(args, speaker)
+	notify('Loading', 'Hold on a sec')
+	loadstring(game:HttpGet(("https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/BetterDex" or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/BetterDex' or 'https://scriptblox.com/raw/Universal-Script-DEX-Explorer-For-Mobile-17871')))()
 end)
 
 addcmd('solaraexplorer', {'solaradex'}, function(args, speaker)
@@ -12773,7 +12885,11 @@ end)
 
 addcmd('remotespy',{'rspy'},function(args, speaker)
 	notify("Loading",'Hold on a sec')
-	loadstring(game:HttpGet("https://github.com/FurryBoyYT/synz_fixed_dex/raw/refs/heads/main/simple_spy.lua"))()
+	if not IsOnMobile then
+	    loadstring(game:HttpGet("https://github.com/FurryBoyYT/synz_fixed_dex/raw/refs/heads/main/simple_spy.lua"))()
+	else
+	    loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua"))()
+	end
 end)
 
 addcmd('audiologger',{'alogger'},function(args, speaker)
@@ -15587,6 +15703,42 @@ addcmd('trip',{},function(args, speaker)
 	end
 end)
 
+addcmd("removeads", {"adblock"}, function(args, speaker)
+    while wait() do
+        pcall(function()
+            for i, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("PackageLink") then
+                    if v.Parent:FindFirstChild("ADpart") then
+                        v.Parent:Destroy()
+                    end
+                    if v.Parent:FindFirstChild("AdGuiAdornee") then
+                        v.Parent.Parent:Destroy()
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+addcmd("scare", {"spook"}, function(args, speaker)
+    local players = getPlayer(args[1], speaker)
+    local oldpos = nil
+
+    for _, v in pairs(players) do
+        local root = speaker.Character and getRoot(speaker.Character)
+        local target = Players[v]
+        local targetRoot = target and target.Character and getRoot(target.Character)
+
+        if root and targetRoot and target ~= speaker then
+            oldpos = root.CFrame
+            root.CFrame = targetRoot.CFrame + targetRoot.CFrame.lookVector * 2
+            root.CFrame = CFrame.new(root.Position, targetRoot.Position)
+            task.wait(0.5)
+            root.CFrame = oldpos
+        end
+    end
+end)
+
 local freezingua = nil
 frozenParts = {}
 addcmd('freezeunanchored',{'freezeua'},function(args, speaker)
@@ -15901,8 +16053,9 @@ if IsOnMobile then
 	QuickCapture.Font = Enum.Font.SourceSansBold
 	QuickCapture.Text = "IYR"
 	QuickCapture.TextColor3 = Color3.fromRGB(255, 255, 255)
-	QuickCapture.TextSize = 20.000
+	QuickCapture.TextSize = 20
 	QuickCapture.TextWrapped = true
+	QuickCapture.ZIndex = 10
 	QuickCapture.Draggable = true
 	UICorner.Name = randomString()
 	UICorner.CornerRadius = UDim.new(0.5, 0)
