@@ -9074,9 +9074,9 @@ addcmd('clearerror',{'clearerrors'},function(args, speaker)
 	GuiService:ClearError()
 end)
 
--- REMINDER: Replace this with konstant
+-- REMINDER: Replace this with konstant --Ry: bish where can i find konstant?!
 addcmd("decompiler", {}, function(args, speaker)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Edward-Bill/Scripts/main/DecompilerForShitSploits"))()
+	loadstring(game:HttpGet(("https://raw.githubusercontent.com/w-a-e/Advanced-Decompiler-V3/main/init.lua" or 'https://raw.githubusercontent.com/OfficiallyMelon/BetterDecompiler/refs/heads/main/main.lua')))()
 end)
 
 addcmd('removeanticheat',{'deleteanticheat'},function(args, speaker)
