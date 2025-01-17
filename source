@@ -12886,7 +12886,7 @@ addcmd('remotespy',{'rspy'},function(args, speaker)
 	if not IsOnMobile then
 	    loadstring(game:HttpGet("https://github.com/FurryBoyYT/synz_fixed_dex/raw/refs/heads/main/simple_spy.lua"))()
 	else
-	    loadstring(game:HttpGet(("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua" or "https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/MobileSpy")))()
+	    loadstring(game:HttpGet(("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua" or "https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/MobileSpy" or "https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/MobileSpy")))()
 	end
 end)
 
