@@ -9352,29 +9352,62 @@ addcmd('setfpscap', {'fpscap', 'maxfps'}, function(args, speaker)
 	end
 end)
 
-addcmd("printglobals", {"printg", 'getglobals', 'getg'}, function(args, speaker)
-    for k, v in pairs(getgenv()) do
-       print(k, v)
+addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
+    local globalTypes = {
+        {name = "getgenv", env = getgenv and getgenv() or nil},
+        {name = "getrenv", env = getrenv or nil},
+        {name = "getfenv", env = getfenv and getfenv() or nil},
+        {name = "G_", env = rawget(_G, "G_") or nil},
+        {name = "_ENV", env = _ENV or nil}
+    }
+
+    for _, global in pairs(globalTypes) do
+        if global.env then
+            print("Globals in", global.name)
+			wait(2)
+            for k, v in pairs(global.env) do
+                print(k, v)
+            end
+        else
+            notify("Skipped:", global.name, "(not available)")
+        end
     end
 end)
 
 addcmd("setglobal", {"setg"}, function(args, speaker)
-    if #args ~= 2 then
-        notify("Error", "Usage: setglobal [globalname] [true/false]")
+    if #args < 2 then
+        notify("SetGlobal", "Usage: setglobal [globalname] [value]")
         return
     end
+
     local globalName = args[1]
-    local value = args[2]
+    local value = table.concat(args, " ", 2)
+
     if value:lower() == "true" then
         value = true
     elseif value:lower() == "false" then
         value = false
-    else
-        notify("Error", "The value must be either 'true' or 'false'.")
-        return
+    elseif value:lower() == "nil" then
+        value = nil
     end
-    _G[globalName] = value
-    notify("Global Variable Set", string.format("Global variable '_G%s' set to %s.", globalName, tostring(value)))
+
+    local globalEnvs = {
+        {name = "getgenv", env = getgenv and getgenv() or nil},
+        {name = "getrenv", env = getrenv or nil},
+        {name = "getfenv", env = getfenv and getfenv() or nil},
+        {name = "_G", env = _G or nil},
+        {name = "_ENV", env = _ENV or nil},
+        {name = "G_", env = rawget(_G, "G_") or nil}
+    }
+
+    for _, global in pairs(globalEnvs) do
+        if global.env then
+            global.env[globalName] = value
+            notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, global.name, tostring(value or "nil")))
+        else
+            notify("Skipped", string.format("Environment '%s' does not exist or is unavailable.", global.name))
+        end
+    end
 end)
 
 addcmd('notify',{},function(args, speaker)
