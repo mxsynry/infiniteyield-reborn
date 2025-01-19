@@ -9376,7 +9376,7 @@ end)
 
 addcmd("setglobal", {"setg"}, function(args, speaker)
     if #args < 2 then
-        notify("SetGlobal", "Usage: setglobal [globalname] [value]")
+        notify("Error", "Usage: setglobal [globalname] [value]")
         return
     end
 
@@ -9387,7 +9387,7 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
         value = true
     elseif value:lower() == "false" then
         value = false
-    elseif value:lower() == "nil" then
+    elseif value:lower() == "_nil_" then
         value = nil
     end
 
@@ -9402,8 +9402,13 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
 
     for _, global in pairs(globalEnvs) do
         if global.env then
-            global.env[globalName] = value
-            notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, global.name, tostring(value or "nil")))
+            if value == nil then
+                global.env[globalName] = nil
+                notify("Global Removed", string.format("Removed '%s' from %s.", globalName, global.name))
+            else
+                global.env[globalName] = value
+                notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, global.name, tostring(value)))
+            end
         else
             notify("Skipped", string.format("Environment '%s' does not exist or is unavailable.", global.name))
         end
