@@ -9353,35 +9353,69 @@ addcmd('setfpscap', {'fpscap', 'maxfps'}, function(args, speaker)
 end)
 
 addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
-    local globalTypes = {
-        {name = "getgenv", env = getgenv and getgenv() or nil},
-        {name = "getrenv", env = getrenv or nil},
-        {name = "getfenv", env = getfenv and getfenv() or nil},
-        {name = "G_", env = rawget(_G, "G_") or nil},
-        {name = "_ENV", env = _ENV or nil}
+    if #args < 1 then
+        notify("Error", "Usage: printglobals [container].[globalname] or [container] to scan all.")
+        return
+    end
+
+    local fullPath = args[1]
+    local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$") or fullPath, nil
+
+    containerName = containerName:gsub("%(%)", "")
+
+    local availableEnvs = {
+        getgenv = getgenv and getgenv() or nil,
+        getrenv = getrenv or nil,
+        getfenv = getfenv and getfenv() or nil,
+        _G = _G or nil
     }
 
-    for _, global in pairs(globalTypes) do
-        if global.env then
-            print("Globals in", global.name)
-			wait(2)
-            for k, v in pairs(global.env) do
-                print(k, v)
-            end
+    local env = availableEnvs[containerName]
+
+    if not env then
+        notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
+        return
+    end
+
+    local startTime = tick()
+    local timeout = 5
+
+    if globalName then
+        if env[globalName] ~= nil then
+            print(string.format("[%s.%s] = %s", containerName, globalName, tostring(env[globalName])))
+            notify("Global Found", string.format("%s.%s = %s", containerName, globalName, tostring(env[globalName])))
         else
-            notify("Skipped:", global.name, "(not available)")
+            notify("Global Not Found", string.format("'%s' does not exist in %s.", globalName, containerName))
+        end
+    else
+        for k, v in pairs(env) do
+            print(string.format("[%s.%s] = %s", containerName, k, tostring(v)))
+
+            if tick() - startTime > timeout then
+                notify("Timeout", "Execution time exceeded while getting globals.")
+                return
+            end
         end
     end
 end)
 
 addcmd("setglobal", {"setg"}, function(args, speaker)
     if #args < 2 then
-        notify("Error", "Usage: setglobal [globalname] [value]")
+        notify("Error", "Usage: setglobal [container].[globalname] [value]")
         return
     end
 
-    local globalName = args[1]
-    local value = table.concat(args, " ", 2)
+    local fullPath = args[1]
+    local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$")
+
+    if not containerName or not globalName then
+        notify("Error", "Invalid format. Use [container].[globalname].")
+        return
+    end
+
+    containerName = containerName:gsub("%(%)", "")
+
+    local value = args[2]
 
     if value:lower() == "true" then
         value = true
@@ -9391,27 +9425,27 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
         value = nil
     end
 
-    local globalEnvs = {
-        {name = "getgenv", env = getgenv and getgenv() or nil},
-        {name = "getrenv", env = getrenv or nil},
-        {name = "getfenv", env = getfenv and getfenv() or nil},
-        {name = "_G", env = _G or nil},
-        {name = "_ENV", env = _ENV or nil},
-        {name = "G_", env = rawget(_G, "G_") or nil}
+    local availableEnvs = {
+        getgenv = getgenv and getgenv() or nil,
+        getrenv = getrenv or nil,
+        getfenv = getfenv and getfenv() or nil,
+        _G = _G or nil
     }
 
-    for _, global in pairs(globalEnvs) do
-        if global.env then
-            if value == nil then
-                global.env[globalName] = nil
-                notify("Global Removed", string.format("Removed '%s' from %s.", globalName, global.name))
-            else
-                global.env[globalName] = value
-                notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, global.name, tostring(value)))
-            end
+    local env = availableEnvs[containerName]
+
+    if env then
+        local success, err = pcall(function()
+            env[globalName] = value
+        end)
+
+        if success then
+            notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, containerName, tostring(value)))
         else
-            notify("Skipped", string.format("Environment '%s' does not exist or is unavailable.", global.name))
+            notify("Write Failed", string.format("Failed to set '%s' in %s: %s", globalName, containerName, err))
         end
+    else
+        notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
     end
 end)
 
