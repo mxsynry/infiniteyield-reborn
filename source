@@ -4750,8 +4750,8 @@ CMDs[#CMDs + 1] = {NAME = 'chokeon / suckon [player] [lower / upper]', DESC = 'C
 CMDs[#CMDs + 1] = {NAME = 'masturbate / jerkoff / meatbeat [speed]', DESC = 'Masturbates. (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unmasturbate / stopjerkoff / stopmeatbeat', DESC = 'Masturbates. (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
-]]
 CMDs[#CMDs + 1] = {NAME = 'unchokeon / unsuckon', DESC = 'Stops the choking.'}
+]]
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / unkiss / unbiden', DESC = 'Stops the hugging.'}
 CMDs[#CMDs + 1] = {NAME = 'backpack / attach [player]', DESC = 'Be someones backpack'}
@@ -9354,29 +9354,102 @@ addcmd('setfpscap', {'fpscap', 'maxfps'}, function(args, speaker)
 	end
 end)
 
-addcmd("printglobals", {"printg", 'getglobals', 'getg'}, function(args, speaker)
-    for k, v in pairs(getgenv()) do
-       print(k, v)
+addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
+    if #args < 1 then
+        notify("Error", "Usage: printglobals [container].[globalname] or [container] to scan all.")
+        return
+    end
+
+    local fullPath = args[1]
+    local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$") or fullPath, nil
+
+    containerName = containerName:gsub("%(%)", "")
+
+    local availableEnvs = {
+        getgenv = getgenv and getgenv() or nil,
+        getrenv = getrenv or nil,
+        getfenv = getfenv and getfenv() or nil,
+        _G = _G or nil
+    }
+
+    local env = availableEnvs[containerName]
+
+    if not env then
+        notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
+        return
+    end
+
+    local startTime = tick()
+    local timeout = 5
+
+    if globalName then
+        if env[globalName] ~= nil then
+            print(string.format("[%s.%s] = %s", containerName, globalName, tostring(env[globalName])))
+            notify("Global Found", string.format("%s.%s = %s", containerName, globalName, tostring(env[globalName])))
+        else
+            notify("Global Not Found", string.format("'%s' does not exist in %s.", globalName, containerName))
+        end
+    else
+        for k, v in pairs(env) do
+            print(string.format("[%s.%s] = %s", containerName, k, tostring(v)))
+			notify('Console','Press F9 to open the console')
+
+            if tick() - startTime > timeout then
+                notify("Timeout", "Execution time exceeded while getting globals.")
+                return
+            end
+        end
     end
 end)
 
 addcmd("setglobal", {"setg"}, function(args, speaker)
-    if #args ~= 2 then
-        notify("Error", "Usage: setglobal [globalname] [true/false]")
+    if #args < 2 then
+        notify("Error", "Usage: setglobal [container].[globalname] [value]")
         return
     end
-    local globalName = args[1]
+
+    local fullPath = args[1]
+    local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$")
+
+    if not containerName or not globalName then
+        notify("Error", "Invalid format. Use [container].[globalname].")
+        return
+    end
+
+    containerName = containerName:gsub("%(%)", "")
+
     local value = args[2]
+
     if value:lower() == "true" then
         value = true
     elseif value:lower() == "false" then
         value = false
-    else
-        notify("Error", "The value must be either 'true' or 'false'.")
-        return
+    elseif value:lower() == "_nil_" then
+        value = nil
     end
-    _G[globalName] = value
-    notify("Global Variable Set", string.format("Global variable '_G%s' set to %s.", globalName, tostring(value)))
+
+    local availableEnvs = {
+        getgenv = getgenv and getgenv() or nil,
+        getrenv = getrenv or nil,
+        getfenv = getfenv and getfenv() or nil,
+        _G = _G or nil
+    }
+
+    local env = availableEnvs[containerName]
+
+    if env then
+        local success, err = pcall(function()
+            env[globalName] = value
+        end)
+
+        if success then
+            notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, containerName, tostring(value)))
+        else
+            notify("Write Failed", string.format("Failed to set '%s' in %s: %s", globalName, containerName, err))
+        end
+    else
+        notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
+    end
 end)
 
 addcmd('notify',{},function(args, speaker)
