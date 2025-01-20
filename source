@@ -9390,6 +9390,7 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
     else
         for k, v in pairs(env) do
             print(string.format("[%s.%s] = %s", containerName, k, tostring(v)))
+			notify('Console','Press F9 to open the console')
 
             if tick() - startTime > timeout then
                 notify("Timeout", "Execution time exceeded while getting globals.")
