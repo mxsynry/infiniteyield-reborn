@@ -7519,8 +7519,9 @@ addcmd("toggleantifling", {"tganfl"}, function(args, speaker)
 end)
 
 addcmd("antichatlogs",{"acl", "antichatlogger"}, function(args, speaker)
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/AnthonyIsntHere/anthonysrepository/main/scripts/AntiChatLogger.lua",true))()
-        notify("Anthony's AntiChatLogger", "Loaded, only works on LegacyChatService")
+	notify("Loading",'Hold on a sec')
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/AnthonyIsntHere/anthonysrepository/main/scripts/AntiChatLogger.lua",true))()
+    notify("Anthony's AntiChatLogger", "Loaded, only works on LegacyChatService")
 end)
 
 addcmd("chatlogswebhook", {"logswebhook"}, function(args, speaker)
