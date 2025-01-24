@@ -8064,7 +8064,7 @@ end)
 
 addcmd('uncframefly',{'uncfly'},function(args, speaker)
     CFing = false
-	execCmd("grav".. lastGravity)
+	execCmd("grav ".. lastGravity)
 	lastGravity=workspace.Gravity
 	if CFloop then
 		CFloop:Disconnect()
