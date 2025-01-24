@@ -2819,7 +2819,7 @@ reference = (function()
 	local lastPress = nil
 	inviteButton.MouseButton1Click:Connect(function()
 		if everyClipboard then
-			toClipboard("https://discord.gg/wfYF6SCAb7")
+			toClipboard("discord.com/invite/wfYF6SCAb7")
 			inviteButton.Text = "Copied"
 		else
 			inviteButton.Text = "No Clipboard Function, type out the link"
@@ -2828,7 +2828,7 @@ reference = (function()
 		lastPress = pressTime
 		task.wait(2)
 		if lastPress ~= pressTime then return end
-		inviteButton.Text = "Copy Discord Invite Link (https://discord.gg/wfYF6SCAb7)"
+		inviteButton.Text = "Copy Discord Invite Link (discord.gg/wfYF6SCAb7)"
 	end)
 	dragGUI(main)
 	main.Parent = PARENT
