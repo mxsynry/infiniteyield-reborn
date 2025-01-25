@@ -48,7 +48,14 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/RyXeleron/infiniteyi
 - Actually has an OnLeave detection.
 - Being the source of the main IY's updates (ehhh maybe, i've saw them adding shits from mine before :sob:)
 
-![image](https://github.com/user-attachments/assets/fee6dd58-e438-47ab-b4a3-1f14f2a2d80b)
+### Preview
+
+![image](https://github.com/user-attachments/assets/37f1e323-b344-497d-809f-9d92490d248e)
+
+### Comparison
+
+![image](https://github.com/user-attachments/assets/d0c64301-bd74-4804-9dd7-de0832683c0c)
+![image](https://github.com/user-attachments/assets/f2e5e15f-ba60-4ee4-85e9-83eb67cfaae8)
 
 ## Credits
 
