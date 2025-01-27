@@ -8221,16 +8221,20 @@ local JUMP_POWER = 60
 local JUMP_GAP = 0.3
 local originalSize
 local originalShape
-local originalCameraSubject
+local originalCameraSubject = workspace.CurrentCamera.CameraSubject
 local marbleConnection
 
 addcmd('marble', {'ball'}, function(args, speaker)
     local character = game.Players.LocalPlayer.Character
+    local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+
+    if not torso then
+        return
+    end
 
     local ball = character.HumanoidRootPart
     originalSize = ball.Size
     originalShape = ball.Shape
-    originalCameraSubject = workspace.CurrentCamera.CameraSubject
 
     for i, v in ipairs(character:GetDescendants()) do
         if v:IsA("BasePart") then
@@ -8274,7 +8278,8 @@ addcmd('marble', {'ball'}, function(args, speaker)
         end
     end)
 
-    Camera.CameraSubject = ball
+    Camera.CameraSubject = torso
+
     humanoid.Died:Connect(function()
         if marbleConnection then
             marbleConnection:Disconnect()
