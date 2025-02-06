@@ -11725,7 +11725,7 @@ addcmd('freeze', {'fr'}, function(args, speaker)
     if players ~= nil then
         for i, v in pairs(players) do
             task.spawn(function()
-                if (v == speaker.Name or args[1] == nil or args[1]:lower() == "me") and CFing then
+                if (v == speaker.Name or args[1] == nil or args[1]:lower() == "me") and CFing == true then
                     notify("freeze", "Cannot freeze yourself while cfly is active.")
                     return
                 end
@@ -11745,7 +11745,7 @@ addcmd('thaw', {'unfreeze', 'unfr'}, function(args, speaker)
     if players ~= nil then
         for i, v in pairs(players) do
             task.spawn(function()
-                if (v == speaker.Name or args[1] == nil or args[1]:lower() == "me") and CFing then
+                if (v == speaker.Name or args[1] == nil or args[1]:lower() == "me") and CFing == true then
                     notify("thaw", "Cannot thaw yourself while cfly is active.")
                     return
                 end
