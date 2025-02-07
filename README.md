@@ -3,7 +3,9 @@
 
 <p align="center">
 	Infinite Yield but 𝗯𝗲𝘁𝘁𝗲𝗿
+	
 	Infinite Yield but for actual devs
+
 	Infinite Yield but for edaters
 </p>
 
