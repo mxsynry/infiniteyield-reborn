@@ -9456,7 +9456,7 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
 
     local timeout = (containerName == "all") and 10 or 5
 
-    if containerName == "all" then
+    if containerName or arg[1] == "all" then
         for envName, envTable in pairs(availableEnvs) do
             printGlobals(envName, envTable, timeout)
         end
