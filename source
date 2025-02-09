@@ -9091,52 +9091,96 @@ addcmd("decompile", {"decompiler"}, function(args, speaker)
         local Success, Decompile_Source = pcall(function()
             return game:HttpGet("https://raw.githubusercontent.com/w-a-e/Advanced-Decompiler-V3/main/init.lua", true)
         end)
-        
+
         if Success then
             local CONSTANTS = [[
             local ENABLED_REMARKS = {
-            NATIVE_REMARK = true,
-            INLINE_REMARK = true
-			}
+                NATIVE_REMARK = true,
+                INLINE_REMARK = true
+            }
 
             local DECOMPILER_TIMEOUT = 10
-
             local READER_FLOAT_PRECISION = 7 -- up to 99
             local SHOW_INSTRUCTION_LINES = false
             local SHOW_REFERENCES = true
             local SHOW_OPERATION_NAMES = false
             local SHOW_MISC_OPERATIONS = false
             local LIST_USED_GLOBALS = true
-            local RETURN_ELAPSED_TIME = false]]
-            
-            xpcall(function()loadstring(string.gsub(string.gsub(Decompile_Source, "return %(x %% 2^32%) // %(2^disp%)", "return math.floor((x %% 2^32) / (2^disp))", 1), ";;CONSTANTS HERE;;", CONSTANTS), "Advanced-Decompiler-V3")() end, notify)
+            local RETURN_ELAPSED_TIME = false
+            ]]
+
+            xpcall(function()
+                loadstring(
+                    string.gsub(
+                        string.gsub(Decompile_Source, "return %(x %% 2^32%) // %(2^disp%)", "return math.floor((x %% 2^32) / (2^disp))", 1), 
+                        ";;CONSTANTS HERE;;", 
+                        CONSTANTS
+                    ), 
+                    "Advanced-Decompiler-V3"
+                )()
+            end, notify)
+
             Decompile = _ENV.decompile
+            getgenv().decompile = decompile
             notify("Decompiler 1 Loaded", "Advanced Decompiler V3 is now loaded and ready to use.")
         else
             notify("Error", "Failed to load Decompiler 1.")
         end
 
     elseif option == 2 then
-        local Success, Result = pcall(function()
-            return loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/Decompile/main/MobileV2.Lua"))()
-        end)
-        
-        if Success then
-            Decompile = Result
-            Decompile.setclipboard = true
-            Decompile.getupvalues = false
-            Decompile.getconstants = false
-            Decompile.antiloop = false
-            notify("Decompiler 2 Loaded", "REDzHUB MobileV2 Decompiler is now loaded and ready to use.")
-        else
-            notify("Error", "Failed to load Decompiler 2.")
+        if not getscriptbytecode then
+            notify("Error", "Decompiler 2 is not supported on your exploit.")
+            return
         end
+
+        local API = "http://api.plusgiant5.com"
+        local last_call = 0
+
+        local function call(konstantType, scriptPath)
+            local success, bytecode = pcall(getscriptbytecode, scriptPath)
+
+            if not success then
+                return "Failed to get script bytecode, error:\n\n--[[\n" .. tostring(bytecode) .. "\n--]]"
+            end
+
+            local time_elapsed = os.clock() - last_call
+            if time_elapsed <= 0.5 then
+                task.wait(0.5 - time_elapsed)
+            end
+
+            local httpResult = request({
+                Url = API .. konstantType,
+                Body = bytecode,
+                Method = "POST",
+                Headers = {["Content-Type"] = "text/plain"}
+            })
+            last_call = os.clock()
+
+            if httpResult.StatusCode ~= 200 then
+                return "Error occurred while requesting the API, status: " .. tostring(httpResult.StatusCode) .. "\n\n--[[\n" .. tostring(httpResult.Body) .. "\n--]]"
+            else
+                return httpResult.Body
+            end
+        end
+
+        local function decompile(scriptPath)
+            return call("/konstant/decompile", scriptPath)
+        end
+
+        local function disassemble(scriptPath)
+            return call("/konstant/disassemble", scriptPath)
+        end
+
+        getgenv().decompile = decompile
+        getgenv().disassemble = disassemble
+
+        notify("Decompiler 2 Loaded", "Konstant Decompiler is now ready to use.")
 
     elseif option == 3 then
         local Success, Decompile_Source = pcall(function()
             return game:HttpGet("https://raw.githubusercontent.com/OfficiallyMelon/BetterDecompiler/refs/heads/main/main.lua")
         end)
-        
+
         if Success then
             Decompile = loadstring(Decompile_Source)
             notify("Decompiler 3 Loaded", "OfficiallyMelon's BetterDecompiler is now loaded and ready to use.")
@@ -9370,40 +9414,54 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
 
     containerName = containerName:gsub("%(%)", "")
 
-    local availableEnvs = {
-        getgenv = getgenv and getgenv() or nil,
-        getrenv = getrenv or nil,
-        getfenv = getfenv and getfenv() or nil,
-        _G = _G or nil
-    }
-
-    local env = availableEnvs[containerName]
-
-    if not env then
-        notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
-        return
+    local function safeCall(func, ...)
+        if type(func) == "function" then
+            local success, result = pcall(func, ...)
+            if success then return result end
+        end
+        return nil
     end
 
-    local startTime = tick()
-    local timeout = 5
+    local availableEnvs = {
+        getgenv = safeCall(getgenv),
+        getrenv = safeCall(getrenv),
+        getfenv = safeCall(getfenv),
+        getgc = safeCall(getgc, false),
+        getreg = safeCall(getreg),
+        getinstances = safeCall(getinstances),
+        getnilinstances = safeCall(getnilinstances),
+        getloadedmodules = safeCall(getloadedmodules),
+        _G = _G
+    }
 
-    if globalName then
-        if env[globalName] ~= nil then
-            print(string.format("[%s.%s] = %s", containerName, globalName, tostring(env[globalName])))
-            notify("Global Found", string.format("%s.%s = %s", containerName, globalName, tostring(env[globalName])))
-        else
-            notify("Global Not Found", string.format("'%s' does not exist in %s.", globalName, containerName))
+    local function printGlobals(envName, envTable, timeout)
+        if not envTable then
+            notify("Error", string.format("Container '%s' does not exist or is inaccessible.", envName))
+            return
         end
-    else
-        for k, v in pairs(env) do
-            print(string.format("[%s.%s] = %s", containerName, k, tostring(v)))
-			notify('Console','Press F9 to open the console')
+
+        print("🔹 Globals for:", envName)
+        local startTime = tick()
+
+        for k, v in pairs(envTable) do
+            print(string.format("[%s.%s] = %s", envName, k, tostring(v)))
+            notify('Console', "Press F9 to open the console")
 
             if tick() - startTime > timeout then
-                notify("Timeout", "Execution time exceeded while getting globals.")
+                notify("Timeout", string.format("Execution time exceeded for '%s'.", envName))
                 return
             end
         end
+    end
+
+    local timeout = (containerName == "all") and 10 or 5
+
+    if containerName == "all" then
+        for envName, envTable in pairs(availableEnvs) do
+            printGlobals(envName, envTable, timeout)
+        end
+    else
+        printGlobals(containerName, availableEnvs[containerName], timeout)
     end
 end)
 
