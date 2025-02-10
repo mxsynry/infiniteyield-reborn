@@ -9411,7 +9411,6 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
 
     local fullPath = args[1]
     local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$") or fullPath, nil
-
     containerName = containerName:gsub("%(%)", "")
 
     local function safeCall(func, ...)
@@ -9445,7 +9444,7 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
 
         for k, v in pairs(envTable) do
             print(string.format("[%s.%s] = %s", envName, k, tostring(v)))
-            notify('Console', "Press F9 to open the console")
+            notify("Console", "Press F9 to open the console")
 
             if tick() - startTime > timeout then
                 notify("Timeout", string.format("Execution time exceeded for '%s'.", envName))
@@ -9454,14 +9453,30 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
         end
     end
 
-    local timeout = (containerName == "all" or "") and 10 or 5
+    local timeout = (containerName == "all") and 10 or 5
 
-    if containerName and arg[1] == ("all" or "") then
+    if containerName == "all" then
         for envName, envTable in pairs(availableEnvs) do
             printGlobals(envName, envTable, timeout)
         end
     else
-        printGlobals(containerName, availableEnvs[containerName], timeout)
+        local env = availableEnvs[containerName]
+
+        if env then
+            if globalName then
+                local value = env[globalName]
+                if value ~= nil then
+                    print(string.format("[%s.%s] = %s", containerName, globalName, tostring(value)))
+                    notify("Global Found", string.format("%s.%s = %s", containerName, globalName, tostring(value)))
+                else
+                    notify("Global Not Found", string.format("'%s' does not exist in %s.", globalName, containerName))
+                end
+            else
+                printGlobals(containerName, env, timeout)
+            end
+        else
+            notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
+        end
     end
 end)
 
