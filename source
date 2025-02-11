@@ -1993,6 +1993,14 @@ local textChannels = TextChatService:FindFirstChild("TextChannels")
 local RBXGeneral = if textChannels then textChannels:FindFirstChild("RBXGeneral") else nil
 local chatChannel = not isChatLegacy and RBXGeneral
 
+local function scall(func, ...)
+    if type(func) == "function" then
+        local success, result = pcall(func, ...)
+        if success then return result end
+    end
+    return nil
+end
+
 function vtype(o, t)
     if o == nil then return false end
     if type(o) == "userdata" then return typeof(o) == t end
@@ -9413,23 +9421,15 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
     local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$") or fullPath, nil
     containerName = containerName:gsub("%(%)", "")
 
-    local function safeCall(func, ...)
-        if type(func) == "function" then
-            local success, result = pcall(func, ...)
-            if success then return result end
-        end
-        return nil
-    end
-
     local availableEnvs = {
-        getgenv = safeCall(getgenv),
-        getrenv = safeCall(getrenv),
-        getfenv = safeCall(getfenv),
-        getgc = safeCall(getgc, false),
-        getreg = safeCall(getreg),
-        getinstances = safeCall(getinstances),
-        getnilinstances = safeCall(getnilinstances),
-        getloadedmodules = safeCall(getloadedmodules),
+        getgenv = scall(getgenv),
+        getrenv = scall(getrenv),
+        getfenv = scall(getfenv),
+        getgc = scall(getgc, false),
+        getreg = scall(getreg),
+        getinstances = scall(getinstances),
+        getnilinstances = scall(getnilinstances),
+        getloadedmodules = scall(getloadedmodules),
         _G = _G
     }
 
