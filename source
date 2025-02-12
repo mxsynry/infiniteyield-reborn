@@ -9195,8 +9195,20 @@ addcmd("decompile", {"decompiler"}, function(args, speaker)
         else
             notify("Error", "Failed to load Decompiler 3.")
         end
+
+	elseif option == 4 then
+        local Success, Decompile_Source = pcall(function()
+            return game:HttpGet("https://raw.githubusercontent.com/LegoHacker1337/PseudoLuaDecompiler/refs/heads/main/Decompiler.lua")
+        end)
+
+        if Success then
+            Decompile = loadstring(Decompile_Source)
+            notify("Decompiler 4 Loaded", "LegoHacker1337's PseudoLuaDecompiler is now loaded and ready to use.")
+        else
+            notify("Error", "Failed to load Decompiler 4.")
+        end
     else
-        notify("Error", "Invalid decompiler option. Use 1, 2, or 3.")
+        notify("Error", "Invalid decompiler option. Use 1, 2, 3 or 4.")
     end
 end)
 
