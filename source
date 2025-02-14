@@ -9523,7 +9523,6 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
     containerName = containerName:gsub("%(%)", "")
 
     local value = args[2]
-
     if value:lower() == "true" then
         value = true
     elseif value:lower() == "false" then
@@ -9532,28 +9531,23 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
         value = nil
     end
 
+    -- Safecall Wrapper
+    local function scall(fn, ...)
+        if type(fn) == "function" then
+            local success, result = pcall(fn, ...)
+            if success then
+                return result
+            end
+        end
+        return nil
+    end
+
+    -- Define all environments with safecalls
     local availableEnvs = {
         getgenv = scall(getgenv),
         getrenv = scall(getrenv),
         getfenv = scall(getfenv),
-		getsenv = scall(getsenv),
-        getgc = scall(getgc, false),
-        getreg = scall(getreg),
-        getinstances = scall(getinstances),
-        getnilinstances = scall(getnilinstances),
-        getloadedmodules = scall(getloadedmodules),
-		getprotectedguis = scall(getprotectedguis),
-		getscripts = scall(getscripts),
-		getthreadidentity = scall(getthreadidentity),
-		getthreadcontext = scall(getthreadcontext),
-		gethui = scall(gethui),
-		getrunningscripts = scall(getrunningscripts),
-		getrenderproperty = scall(getrenderproperty),
-		getnamecallmethod = scall(getnamecallmethod),
-		getcallbackvalue = scall(getcallbackvalue),
-		getcustomasset = scall(getcustomasset),
-		getscriptclosure = scall(getscriptclosure),
-		getscripthash = scall(getscripthash)
+        getsenv = scall(getsenv),
         _G = _G
     }
 
