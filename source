@@ -9553,6 +9553,7 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
 		getcallbackvalue = scall(getcallbackvalue),
 		getcustomasset = scall(getcustomasset),
 		getscriptclosure = scall(getscriptclosure),
+		getscripthash = scall(getscripthash)
         _G = _G
     }
 
