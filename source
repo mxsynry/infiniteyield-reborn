@@ -9531,7 +9531,6 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
         value = nil
     end
 
-    -- Safecall Wrapper
     local function scall(fn, ...)
         if type(fn) == "function" then
             local success, result = pcall(fn, ...)
@@ -9542,7 +9541,6 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
         return nil
     end
 
-    -- Define all environments with safecalls
     local availableEnvs = {
         getgenv = scall(getgenv),
         getrenv = scall(getrenv),
