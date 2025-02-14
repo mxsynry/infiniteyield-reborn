@@ -2001,6 +2001,8 @@ local function scall(func, ...)
     return nil
 end
 
+getgenv().scall = scall and scall()
+
 function vtype(o, t)
     if o == nil then return false end
     if type(o) == "userdata" then return typeof(o) == t end
@@ -9437,11 +9439,23 @@ addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
         getgenv = scall(getgenv),
         getrenv = scall(getrenv),
         getfenv = scall(getfenv),
+		getsenv = scall(getsenv),
         getgc = scall(getgc, false),
         getreg = scall(getreg),
         getinstances = scall(getinstances),
         getnilinstances = scall(getnilinstances),
         getloadedmodules = scall(getloadedmodules),
+		getprotectedguis = scall(getprotectedguis),
+		getscripts = scall(getscripts),
+		getthreadidentity = scall(getthreadidentity),
+		getthreadcontext = scall(getthreadcontext),
+		gethui = scall(gethui),
+		getrunningscripts = scall(getrunningscripts),
+		getrenderproperty = scall(getrenderproperty),
+		getnamecallmethod = scall(getnamecallmethod),
+		getcallbackvalue = scall(getcallbackvalue),
+		getcustomasset = scall(getcustomasset),
+		getscriptclosure = scall(getscriptclosure),
         _G = _G
     }
 
@@ -9519,10 +9533,27 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
     end
 
     local availableEnvs = {
-        getgenv = getgenv and getgenv() or nil,
-        getrenv = getrenv or nil,
-        getfenv = getfenv and getfenv() or nil,
-        _G = _G or nil
+        getgenv = scall(getgenv),
+        getrenv = scall(getrenv),
+        getfenv = scall(getfenv),
+		getsenv = scall(getsenv),
+        getgc = scall(getgc, false),
+        getreg = scall(getreg),
+        getinstances = scall(getinstances),
+        getnilinstances = scall(getnilinstances),
+        getloadedmodules = scall(getloadedmodules),
+		getprotectedguis = scall(getprotectedguis),
+		getscripts = scall(getscripts),
+		getthreadidentity = scall(getthreadidentity),
+		getthreadcontext = scall(getthreadcontext),
+		gethui = scall(gethui),
+		getrunningscripts = scall(getrunningscripts),
+		getrenderproperty = scall(getrenderproperty),
+		getnamecallmethod = scall(getnamecallmethod),
+		getcallbackvalue = scall(getcallbackvalue),
+		getcustomasset = scall(getcustomasset),
+		getscriptclosure = scall(getscriptclosure),
+        _G = _G
     }
 
     local env = availableEnvs[containerName]
