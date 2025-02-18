@@ -6971,7 +6971,7 @@ end)
 addcmd("serverhop", {"shop"}, function(args, speaker)
 	if httprequest then
 		local servers = {}
-		local req = httprequest({Url = string.format("https://api.iyr.lol/servers?Id=%d", PlaceId)})
+		local req = httprequest({Url = string.format("https://api.iyr.lol/servers?id=%d", PlaceId)})
 		local body = HttpService:JSONDecode(req.Body)
 		if body and body.data then
 			for i, v in next, body.data do
@@ -6994,7 +6994,7 @@ end)
 local canOpenServerIist = true
 addcmd('serverlist',{'slist'},function(args, speaker)
 	if httprequest then
-		local listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?Id=%d", PlaceId)})
+		local listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?id=%d", PlaceId)})
 		local listbody = HttpService:JSONDecode(listreq.Body)
 		if listbody and listbody.data then
 			if not canOpenServerIist then return end
@@ -7200,7 +7200,7 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 						v:Destroy()
 					end
 				end
-				listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?Id=%d", PlaceId)})
+				listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?id=%d", PlaceId)})
 				listbody = HttpService:JSONDecode(listreq.Body)
 				task.wait(.5)
 				addservertemplate()
