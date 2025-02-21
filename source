@@ -3082,15 +3082,20 @@ function saves()
                     if vtype(json.currentText2, "table") then currentText2 = Color3.new(json.currentText2[1],json.currentText2[2],json.currentText2[3]) end
                     if vtype(json.currentScroll, "table") then currentScroll = Color3.new(json.currentScroll[1],json.currentScroll[2],json.currentScroll[3]) end
                     if vtype(json.eventBinds, "string") then loadedEventData = json.eventBinds end
-                end)
-                if not success then
-                    jsonAttempts = jsonAttempts + 1
-                    warn("Save Json Error:", response)
-                    warn("Overwriting Save File")
-                    writefile("IY_FE.iy", defaults, true)
-                    wait()
-                    saves()
-                end
+				end)
+				if not success then
+					jsonAttempts = jsonAttempts + 1
+					warn("Save Json Error:", response)
+					warn("Overwriting Save File")
+					writefileCooldown("IY_FE.iy", defaults)
+					task.wait()
+					saves()
+				end
+			else
+				writefileCooldown("IY_FE.iy", defaults)
+				task.wait()
+				saves()
+			end
             else
                 writefile("IY_FE.iy", defaults, true)
                 wait()
