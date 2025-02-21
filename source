@@ -3057,12 +3057,11 @@ end
 local loadedEventData = nil
 local jsonAttempts = 0
 function saves()
-    if writefileExploit() and readfileExploit() and jsonAttempts < 10 then
-        local readSuccess, out = readfile("IY_FE.iy", true)
-        if readSuccess then
-            if out ~= nil and tostring(out):gsub("%s", "") ~= "" then
-                local success, response = pcall(function()
-                    local json = HttpService:JSONDecode(out)
+	if writefileExploit() and jsonAttempts < 50 then
+		if pcall(function() readfile("IY_FE.iy") end) then
+			if readfile("IY_FE.iy") ~= nil then
+				local success, response = pcall(function()
+					local json = HttpService:JSONDecode(readfile("IY_FE.iy"))
                     if vtype(json.prefix, "string") then prefix = json.prefix else prefix = ';' end
                     if vtype(json.StayOpen, "boolean") then StayOpen = json.StayOpen else StayOpen = false end
                     if vtype(json.keepIY, "boolean") then KeepInfYield = json.keepIY else KeepInfYield = true end
@@ -3083,19 +3082,14 @@ function saves()
                     if vtype(json.currentScroll, "table") then currentScroll = Color3.new(json.currentScroll[1],json.currentScroll[2],json.currentScroll[3]) end
                     if vtype(json.eventBinds, "string") then loadedEventData = json.eventBinds end
 				end)
-				if not success then
-					jsonAttempts = jsonAttempts + 1
-					warn("Save Json Error:", response)
-					warn("Overwriting Save File")
-					writefileCooldown("IY_FE.iy", defaults)
-					task.wait()
-					saves()
-				end
-			else
-				writefileCooldown("IY_FE.iy", defaults)
-				task.wait()
-				saves()
-			end
+                if not success then
+                    jsonAttempts = jsonAttempts + 1
+                    warn("Save Json Error:", response)
+                    warn("Overwriting Save File")
+                    writefile("IY_FE.iy", defaults, true)
+                    wait()
+                    saves()
+                end
             else
                 writefile("IY_FE.iy", defaults, true)
                 wait()
@@ -3131,6 +3125,7 @@ function saves()
         end
     end
 end
+
 
 saves()
 
