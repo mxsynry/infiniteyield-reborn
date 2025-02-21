@@ -1,0 +1,261 @@
+pcall(function()
+	task.defer(function()
+		local hf = hookfunction or function() end
+		Plugins.ButtonLabel.Text = "Manage Plugins" .. " (x" .. #PluginsTable .. ")"
+		Aliases.ButtonLabel.Text = "Edit Aliases" .. " (x" .. #aliases .. ")"
+		Positions.ButtonLabel.Text = "Edit/Goto Waypoints" .. " (x" .. #WayPoints .. ")"
+		Keybinds.ButtonLabel.Text = "Edit Keybinds" .. " (x" .. #binds .. ")"
+		local old
+		old = hf(table.remove, function(...)
+			old(...)
+			local t = ({ ... })[1]
+			if t == binds then
+				Keybinds.ButtonLabel.Text = "Edit Keybinds" .. " (x" .. #binds .. ")"
+			elseif t == WayPoints then
+				Positions.ButtonLabel.Text = "Edit/Goto Waypoints" .. " (x" .. #WayPoints .. ")"
+			elseif t == aliases then
+				Aliases.ButtonLabel.Text = "Edit Aliases" .. " (x" .. #aliases .. ")"
+			elseif t == PluginsTable then
+				Plugins.ButtonLabel.Text = "Manage Plugins" .. " (x" .. #PluginsTable .. ")"
+			end
+		end)
+		setmetatable(binds, {
+			__newindex = function(_, index, value)
+				rawset(_, index, value)
+				Keybinds.ButtonLabel.Text = "Edit Keybinds" .. " (x" .. #binds .. ")"
+			end,
+		})
+		setmetatable(WayPoints, {
+			__newindex = function(_, index, value)
+				rawset(_, index, value)
+				Positions.ButtonLabel.Text = "Edit/Goto Waypoints" .. " (x" .. #WayPoints .. ")"
+			end,
+		})
+		setmetatable(aliases, {
+			__newindex = function(_, index, value)
+				rawset(_, index, value)
+				Aliases.ButtonLabel.Text = "Edit Aliases" .. " (x" .. #aliases .. ")"
+			end,
+		})
+		setmetatable(PluginsTable, {
+			__newindex = function(_, index, value)
+				rawset(_, index, value)
+				Plugins.ButtonLabel.Text = "Manage Plugins" .. " (x" .. #PluginsTable .. ")"
+			end,
+		})
+
+		function getCount()
+			repeat
+				wait()
+			until eventEditor.SaveData() ~= "[]"
+			local sd = eventEditor.SaveData()
+			local data = game:GetService("HttpService"):JSONDecode(sd)
+			local count = 0
+			for i, v in pairs(data) do
+				for i, v in pairs(v) do
+					count += 1
+				end
+			end
+			return count
+		end
+
+		EventBind.ButtonLabel.Text = "Edit Event Binds" .. " (x" .. getCount() .. ")"
+
+		eventEditor.SetOnEdited(function()
+			updatesaves()
+			EventBind.ButtonLabel.Text = "Edit Event Binds" .. " (x" .. getCount() .. ")"
+		end)
+	end)
+
+	local endTime = tick()
+	local elapsedTime = endTime - startTime
+	local Modules = {
+		Colors = {
+			["Green"] = "0,255,0",
+			["Cyan"] = "33,161,163",
+			["White"] = "255,255,255",
+			["Pink"] = "255,102,153",
+		},
+	}
+
+	Modules.ChangeColor = function()
+		local Loop
+		Loop = RunService.Heartbeat:Connect(function()
+			local success, err = pcall(function()
+				if DevConsoleMaster then
+					for _, label in pairs(DevConsoleMaster:GetDescendants()) do
+						if label:IsA("TextLabel") then
+							label.RichText = true
+						end
+					end
+				else
+					Loop:Disconnect()
+				end
+			end)
+
+			if not success then
+				Loop:Disconnect()
+			end
+		end)
+	end
+
+	Modules.LoadingBar = function(watermark, color, delay, loadingsymbol)
+		delay = delay or 0.1
+
+		local timestamp = os.date("[%H:%M:%S]")
+		local progress = ""
+		local loadingLabel = nil
+		warn(string.format("%s %s", timestamp, watermark))
+
+		if DevConsoleMaster then
+			repeat
+				task.wait()
+					for _, label in pairs(DevConsoleMaster:GetDescendants()) do
+						if label:IsA("TextLabel") and string.find(label.Text:lower(), watermark:lower()) then
+						loadingLabel = label
+					break
+				end
+			end
+			until loadingLabel
+		else end
+
+		if not loadingLabel then 
+			return
+		end
+
+		for i = 1, 50 do
+			progress = progress .. loadingsymbol
+			loadingLabel.Text = string.format(
+				"<font color='rgb(%s)' size='15'>[%s] [%d%% loaded] %s</font>",
+				Modules.Colors[color],
+				watermark,
+				i * 2,
+				progress
+			)
+			task.wait(delay)
+		end
+
+		local elapsedTime = tick() - startTime
+		loadingLabel.Text = string.format(
+			"<font color='rgb(%s)' size='15'>✅ %s -- [%s]: Successfully loaded in %.2f seconds</font>",
+			Modules.Colors[color],
+			timestamp,
+			watermark,
+			elapsedTime
+		)
+	end
+
+	Modules.ChangeColor()
+	Modules.LoadingBar("IYR", "Green", 0.001, "#")
+
+	local screenGuiLogo = Instance.new("ScreenGui")
+	screenGuiLogo.Parent = COREGUI
+	screenGuiLogo.Name = "ImageFadeGui"
+	screenGuiLogo.DisplayOrder = 10^6
+	screenGuiLogo.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	local sound = Instance.new("Sound")
+	sound.Parent = screenGuiLogo
+	sound.SoundId = "rbxassetid://8795831946"
+	sound.Volume = 1
+	sound.Looped = false
+	sound:Play()
+
+	local imageIDs = { "rbxassetid://17645082538" }
+	local credits = { "Edge // Zwolf // Moon // Toon // _Real // Ry" }
+	local loadTimeMessage = "IYR LOADED IN " .. string.format("%.20f", elapsedTime) .. " SECONDS"
+
+	local imageLabels = {}
+	local positions = {
+		UDim2.new(0.5, -563 / 2, 0.1, -563 / 2), -- top
+		UDim2.new(0.5, -563 / 2, 0.9, -563 / 2), -- bottom
+		UDim2.new(0.1, -563 / 2, 0.5, -563 / 2), -- left
+		UDim2.new(0.9, -563 / 2, 0.5, -563 / 2)  -- right
+	}
+	local moveGoals = {
+		UDim2.new(0.5, -563 / 2, 0.5, -563 / 2), -- to center from top
+		UDim2.new(0.5, -563 / 2, 0.5, -563 / 2), -- to center from bottom
+		UDim2.new(0.5, -563 / 2, 0.5, -563 / 2), -- to center from left
+		UDim2.new(0.5, -563 / 2, 0.5, -563 / 2)  -- to center from right
+	}
+
+	local moveDuration = 1.5
+	local fadeDuration = 1.5
+	local moveTweenInfo = TweenInfo.new(moveDuration, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+	local fadeTweenInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+
+	for i = 1, 4 do
+		local imageLabel = Instance.new("ImageLabel")
+		imageLabel.Parent = screenGuiLogo
+		imageLabel.Name = "IYRLOGO" .. i
+		imageLabel.Size = UDim2.new(0, 563, 0, 563)
+		imageLabel.Position = positions[i]
+		imageLabel.Image = imageIDs[1]
+		imageLabel.BackgroundTransparency = 1
+		imageLabel.ImageTransparency = 1
+		imageLabel.ScaleType = Enum.ScaleType.Stretch
+		imageLabel.ZIndex = 10^6
+
+		local textLabel = Instance.new("TextLabel")
+		textLabel.Name = "Credits"
+		textLabel.Parent = screenGuiLogo
+		textLabel.BackgroundTransparency = 1
+		textLabel.BorderSizePixel = 0
+		textLabel.Size = UDim2.new(0, 560, 0, -40)
+		textLabel.Font = Enum.Font.Code
+		textLabel.FontSize = Enum.FontSize.Size18
+		textLabel.Text = credits[1]
+		textLabel.TextColor3 = Color3.new(1, 1, 1)
+		textLabel.TextTransparency = 1
+		textLabel.ZIndex = 10^6 + 1
+
+		textLabel.Position = UDim2.new(imageLabel.Position.X.Scale, imageLabel.Position.X.Offset, imageLabel.Position.Y.Scale + 563 / screenGuiLogo.AbsoluteSize.Y, imageLabel.Position.Y.Offset + imageLabel.Size.Y.Offset + 10)
+
+		local moveGoal = { Position = moveGoals[i] }
+		local moveTween = TweenService:Create(imageLabel, moveTweenInfo, moveGoal)
+
+		local moveTextGoal = {
+			Position = UDim2.new(
+				moveGoals[i].X.Scale,
+				moveGoals[i].X.Offset,
+				moveGoals[i].Y.Scale + 563 / screenGuiLogo.AbsoluteSize.Y,
+				moveGoals[i].Y.Offset + 10
+			)
+		}
+		local moveTextTween = TweenService:Create(textLabel, moveTweenInfo, moveTextGoal)
+
+		local fadeInGoal = { ImageTransparency = 0 }
+		local fadeOutGoal = { ImageTransparency = 1 }
+
+		local fadeInTween = TweenService:Create(imageLabel, fadeTweenInfo, fadeInGoal)
+		local fadeInTextTween = TweenService:Create(textLabel, fadeTweenInfo, { TextTransparency = 0 })
+		local fadeOutTween = TweenService:Create(imageLabel, fadeTweenInfo, fadeOutGoal)
+		local fadeOutTextTween = TweenService:Create(textLabel, fadeTweenInfo, { TextTransparency = 1 })
+
+		table.insert(imageLabels, {imageLabel, textLabel, moveTween, moveTextTween, fadeInTween, fadeInTextTween, fadeOutTween, fadeOutTextTween})
+	end
+
+	local function fadeInAndMove()
+		for _, labelData in ipairs(imageLabels) do
+			local imageLabel, textLabel, moveTween, moveTextTween, fadeInTween, fadeInTextTween, fadeOutTween, fadeOutTextTween = unpack(labelData)
+			fadeInTween:Play()
+			fadeInTextTween:Play()
+			moveTween:Play()
+			moveTextTween:Play()
+			moveTween.Completed:Connect(
+				function()
+					wait(1)
+					textLabel.Text = loadTimeMessage
+					fadeOutTween:Play()
+					fadeOutTextTween:Play()
+					fadeOutTween.Completed:Connect(
+						function()
+							screenGuiLogo:Destroy()
+						end
+					)
+				end
+			)
+		end
+	end
+
+	fadeInAndMove()
+end)
