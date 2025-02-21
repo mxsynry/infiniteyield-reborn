@@ -3057,7 +3057,7 @@ end
 local loadedEventData = nil
 local jsonAttempts = 0
 function saves()
-	if writefileExploit() and jsonAttempts < 50 then
+	if writefileExploit() and jsonAttempts < 10 then
 		if pcall(function() readfile("IY_FE.iy") end) then
 			if readfile("IY_FE.iy") ~= nil then
 				local success, response = pcall(function()
@@ -3125,7 +3125,6 @@ function saves()
         end
     end
 end
-
 
 saves()
 
