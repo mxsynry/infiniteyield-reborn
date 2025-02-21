@@ -4813,13 +4813,14 @@ CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a playe
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'bang / rape [player] [speed]', DESC = 'Fucks someone (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'jerk', DESC = 'Makes you jork it (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'facebang / facefuck / facerape [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Fucks someone in the face (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'unblow / unblower / unblowjob [player] [speed]', DESC = 'Another variant of facebang (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'blow / blower / blowjob [player] [speed]', DESC = 'Another variant of facebang (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'chokeon / suckon [player] [lower / upper]', DESC = 'Chokes someones private part(s) (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'masturbate / jerkoff / meatbeat [speed]', DESC = 'Masturbates. (NSFW)'}
-CMDs[#CMDs + 1] = {NAME = 'unmasturbate / stopjerkoff / stopmeatbeat', DESC = 'Masturbates. (NSFW)'}
+CMDs[#CMDs + 1] = {NAME = 'jerktool', DESC = 'Gives you a tool that makes you jork it (NSFW)'}
 CMDs[#CMDs + 1] = {NAME = 'unbang / unrape / unfacefuck / unfacebang / unfacerape', DESC = 'Stops the rape.'}
+CMDs[#CMDs + 1] = {NAME = 'unjerk', DESC = 'Stops the shanagian'}
+CMDs[#CMDs + 1] = {NAME = 'unblow / unblower / unblowjob [player] [speed]', DESC = 'Stops blowing it.'}
 CMDs[#CMDs + 1] = {NAME = 'unchokeon / unsuckon', DESC = 'Stops the choking.'}
 CMDs[#CMDs + 1] = {NAME = 'hug / kiss / biden [player] [front / back]', DESC = 'Hugs someone.'}
 CMDs[#CMDs + 1] = {NAME = 'unhug / unkiss / unbiden', DESC = 'Stops the hugging.'}
@@ -5017,7 +5018,6 @@ CMDs[#CMDs + 1] = {NAME = 'ctrllock', DESC = 'Binds Shiftlock to LeftControl'}
 CMDs[#CMDs + 1] = {NAME = 'unctrllock', DESC = 'Re-binds Shiftlock to LeftShift'}
 CMDs[#CMDs + 1] = {NAME = 'listento [player]', DESC = 'Listens to the area around a player. Can also eavesdrop with vc'}
 CMDs[#CMDs + 1] = {NAME = 'unlistento', DESC = 'Disables listento'}
-CMDs[#CMDs + 1] = {NAME = 'jerk', DESC = 'Makes you jork it'}
 CMDs[#CMDs + 1] = {NAME = 'whatexpsareonline / whatexploitsareonline / weao', DESC = 'Tells you what exploits are online'}
 CMDs[#CMDs + 1] = {NAME = 'robloxstaffwatch', DESC = 'Notify if a roblox staff member joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'unrobloxstaffwatch', DESC = 'Disable roblox staff watch'}
@@ -9092,11 +9092,21 @@ addcmd('showiy',{'unhideiy', 'showiyr', 'unhideiyr'},function(args, speaker)
 end)
 
 addcmd('rec', {'record'}, function(args, speaker)
-	return COREGUI:ToggleRecording()
+    local success, err = pcall(function()
+        return COREGUI:ToggleRecording()
+    end)
+    if not success then
+        notify("Recording Error", "Failed to toggle recording: " .. tostring(err))
+    end
 end)
 
 addcmd('screenshot', {'scrnshot'}, function(args, speaker)
-	return COREGUI:TakeScreenshot()
+    local success, err = pcall(function()
+        return COREGUI:TakeScreenshot()
+    end)
+    if not success then
+        notify("Screenshot Error", "Failed to take screenshot: " .. tostring(err))
+    end
 end)
 
 addcmd('togglefs', {'togglefullscreen'}, function(args, speaker)
@@ -13677,65 +13687,97 @@ addcmd("chokeon", {"suckon"}, function(args, speaker)
     end
 end)
 
-local ismasturbating = false
-local mstrbt_1, mstrbt_2, mstrbtDied, loopConnection1, loopConnection2
-
-addcmd("masturbate", {"jerkoff", "meatbeat"}, function(args, speaker)
+local jorkin = false
+local jorktrack = nil
+addcmd("jerk", {}, function(args, speaker)
     local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
-    if not humanoid then
-        -- 
-        return
+    if not humanoid then return end
+
+    local function stopcorniness()
+        jorkin = false
+        if jorktrack then
+            jorktrack:Stop()
+            jorktrack = nil
+        end
     end
 
-    if ismasturbating then
-        execCmd('unmasturbate')
-        return
-    end
-
-    if humanoid.RigType ~= Enum.HumanoidRigType.R6 then
-        notify("R6 Required", "This command requires the R6 rig type.")
-        return
-    end
-
-    local Anim_1 = Instance.new("Animation")
-    local Anim_2 = Instance.new("Animation")
-    Anim_1.AnimationId = "rbxassetid://72042024"
-    Anim_2.AnimationId = "rbxassetid://168268306"
-
-    mstrbt_1 = humanoid:LoadAnimation(Anim_1)
-    mstrbt_2 = humanoid:LoadAnimation(Anim_2)
-
-    local loopStart = 0.6
-    local loopEnd = 2.0
-
-    local function manageLoop(animation)
-        return animation:GetMarkerReachedSignal("LoopEnd"):Connect(function()
-            animation.TimePosition = loopStart
-            animation:Play()
-        end)
-    end
-
-    mstrbt_1.TimePosition = loopStart
-    mstrbt_1:Play()
-    loopConnection1 = manageLoop(mstrbt_1)
-
-    mstrbt_2.TimePosition = loopStart
-    mstrbt_2:Play()
-    loopConnection2 = manageLoop(mstrbt_2)
-    execCmd('loopanim')
-
-    ismasturbating = true
-
-    mstrbtDied = humanoid.Died:Connect(function()
-        if loopConnection1 then loopConnection1:Disconnect() end
-        if loopConnection2 then loopConnection2:Disconnect() end
-        mstrbt_1:Stop()
-        mstrbt_2:Stop()
-        Anim_1:Destroy()
-        Anim_2:Destroy()
-        mstrbtDied:Disconnect()
-        ismasturbating = false
+    humanoid.Died:Connect(stopcorniness)
+    speaker.Character.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            stopcorniness()
+        end
     end)
+
+    jorkin = true
+
+    while task.wait() do
+        if not jorkin then continue end
+
+        local isR15 = r15(speaker)
+        if not track then
+            local anim = Instance.new("Animation")
+            anim.AnimationId = not isR15 and "rbxassetid://72042024" or "rbxassetid://698251653"
+            jorktrack = humanoid:LoadAnimation(anim)
+        end
+		
+        jorktrack:Play()
+        jorktrack:AdjustSpeed(isR15 and 0.7 or 0.65)
+        jorktrack.TimePosition = 0.6
+        task.wait(0.1)
+        while jorktrack and jorktrack.TimePosition < (not isR15 and 0.65 or 0.7) do task.wait(0.1) end
+        if jorktrack then
+            jorktrack:Stop()
+            jorktrack = nil
+        end
+    end
+end)
+
+addcmd("jerktool", {}, function(args, speaker)
+    local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    local backpack = speaker:FindFirstChildWhichIsA("Backpack")
+    if not humanoid or not backpack then return end
+
+    local tool = Instance.new("Tool")
+    tool.Name = "Jerk Off"
+    tool.ToolTip = "in the stripped club. straight up \"jorking it\" . and by \"it\" , haha, well. let's justr say. My peanits."
+    tool.RequiresHandle = false
+    tool.Parent = backpack
+
+    local jorkin = false
+    local track = nil
+
+    local function stopTomfoolery()
+        jorkin = false
+        if track then
+            track:Stop()
+            track = nil
+        end
+    end
+
+    tool.Equipped:Connect(function() jorkin = true end)
+    tool.Unequipped:Connect(stopTomfoolery)
+    humanoid.Died:Connect(stopTomfoolery)
+
+    while task.wait() do
+        if not jorkin then continue end
+
+        local isR15 = r15(speaker)
+        if not track then
+            local anim = Instance.new("Animation")
+            anim.AnimationId = not isR15 and "rbxassetid://72042024" or "rbxassetid://698251653"
+            track = humanoid:LoadAnimation(anim)
+        end
+		
+        track:Play()
+        track:AdjustSpeed(isR15 and 0.7 or 0.65)
+        track.TimePosition = 0.6
+        task.wait(0.1)
+        while track and track.TimePosition < (not isR15 and 0.65 or 0.7) do task.wait(0.1) end
+        if track then
+            track:Stop()
+            track = nil
+        end
+    end
 end)
 
 --------------------------------------------------------------------------------------------------------
@@ -14054,6 +14096,17 @@ addcmd("unchokeon", {"unsuckon"}, function(args, speaker)
     humanoid.sit = false
 end)
 
+addcmd("unjerk", {}, function(args, speaker)
+	jorkin = false
+    local humanoid = speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid")
+    if not humanoid then return end
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        if track.Animation.AnimationId == "rbxassetid://72042024" or track.Animation.AnimationId == "rbxassetid://698251653" then
+            track:Stop()
+        end
+    end
+end)
+
 addcmd("unblower", {'unblow', 'unblowbang', 'unblowjob'}, function()
     execCmd("unhug\\unfacebang")
     if isBlowing then
@@ -14063,26 +14116,6 @@ addcmd("unblower", {'unblow', 'unblowbang', 'unblowjob'}, function()
             jumpConnection = nil
         end
     end
-end)
-
-addcmd("unmasturbate", {"stopjerkoff", "stopmeatbeat"}, function(args, speaker)
-    if loopConnection1 then loopConnection1:Disconnect() end
-    if loopConnection2 then loopConnection2:Disconnect() end
-
-    if mstrbt_1 and mstrbt_2 then
-        mstrbt_1:Stop()
-        mstrbt_2:Stop()
-        mstrbt_1.Animation:Destroy()
-        mstrbt_2.Animation:Destroy()
-        mstrbt_1, mstrbt_2 = nil, nil
-    end
-
-    if mstrbtDied then
-        mstrbtDied:Disconnect()
-        mstrbtDied = nil
-    end
-
-    ismasturbating = false
 end)
 
 addcmd('carpet',{},function(args, speaker)
@@ -16123,54 +16156,6 @@ end)
 addcmd("unlistento", {}, function(args, speaker)
     SoundService:SetListener(Enum.ListenerType.Camera)
     listentoChar:Disconnect()
-end)
-
-addcmd("jerk", {}, function(args, speaker)
-    local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-    local backpack = speaker:FindFirstChildWhichIsA("Backpack")
-    if not humanoid or not backpack then return end
-
-    local tool = Instance.new("Tool")
-    tool.Name = "Jerk Off"
-    tool.ToolTip = "in the stripped club. straight up \"jorking it\" . and by \"it\" , haha, well. let's justr say. My peanits."
-    tool.RequiresHandle = false
-    tool.Parent = backpack
-
-    local jorkin = false
-    local track = nil
-
-    local function stopTomfoolery()
-        jorkin = false
-        if track then
-            track:Stop()
-            track = nil
-        end
-    end
-
-    tool.Equipped:Connect(function() jorkin = true end)
-    tool.Unequipped:Connect(stopTomfoolery)
-    humanoid.Died:Connect(stopTomfoolery)
-
-    while task.wait() do
-        if not jorkin then continue end
-
-        local isR15 = r15(speaker)
-        if not track then
-            local anim = Instance.new("Animation")
-            anim.AnimationId = not isR15 and "rbxassetid://72042024" or "rbxassetid://698251653"
-            track = humanoid:LoadAnimation(anim)
-        end
-		
-        track:Play()
-        track:AdjustSpeed(isR15 and 0.7 or 0.65)
-        track.TimePosition = 0.6
-        task.wait(0.1)
-        while track and track.TimePosition < (not isR15 and 0.65 or 0.7) do task.wait(0.1) end
-        if track then
-            track:Stop()
-            track = nil
-        end
-    end
 end)
 
 local freezingua = nil
