@@ -53,7 +53,7 @@ if not game:IsLoaded() then
 	notLoaded:Destroy()
 end
 
-currentVersion = '7.0.1'
+currentVersion = '7.0.3'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -5337,6 +5337,11 @@ function removecmd(cmd)
 			end
 		end
 	end
+end
+
+function overridecmd(name, func)
+    local cmd = findCmd(name)
+    if cmd and cmd.FUNC then cmd.FUNC = func end
 end
 
 function addbind(cmd,key,iskeyup,toggle)
