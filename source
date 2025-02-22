@@ -7038,8 +7038,8 @@ addcmd("serverhop", {"shop"}, function(args, speaker)
 		local servers = {}
 		local req = httprequest({Url = string.format("https://api.iyr.lol/servers?id=%d", PlaceId)})
 		local body = HttpService:JSONDecode(req.Body)
-		if body and body.data then
-			for i, v in next, body.data do
+		if body then
+			for i, v in next, body do
 				if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
 					table.insert(servers, 1, v.id)
 				end
@@ -7059,9 +7059,9 @@ end)
 local canOpenServerIist = true
 addcmd('serverlist',{'slist'},function(args, speaker)
 	if httprequest then
-		local listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?id=%d", PlaceId)})
+		local listreq = game:HttpGet(string.format("https://api.iyr.lol/servers?id=%d", PlaceId))
 		local listbody = HttpService:JSONDecode(listreq.Body)
-		if listbody and listbody.data then
+		if listbody then
 			if not canOpenServerIist then return end
 			canOpenServerIist = false
 			local FRAME = Instance.new("Frame")
@@ -7155,7 +7155,7 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 			UIListLayout.Name = "UIListLayout"
 			UIListLayout.Padding = UDim.new(0,5)
 			local function addservertemplate()
-				for i,v in ipairs(listbody.data) do
+				for i,v in ipairs(listbody) do
 					local frame1 = Instance.new("Frame")
 					local textlabel = Instance.new("TextLabel")
 					local textlabel2 = Instance.new("TextLabel")
@@ -7232,22 +7232,6 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 					textlabel3.BackgroundTransparency = 1
 					textlabel3.Parent = frame2
 
-					textlabel4.ZIndex = 11
-					textlabel4.Size = UDim2.new(0,100,0,35)
-					textlabel4.Position = UDim2.new(0,0,0.304,0)
-					textlabel4.Text = "Fps: "..v.fps
-					textlabel4.TextColor3 = currentText1
-					textlabel4.BackgroundTransparency = 1
-					textlabel4.Parent = frame2
-
-					textlabel5.ZIndex = 11
-					textlabel5.Size = UDim2.new(0,100,0,35)
-					textlabel5.Position = UDim2.new(0,0,0.44,0)
-					textlabel5.Text = "Ping: "..v.ping
-					textlabel5.TextColor3 = currentText1
-					textlabel5.BackgroundTransparency = 1
-					textlabel5.Parent = frame2
-
 					textlabel6.ZIndex = 11
 					textlabel6.Size = UDim2.new(0,265,0,35)
 					textlabel6.Position = UDim2.new(0,0,0.72,0)
@@ -7265,7 +7249,7 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 						v:Destroy()
 					end
 				end
-				listreq = httprequest({Url = string.format("https://api.iyr.lol/servers?id=%d", PlaceId)})
+				listreq = game:HttpGet(string.format("https://api.iyr.lol/servers?id=%d", PlaceId))
 				listbody = HttpService:JSONDecode(listreq.Body)
 				task.wait(.5)
 				addservertemplate()
