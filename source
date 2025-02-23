@@ -13206,6 +13206,7 @@ addcmd('loopgoto',{},function(args, speaker)
 				if target_root then
 					local target_cf = target_root.CFrame
 					getRoot(speaker.Character).CFrame = target_cf + target_cf.LookVector * distance
+					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
 				end
 				task.wait(lDelay)
 			else
