@@ -13254,6 +13254,7 @@ addcmd('orbit',{},function(args, speaker)
 			if p then
 				local target_root = p.Character and getRoot(p.Character)
 				local speaker_root = getRoot(speaker.Character)
+				speaker_root.Velocity = Vector3.new(0,0,0)
 				if not speaker_root then
 					orbit = nil
 				end
