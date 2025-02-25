@@ -2131,7 +2131,7 @@ function dragGUI(gui)
 	task.spawn(function()
 		local dragging
 		local dragInput
-		local dragStart = Vector3.new(0,0,0)
+		local dragStart = Vector3.zero
 		local startPos
 		local function update(input)
 			local delta = input.Position - dragStart
@@ -4250,7 +4250,7 @@ function dragMain(dragpoint,gui)
 	task.spawn(function()
 		local dragging
 		local dragInput
-		local dragStart = Vector3.new(0,0,0)
+		local dragStart = Vector3.zero
 		local startPos
 		local function update(input)
 			local pos = -250
@@ -7742,7 +7742,7 @@ function mobileStartFly()
 	
 	local root = getRoot(Players.LocalPlayer.Character)
 	local camera = workspace.CurrentCamera
-	local zeroVector = Vector3.new(0, 0, 0)
+	local zeroVector = Vector3.zero
 	local infiniteForce = Vector3.new(9e9, 9e9, 9e9)
 
 	local controlModule = require(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("ControlModule"))
@@ -7870,7 +7870,7 @@ function sFLY(vfly)
 		BV.Parent = T
 		BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
 		BG.cframe = T.CFrame
-		BV.velocity = Vector3.new(0, 0, 0)
+		BV.velocity = Vector3.zero
 		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
 		task.spawn(function()
 			repeat task.wait()
@@ -7888,7 +7888,7 @@ function sFLY(vfly)
 				elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and (CONTROL.Q + CONTROL.E) == 0 and SPEED ~= 0 then
 					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
 				else
-					BV.velocity = Vector3.new(0, 0, 0)
+					BV.velocity = Vector3.zero
 				end
 				BG.cframe = workspace.CurrentCamera.CoordinateFrame
 			until not FLYING
@@ -7969,7 +7969,7 @@ local mobilefly = function(speaker, vfly)
 	local root = getRoot(speaker.Character)
 	local camera = workspace.CurrentCamera
 	local v3none = Vector3.new()
-	local v3zero = Vector3.new(0, 0, 0)
+	local v3zero = Vector3.zero
 	local v3inf = Vector3.new(9e9, 9e9, 9e9)
 
 	local controlModule = require(speaker.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("ControlModule"))
@@ -11231,7 +11231,7 @@ function RunCustomAnimation(Char)
 	-- STATE CHANGE HANDLERS
 
 	function onRunning(speed)
-		local movedDuringEmote = currentlyPlayingEmote and Humanoid.MoveDirection == Vector3.new(0, 0, 0)
+		local movedDuringEmote = currentlyPlayingEmote and Humanoid.MoveDirection == Vector3.zero
 		local speedThreshold = movedDuringEmote and Humanoid.WalkSpeed or 0.75
 		humanoidSpeed = speed
 		if speed > speedThreshold then
@@ -12255,7 +12255,7 @@ addcmd("unweaken", {"unstrengthen"}, function(args, speaker)
 end)
 
 addcmd("breakvelocity", {}, function(args, speaker)
-	local BeenASecond, V3 = false, Vector3.new(0, 0, 0)
+	local BeenASecond, V3 = false, Vector3.zero
 	delay(1, function()
 		BeenASecond = true
 	end)
@@ -13206,7 +13206,7 @@ addcmd('loopgoto',{},function(args, speaker)
 				if target_root then
 					local target_cf = target_root.CFrame
 					getRoot(speaker.Character).CFrame = target_cf + target_cf.LookVector * distance
-					getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+					getRoot(speaker.Character).Velocity = Vector3.zero
 				end
 				task.wait(lDelay)
 			else
@@ -13254,7 +13254,7 @@ addcmd('orbit',{},function(args, speaker)
 			if p then
 				local target_root = p.Character and getRoot(p.Character)
 				local speaker_root = getRoot(speaker.Character)
-				speaker_root.Velocity = Vector3.new(0,0,0)
+				speaker_root.Velocity = Vector3.zero
 				if not speaker_root then
 					orbit = nil
 				end
@@ -13287,7 +13287,7 @@ addcmd('headsit',{},function(args, speaker)
 		while task.wait() do
 			if Players:FindFirstChild(Players[v].Name) and Players[v].Character ~= nil and getRoot(Players[v].Character) and getRoot(speaker.Character) and speaker.Character:FindFirstChildOfClass('Humanoid').Sit == true then
 				getRoot(speaker.Character).CFrame = getRoot(Players[v].Character).CFrame * CFrame.Angles(0,math.rad(0),0)* CFrame.new(0,1.6,0.4)
-				getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+				getRoot(speaker.Character).Velocity = Vector3.zero
 			else
 				break
 			end
@@ -13535,7 +13535,7 @@ addcmd("bang", {"rape"}, function(args, speaker)
 				end
 				local otherRoot = getTorso(Players[bangplr].Character)
 				getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet
-				getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+				getRoot(speaker.Character).Velocity = Vector3.zero
 			end	
 		end
 	end
@@ -13568,7 +13568,7 @@ addcmd("facebang", {"facerape", "facefuck"}, function(args, speaker)
 				end
 				local otherRoot = getTorso(Players[bangplr].Character)
 				getRoot(speaker.Character).CFrame = otherRoot.CFrame * bangOffet * CFrame.Angles(0,3.15,0)
-				getRoot(speaker.Character).Velocity = Vector3.new(0,0,0)
+				getRoot(speaker.Character).Velocity = Vector3.zero
 			end
 		end
 	end
@@ -13668,7 +13668,7 @@ addcmd("chokeon", {"suckon"}, function(args, speaker)
                     end
                     local otherRoot = getTorso(Players[suckPlayer].Character)
                     getRoot(speaker.Character).CFrame = otherRoot.CFrame * suckOffset * rotationOffset
-                    getRoot(speaker.Character).Velocity = Vector3.new(0, 0, 0)
+                    getRoot(speaker.Character).Velocity = Vector3.zero
                 end
             else
                 isSuckingOn = false
@@ -13826,7 +13826,7 @@ addcmd("hug", {"kiss", "biden"}, function(args, speaker)
                     end
                     local otherRoot = getTorso(Players[hugPlayer].Character)
                     getRoot(speaker.Character).CFrame = otherRoot.CFrame * hugOffset * rotationOffset
-                    getRoot(speaker.Character).Velocity = Vector3.new(0, 0, 0)
+                    getRoot(speaker.Character).Velocity = Vector3.zero
                 end
             else
                 ishugging = false
@@ -14818,7 +14818,7 @@ addcmd('reach',{},function(args, speaker)
 				a.Adornee = v.Handle
 				v.Handle.Massless = true
 				v.Handle.Size = Vector3.new(0.5,0.5,args[1])
-				v.GripPos = Vector3.new(0,0,0)
+				v.GripPos = Vector3.zero
 				speaker.Character:FindFirstChildOfClass('Humanoid'):UnequipTools()
 			else
 				currentToolSize = v.Handle.Size
@@ -14829,7 +14829,7 @@ addcmd('reach',{},function(args, speaker)
 				a.Adornee = v.Handle
 				v.Handle.Massless = true
 				v.Handle.Size = Vector3.new(0.5,0.5,60)
-				v.GripPos = Vector3.new(0,0,0)
+				v.GripPos = Vector3.zero
 				speaker.Character:FindFirstChildOfClass('Humanoid'):UnequipTools()
 			end
 		end
@@ -14850,7 +14850,7 @@ addcmd("boxreach", {}, function(args, speaker)
             a.Adornee = v.Handle
             v.Handle.Massless = true
             v.Handle.Size = Vector3.new(size, size, size)
-            v.GripPos = Vector3.new(0, 0, 0)
+            v.GripPos = Vector3.zero
             speaker.Character:FindFirstChildOfClass("Humanoid"):UnequipTools()
         end
     end
@@ -14953,7 +14953,7 @@ addcmd('fling',{'spinfling'},function(args, speaker)
 		if v:IsA("BasePart") then
 			v.CanCollide = false
 			v.Massless = true
-			v.Velocity = Vector3.new(0, 0, 0)
+			v.Velocity = Vector3.zero
 		end
 	end
 	flinging = true
@@ -14964,7 +14964,7 @@ addcmd('fling',{'spinfling'},function(args, speaker)
 	repeat
 		bambam.AngularVelocity = Vector3.new(0,99999,0)
 		task.wait(.2)
-		bambam.AngularVelocity = Vector3.new(0,0,0)
+		bambam.AngularVelocity = Vector3.zero
 		task.wait(.1)
 	until flinging == false
 end)
