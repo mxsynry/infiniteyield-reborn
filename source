@@ -3209,7 +3209,7 @@ function maximizeHolder()
 	end
 end
 
-local minimizeNum = -20
+minimizeNum = -20
 function minimizeHolder()
 	if StayOpen == false then
 		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, minimizeNum), "InOut", "Quart", 0.5, true, nil)
@@ -3383,10 +3383,8 @@ end
 
 IYMouse.KeyDown:Connect(function(Key)
 	if (Key==prefix) then
+		RunService.RenderStepped:Wait()
 		Cmdbar:CaptureFocus()
-		spawn(function()
-			repeat Cmdbar.Text = '' until Cmdbar.Text == ''
-		end)
 		maximizeHolder()
 	end
 end)
@@ -4842,7 +4840,7 @@ CMDs[#CMDs + 1] = {NAME = 'rolewatch [group id] [role name]', DESC = 'Notify if 
 CMDs[#CMDs + 1] = {NAME = 'rolewatchstop / unrolewatch', DESC = 'Disable Rolewatch'}
 CMDs[#CMDs + 1] = {NAME = 'rolewatchleave', DESC = 'Toggle if you should leave the game if someone from a watched group joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'attach [player] (TOOL)', DESC = 'Attaches you to a player (YOU NEED A TOOL)'}
-if game.PlaceId == 574746640 then
+if PlaceId == 574746640 then
 	CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 	CMDs[#CMDs + 1] = {NAME = '-- 4nn1\'s Place --', DESC = 'Commands for 4nn1\'s Place'}
 	CMDs[#CMDs + 1] = {NAME = 'kill [player]', DESC = 'Attempts to kill a player'}
@@ -7205,7 +7203,7 @@ addcmd('serverlist',{'slist'},function(args, speaker)
 						joinbutton.Text = "Join"
 						joinbutton.TextColor3 = currentText1
 						joinbutton.MouseButton1Click:Connect(function()
-							game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,v.id)
+							game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId,v.id)
 						end)
 						joinbutton.Parent = frame2
 					end
@@ -13464,11 +13462,19 @@ addcmd('spamspeed',{},function(args, speaker)
 end)
 
 addcmd('bubblechat',{},function(args, speaker)
-	ChatService.BubbleChatEnabled = true
+	if isLegacyChat then
+		ChatService.BubbleChatEnabled = true
+	else
+		TextChatService.BubbleChatConfiguration.Enabled = true
+	end
 end)
 
 addcmd('unbubblechat',{'nobubblechat'},function(args, speaker)
-	ChatService.BubbleChatEnabled = false
+	if isLegacyChat then
+		ChatService.BubbleChatEnabled = false
+	else
+		TextChatService.BubbleChatConfiguration.Enabled = false
+	end
 end)
 
 addcmd('safechat',{},function(args, speaker)
@@ -15157,7 +15163,7 @@ end
 addcmd('kill',{'fekill'},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
 	for i,v in pairs(players) do
-		if game.PlaceId ~= 574746640 then
+		if PlaceId ~= 574746640 then
 			kill(speaker,Players[v])
 		else
 			Ann1kill(speaker,Players[v])
@@ -15225,7 +15231,7 @@ end
 -- // Commands \\ --
 
 -- guess how many ct.CFrame = hrp.CFrame there ARE! --
-if game.PlaceId == 574746640 then
+if PlaceId == 574746640 then
 	local gameTools = workspace.Tools
 	local chests = {
 		Chest_Invisibility_Cloak = gameTools.Chest_Invisibility_Cloak,
@@ -16424,7 +16430,7 @@ end)
 
 addcmd('joinjobid',{'jjobid', 'jjid'},function(args, speaker)
 	if args[1] then 
-		TeleportService:TeleportToPlaceInstance(game.PlaceId,args[1])
+		TeleportService:TeleportToPlaceInstance(PlaceId,args[1])
 	else
 		notify('Argument error', 'Missing arg 1 - JobId expected')
 	end
@@ -16724,12 +16730,12 @@ task.spawn(function()
 	minimizeHolder()
 	if IsOnMobile then
 		notify("Unstable Device", "On mobile, Infinite Yield Reborn has a lot of bugs. It's recommended to use a PC executor")
-		if game.PlaceId == 574746640 then
+		if PlaceId == 574746640 then
 			task.wait(3)
 			notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
 		end
 	else
-		if game.PlaceId == 574746640 then
+		if PlaceId == 574746640 then
 			notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
 		end
 	end
