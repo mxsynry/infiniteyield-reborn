@@ -19,8 +19,7 @@
 ]]--
 
 --[[ things to add:
-     earrape
-	 r15 support for backpack
+      currently none, was abt to add earrp but lazy
   ]]
 
 local getconnections = getconnections or get_signal_cons
