@@ -1,4 +1,6 @@
+pcall(function()
         local startTime = tick()
+        --the actual shits here
         local endTime = tick()
 	local elapsedTime = endTime - startTime
 	local Modules = {
