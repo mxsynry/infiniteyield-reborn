@@ -48,10 +48,10 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/RyXeleron/infiniteyi
 ### What IYR offers
 - Frequency updates
 - Has support for TextChatService
-- Trimmed down unused or broken commands
+- Removed some unused or broken commands
 - Now includes counters for Plugins, Aliases, Keybinds, and Waypoints
 - Actually has an OnLeave detection.
-- Being the source of the main IY's updates (ehhh maybe, i've saw them adding shits from mine before :sob:)
+- Not getting detected by some unknown client ac because IYR uses a different assetid for the image
 
 ### Preview
 
