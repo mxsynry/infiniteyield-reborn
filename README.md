@@ -49,8 +49,6 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/RyXeleron/infiniteyi
 - Frequency updates
 - Has support for TextChatService
 - Removed some unused or broken commands
-- Now includes counters for Plugins, Aliases, Keybinds, and Waypoints
-- Actually has an OnLeave detection.
 - Not getting detected by some unknown client ac because IYR uses a different assetid for the image
 
 ### Preview
