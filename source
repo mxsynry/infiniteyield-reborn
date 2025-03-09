@@ -9678,7 +9678,7 @@ end)
 
 local cachedESP = {}
 function createESP(player)
-    print(player.." | create esp")
+    --print(player.." | create esp")
     local espitems = {}
     if Drawing then
         espitems.box = Drawing.new("Square")
