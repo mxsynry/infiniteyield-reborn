@@ -4575,6 +4575,7 @@ CMDs[#CMDs + 1] = {NAME = 'guiscale [number]', DESC = 'Changes the size of the g
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
 CMDs[#CMDs + 1] = {NAME = 'website', DESC = 'Give you the website link'}
 CMDs[#CMDs + 1] = {NAME = 'killroblox', DESC = 'Kills Roblox process'}
+CMDs[#CMDs + 1] = {NAME = 'crash', DESC = 'Crashes your game for fun'}
 CMDs[#CMDs + 1] = {NAME = 'unc / unctest / unccheckevn', DESC = 'Tests all UNC Environment, by vxsty'}
 CMDs[#CMDs + 1] = {NAME = 'sunc / sunctest / sunccheckevn', DESC = 'Tests all sUNC Environment, credits will be printed'}
 CMDs[#CMDs + 1] = {NAME = 'luarmor / luarmortest / luarmorcheck', DESC = "Tests the executor's luarmor compatibility, by Luarmor themselves"}
@@ -13030,6 +13031,14 @@ addcmd("killroblox",{},function(args, speaker)
         syn.killprocess()
     else
         notify("Incompatible Exploit", "This works for Synapse Z only!")
+    end
+end)
+
+addcmd("crash",{},function(args, speaker)
+    if firesignal then
+        firesignal(game.Players.LocalPlayer.ConnectDiedSignalBackend)
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command")
     end
 end)
 
