@@ -4623,7 +4623,7 @@ CMDs[#CMDs + 1] = {NAME = 'keepiy / keepiyr', DESC = 'Auto execute IYR when you 
 CMDs[#CMDs + 1] = {NAME = 'unkeepiy / unkeepiyr', DESC = 'Disable keepiy'}
 CMDs[#CMDs + 1] = {NAME = 'togglekeepiy / togglekeepiyr', DESC = 'Toggle keepiy'}
 CMDs[#CMDs + 1] = {NAME = 'savegame / saveplace', DESC = 'Uses saveinstance to save the game'}
-CMDs[#CMDs + 1] = {NAME = 'savelogs', DESC = 'Saves Roblox logs as a file'}
+CMDs[#CMDs + 1] = {NAME = 'savelogs', DESC = 'Saves console logs as a file'}
 CMDs[#CMDs + 1] = {NAME = 'clearerror', DESC = 'Clears the annoying box and blur when a game kicks you'}
 CMDs[#CMDs + 1] = {NAME = 'antichatlogger / acl / antichatlogs', DESC = 'Prevents AutoMod from detecting you bypassing chatfilter.'}
 CMDs[#CMDs + 1] = {NAME = 'removeanticheat / antianticheat (LOCALSCRIPT)', DESC = 'Deletes some simple anticheats.'}
@@ -9131,7 +9131,7 @@ end)
 addcmd("savelogs", {}, function(args, speaker)
     local LogService = cloneref(game:GetService('LogService'))
     local placeName = CleanFileName(MarketplaceService:GetProductInfo(PlaceId).Name)
-    local writelogs = '-- Infinite Yield Reborn Console logs for "'..placeName..'"\n'
+    local writelogs = '-- Infinite Yield Reborn console logs for "'..placeName..'"\n'
     local getLogMessages = LogService:GetLogHistory()
     local array = {}
     local writelogsFile
@@ -9159,9 +9159,9 @@ addcmd("savelogs", {}, function(args, speaker)
             end
         end
         nameFile()
-        notify('Success','Saved Console logs to the workspace folder within your exploit folder.')
+        notify('Success','Saved console logs to the workspace within your exploit folder.')
     else
-        notify('Incompatible Exploit','Your exploit does not support read/write file. You cannot save Console logs.')
+        notify('Incompatible Exploit','Your exploit does not support read/write file functions. You cannot save Console logs.')
     end
 end)
 
