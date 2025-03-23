@@ -7526,6 +7526,9 @@ end)
 
 addcmd("unantifling",{"unanfl"},function(args, speaker)
     AntiFlingEnabled = false
+    for _,v in game:GetService("Players") do
+	setCanCollideOfModelDescendants(v.Character, false)
+	end
     notify("Anti-fling", "Anti-fling has been disabled.")
 end)
 
