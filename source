@@ -49,7 +49,7 @@ if not game:IsLoaded() then
     notLoaded:Destroy()
 end
 
-currentVersion = '7.0.4'
+currentVersion = '7.0.5'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -1963,7 +1963,6 @@ StarterGui = cloneref(game:GetService("StarterGui"))
 GuiService = cloneref(game:GetService("GuiService"))
 Lighting = cloneref(game:GetService("Lighting"))
 ContextActionService = cloneref(game:GetService("ContextActionService"))
-NetworkClient = cloneref(game:GetService("NetworkClient"))
 ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
 GroupService = cloneref(game:GetService("GroupService"))
 PathService = cloneref(game:GetService("PathfindingService"))
@@ -4887,6 +4886,7 @@ CMDs[#CMDs + 1] = {NAME = 'reset', DESC = 'Resets your character normally'}
 CMDs[#CMDs + 1] = {NAME = 'respawn', DESC = 'Respawns you'}
 CMDs[#CMDs + 1] = {NAME = 'refresh / re', DESC = 'Respawns and brings you back to the same position'}
 CMDs[#CMDs + 1] = {NAME = 'god', DESC = 'Makes your character difficult to kill in most games'}
+CMDs[#CMDs + 1] = {NAME = 'permadeath', DESC = 'Makes you unable to die'}
 CMDs[#CMDs + 1] = {NAME = 'invisible / invis', DESC = 'Makes you invisible to other players'}
 CMDs[#CMDs + 1] = {NAME = 'visible / vis', DESC = 'Makes you visible to other players'}
 CMDs[#CMDs + 1] = {NAME = 'toolinvisible / toolinvis / tinvis', DESC = 'Makes you invisible to other players and able to use tools'}
@@ -5128,15 +5128,25 @@ function GetInTable(Table, Name)
     return false
 end
 
+function permadeath(plr)
+    if replicatesignal then
+        replicatesignal(plr.ConnectDiedSignalBackend)
+        task.wait(Players.RespawnTime - 0.165)
+    end
+end
+
 function respawn(plr)
     if invisRunning then TurnVisible() end
+    permadeath(plr)
     local char = plr.Character
-    if char:FindFirstChildOfClass("Humanoid") then char:FindFirstChildOfClass("Humanoid"):ChangeState(15) end
+    local hum = char:FindFirstChildWhichIsA("Humanoid")
+    if hum then hum:ChangeState(Enum.HumanoidStateType.Dead) end
+    if not replicatesignal then wait() end
     char:ClearAllChildren()
     local newChar = Instance.new("Model")
     newChar.Parent = workspace
     plr.Character = newChar
-    task.wait()
+    wait()
     plr.Character = char
     newChar:Destroy()
 end
@@ -10453,8 +10463,10 @@ addcmd("wallwalk", {"walkonwalls"}, function(args, speaker)
 end)
 
 addcmd("datalimit", {}, function(args, speaker)
-    if tonumber(args[1]) then
-        NetworkClient:SetOutgoingKBPSLimit(args[1])
+    local kbps = tonumber(args[1])
+    if kbps then
+        local NetworkClient = cloneref(game:GetService("NetworkClient"))
+        NetworkClient:SetOutgoingKBPSLimit(kbps)
     end
 end)
 
@@ -12448,16 +12460,30 @@ addcmd('unedgejump',{'noedgejump', 'noejump', 'unejump'},function(args, speaker)
     HumanModCons.ejCA = (HumanModCons.ejCA and HumanModCons.ejCA:Disconnect() and false) or nil
 end)
 
-addcmd('team',{},function(args, speaker)
-    local teamname = nil
-    for a,b in pairs(Teams:GetChildren()) do
-        local L_name = b.Name:lower()
-        local F = L_name:find(getstring(1))
-        if F == 1 then
-            teamname = b 
+addcmd("team", {}, function(args, speaker)
+    local teamName = getstring(1)
+    local team = nil
+    local root = speaker.Character and getRoot(speaker.Character)
+    for _, v in ipairs(Teams:GetChildren()) do
+        if v.Name:lower():match(teamName:lower()) then
+            team = v
+            break
         end
     end
-    speaker.Team = teamname
+    if not team then
+        return notify("Invalid Team", teamName .. " is not a valid team")
+    end
+    if root and firetouchinterest then
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("SpawnLocation") and v.BrickColor == team.TeamColor and v.AllowTeamChangeOnTouch == true then
+                firetouchinterest(v, root, 0)
+                firetouchinterest(v, root, 1)
+                break
+            end
+        end
+    else
+        speaker.Team = team
+    end
 end)
 
 addcmd('nobgui',{'unbgui','nobillboardgui','unbillboardgui','noname','rohg'},function(args, speaker)
@@ -14118,14 +14144,14 @@ end)
 addcmd('friend',{},function(args, speaker)
     local players = getPlayer(args[1], speaker)
     for i,v in pairs(players)do
-        speaker:RequestFriendship(v)
+        speaker:RequestFriendship(Players[v])
     end
 end)
 
 addcmd('unfriend',{},function(args, speaker)
     local players = getPlayer(args[1], speaker)
     for i,v in pairs(players)do
-        speaker:RevokeFriendship(v)
+        speaker:RevokeFriendship(Players[v])
     end
 end)
 
