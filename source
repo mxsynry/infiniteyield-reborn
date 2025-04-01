@@ -16826,15 +16826,18 @@ task.spawn(function()
     Credits:Destroy()
     IntroBackground:Destroy()
     minimizeHolder()
+    if os.date("%m %d") == "04 01" then
+        if math.random(1, 4) == 1 then
+            createPopup("AMONG US JUMPSCARE AMONG US DIES TOMORROW!!\n\nidk april fools")
+        end
+        Title.Text = string.gsub(Title.Text, "Infinite Yield FE", "fortnite hack")
+        task.wait(3)
+    end
     if IsOnMobile then
         notify("Unstable Device", "On mobile, Infinite Yield Reborn has a lot of bugs. It's recommended to use a PC executor")
-        if PlaceId == 574746640 then
-            task.wait(3)
-            notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
-        end
-    else
-        if PlaceId == 574746640 then
-            notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
-        end
+        task.wait(3)
+    end
+    if PlaceId == 574746640 then
+        notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
     end
 end)
