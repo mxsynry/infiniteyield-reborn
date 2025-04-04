@@ -13010,7 +13010,7 @@ addcmd("unc",{"unctest","unccheckevn"},function(args, speaker)
     notify("Check console", "Press F9 or type /console in chat to see results")
 end)
 
-getgenv().sUNCDebug = { ["printcheckpoints"] = false, ["delaybetweentests"] = 0}
+getgenv().sUNCDebug = { ["printcheckpoints"] = false, ["delaybetweentests"] = 0 }
 
 addcmd("sunc",{"sunctest","sunccheckevn"},function(args, speaker)
     loadstring(game:HttpGet("https://script.sunc.su/"))()
