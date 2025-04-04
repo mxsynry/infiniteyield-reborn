@@ -13018,8 +13018,37 @@ addcmd("sunc",{"sunctest","sunccheckevn"},function(args, speaker)
 end)
 
 addcmd("addunc", {'addmoreunc', 'adduncevn'}, function(args, speaker)
-    loadstring(game:HttpGet("https://github.com/FurryBoyYT/moreunc/raw/main/iyr_init"))()
-    notify("Adding some UNC (Thanks to the community) (WARNING THIS MAY REMOVE SOME UNC)")
+    local version = args[1] or "3"
+    local links = {
+        ["1"] = {
+            "https://scriptblox.com/script/Universal-Script-MoreUNC-13110",
+            "https://github.com/RyXeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv1.luau",
+            "https://github.com/RyXeleron/ryxeleron.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv1.luau"
+        },
+        ["2"] = {
+            "https://scriptblox.com/script/Universal-Script-MoreUNC-V2-15902",
+            "https://github.com/RyXeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv2.luau",
+            "https://github.com/RyXeleron/ryxeleron.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
+        },
+        ["3"] = {
+            "https://scriptblox.com/raw/Universal-Script-MoreUNC-V3-27493",
+            "https://github.com/RyXeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv3.luau",
+            "https://github.com/RyXeleron/ryxeleron.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
+        }
+    }
+
+    local urls = links[version]
+    if urls then
+        for _, url in ipairs(urls) do
+            local success = pcall(function() loadstring(game:HttpGet(url))({PrintLogs = true, OverrideExistingFunctions = false}) end)
+            if success then
+                notify("MoreUNC", "Adding some UNC (Thanks to the community) (WARNING THIS MAY REMOVE SOME UNC)")
+                break
+            end
+        end
+    else
+        notify("MoreUNC", "Invalid version, choose from 1 to 3")
+    end
 end)
 
 addcmd("identitytest", {'testidentity', 'validateidentity'}, function(args, speaker)

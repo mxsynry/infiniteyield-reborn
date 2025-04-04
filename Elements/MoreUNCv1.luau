@@ -562,7 +562,7 @@ TEMPORARY REMOVED UNTIL WE FIND A FIX
 -- Thanks to xAPI for the following:
 
 local Sandbox = loadstring(game:HttpGet(("https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/Sandbox.luau" or "https://raw.githubusercontent.com/bbbbbbbbbbbbbb121/sandbox/refs/heads/main/main.lua")))()
-funcs.string.dump = loadstring(game:HttpGet(("https://rawscripts.net/raw/Universal-Script-Function-Dumper-14820" or "https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/FuncDumper.luau")))()
+funcs.string.dump = loadstring(game:HttpGet(("https://rawscripts.net/raw/Universal-Script-Function-Dumper-14820" or "https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/FuncDumper.luau" or "https://github.com/ryxeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/FuncDumper.luau")))()
 funcs.dumpstring = funcs.string.dump
 
 -- // The rest is made by me.
