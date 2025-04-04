@@ -1,4 +1,4 @@
-# <h1 align="center">![IYR1](https://github.com/RyXeleron/infiniteyield-reborn/blob/master/logo.png?raw=true)
+# <h1 align="center">![IYR1](/logo.png?raw=true)
 </h1>
 
 <p align="center">
