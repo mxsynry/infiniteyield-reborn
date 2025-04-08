@@ -559,7 +559,7 @@ AddElement('syn', {
 	end,
 	unprotect_gui = function(gui)
 		local Gui = rawget(protected_guis, gui)
-		if not Gui then return error(`GUI {gui.Name} does not exist in the protected guis list.`, 1) end
+		if not Gui then return error("GUI " .. gui.Name .. " does not exist in the protected guis list.", 1) end
 		gui.Name = Gui.Name
 		gui.Parent = Gui.Parent
 		protected_guis[gui] = nil
