@@ -16200,6 +16200,15 @@ addcmd("unsuspendvc", {}, function(args, speaker)
     VoiceChatService:joinVoice()
 end)
 
+addcmd("permadeath", {}, function(args, speaker)
+    if replicatesignal then
+        permadeath(speaker)
+        notify("Permadeath", "Enabled")
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+    end
+end)
+
 local freezingua = nil
 frozenParts = {}
 addcmd('freezeunanchored',{'freezeua'},function(args, speaker)
