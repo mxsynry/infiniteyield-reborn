@@ -29,7 +29,7 @@ Features:
 
 ## Loadstring:
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/scriptblox/source"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/scriptblox/source"))()
 ```
 
 Thank you.
