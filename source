@@ -30,7 +30,7 @@ if getconnections then
 end
 
 if IY_LOADED and not _G.IY_DEBUG == true then
-    loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/alreadyexecuted' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/uselessscriptthatexistsinthisrepoiwin')))()
+    loadstring(game:HttpGet(('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/alreadyexecuted' or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/uselessscriptthatexistsinthisrepoiwin')))()
     return
 end
 
@@ -6497,7 +6497,7 @@ local TeleportCheck = false
 Players.LocalPlayer.OnTeleport:Connect(function(State)
     if KeepInfYield and (not TeleportCheck) and queueteleport then
         TeleportCheck = true
-        queueteleport("loadstring(game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/source' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/source')))()")
+        queueteleport("loadstring(game:HttpGet(('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/source' or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/source')))()")
     end
 end)
 
@@ -6651,7 +6651,7 @@ addcmd('clienttoken', {'ctoken'}, function(args, speaker)
     
         game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
             queueteleport([[
-                loadstring(game:HttpGet("https://ryxeleron.github.io/storage/other-stuff/iyr-execution/"))()
+                loadstring(game:HttpGet("https://mxsynry.github.io/storage/other-stuff/iyr-execution/"))()
             ]])
             ws:Close()
         end)
@@ -13022,18 +13022,18 @@ addcmd("addunc", {'addmoreunc', 'adduncevn'}, function(args, speaker)
     local links = {
         ["1"] = {
             "https://scriptblox.com/script/Universal-Script-MoreUNC-13110",
-            "https://github.com/RyXeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv1.luau",
-            "https://github.com/RyXeleron/ryxeleron.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv1.luau"
+            "https://github.com/mxsynry/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv1.luau",
+            "https://github.com/mxsynry/mxsynry.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv1.luau"
         },
         ["2"] = {
             "https://scriptblox.com/script/Universal-Script-MoreUNC-V2-15902",
-            "https://github.com/RyXeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv2.luau",
-            "https://github.com/RyXeleron/ryxeleron.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
+            "https://github.com/mxsynry/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv2.luau",
+            "https://github.com/mxsynry/mxsynry.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
         },
         ["3"] = {
             "https://scriptblox.com/raw/Universal-Script-MoreUNC-V3-27493",
-            "https://github.com/RyXeleron/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv3.luau",
-            "https://github.com/RyXeleron/ryxeleron.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
+            "https://github.com/mxsynry/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv3.luau",
+            "https://github.com/mxsynry/mxsynry.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
         }
     }
 
@@ -13093,12 +13093,12 @@ end)
 
 addcmd('betterexplorer', {'betterdex'}, function(args, speaker)
     notify('Loading', 'Hold on a sec')
-    loadstring(game:HttpGet(("https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/BetterDex" or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/BetterDex' or 'https://scriptblox.com/raw/Universal-Script-DEX-Explorer-For-Mobile-17871')))()
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/Elements/BetterDex" or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/Elements/BetterDex' or 'https://scriptblox.com/raw/Universal-Script-DEX-Explorer-For-Mobile-17871')))()
 end)
 
 addcmd('solaraexplorer', {'solaradex'}, function(args, speaker)
     notify('Loading', 'Hold on a sec')
-    loadstring(game:HttpGet(("https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/SolaraDex" or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/SolaraDex')))()
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/Elements/SolaraDex" or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/Elements/SolaraDex')))()
 end)
 
 addcmd('secureexplorer', {'securedex', "bypasseddex"}, function(args, speaker)
@@ -13191,7 +13191,7 @@ addcmd('remotespy',{'rspy'},function(args, speaker)
     if not IsOnMobile then
         loadstring(game:HttpGet("https://github.com/FurryBoyYT/synz_fixed_dex/raw/refs/heads/main/simple_spy.lua"))()
     else
-        loadstring(game:HttpGet(("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua" or "https://raw.githubusercontent.com/ryxeleron/infiniteyield-reborn/master/Elements/MobileSpy" or "https://ryxeleron.github.io/storage/iyrbackup/legacy/master/Elements/MobileSpy")))()
+        loadstring(game:HttpGet(("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua" or "https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/Elements/MobileSpy" or "https://mxsynry.github.io/storage/iyrbackup/legacy/master/Elements/MobileSpy")))()
     end
 end)
 
@@ -16679,7 +16679,7 @@ end)
 
 local function iyonloadstuff(shouldpopupannouncement)
     local success, latestVersionInfo = pcall(function() 
-        local versionJson = game:HttpGet(('https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/refs/heads/master/version' or 'https://ryxeleron.github.io/storage/iyrbackup/legacy/master/version'))
+        local versionJson = game:HttpGet(('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/version' or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/version'))
         return HttpService:JSONDecode(versionJson)
     end)
 

@@ -13813,7 +13813,7 @@ PopupText4.Size = UDim2.new(1, -16, 0.100000001, 0)
 PopupText4.ZIndex = 10
 PopupText4.Font = Enum.Font.SourceSansBold
 PopupText4.FontSize = Enum.FontSize.Size18
-PopupText4.Text = "github.com/ryxeleron/infiniteyield-reborn"
+PopupText4.Text = "github.com/mxsynry/infiniteyield-reborn"
 PopupText4.TextColor3 = Color3.new(0.97, 0.97, 0.97)
 PopupText4.TextStrokeTransparency = 0
 PopupText4.TextWrapped = true
@@ -13972,7 +13972,7 @@ if not game.CoreGui:FindFirstChild("IYrun") then
         a.ZIndex = 10
         a.Font = Enum.Font.SourceSansBold
         a.FontSize = Enum.FontSize.Size18
-        a.Text = "github.com/ryxeleron/infiniteyield-reborn"
+        a.Text = "github.com/mxsynry/infiniteyield-reborn"
         a.TextColor3 = Color3.new(0.97, 0.97, 0.97)
         a.TextStrokeTransparency = 0
         a.TextWrapped = true
@@ -14056,7 +14056,7 @@ if not game.CoreGui:FindFirstChild("IYrun") then
             end
             wait(0.5)
             Updates:Destroy()
-            loadstring(game:HttpGet(("https://raw.githubusercontent.com/RyXeleron/infiniteyield-reborn/master/Infinite%20Yield%20FD"), true))()
+            loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/Infinite%20Yield%20FD"), true))()
             end
             UPDATE.MouseButton1Down:connect(Click)
         end
