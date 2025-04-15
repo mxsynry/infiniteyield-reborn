@@ -252,9 +252,9 @@ Title.Font = Enum.Font.SourceSans
 Title.TextSize = 18
 if os.date("*t", os.time()).month == 4 then
     -- This is a reminder how EdgeIY edgy was
-    Title.Text = "Infinite Yiff v"  .. currentVersion
+    Title.Text = "Infinite Yiff v" .. currentVersion
 else
-    Title.Text = "Infinite Yield Reborn v"  .. currentVersion
+    Title.Text = "Infinite Yield Reborn v" .. currentVersion
 end
 do
     local emoji = ({
@@ -16198,10 +16198,18 @@ end)
 
 addcmd("unsuspendvc", {}, function(args, speaker)
     VoiceChatService:joinVoice()
+
+    if typeof(onVoiceModerated) ~= "RBXScriptConnection" then
+        onVoiceModerated = cloneref(game:GetService("VoiceChatInternal")).LocalPlayerModerated:Connect(function()
+            task.wait(1)
+            VoiceChatService:joinVoice()
+        end)
+    end
 end)
 
 addcmd("permadeath", {}, function(args, speaker)
     if replicatesignal then
+        notify("Permadeath", "Enablind... This may take a moment depending on the respawn time.")
         permadeath(speaker)
         notify("Permadeath", "Enabled")
     else
