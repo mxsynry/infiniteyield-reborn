@@ -80,6 +80,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyiel
 - **Contributor:** [Ry](https://github.com/mxsynry)
 - **Contributor** [TheCoolestSmug](https://discordapp.com/users/807464610147598336)
 - **Contributor** [igor_tigrek](https://discordapp.com/users/1029468860652470315)
+- **Contributor** [Devyzyn](https://github.com/Devyzn)
 - **Contributor** [Tatsuki](https://github.com/yixiyotatsuki)
 
 
