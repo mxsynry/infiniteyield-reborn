@@ -12946,12 +12946,12 @@ addcmd("addunc", {'addmoreunc', 'adduncevn'}, function(args, speaker)
     local version = args[1] or "3"
     local links = {
         ["1"] = {
-            "https://scriptblox.com/script/Universal-Script-MoreUNC-13110",
+            "https://scriptblox.com/raw/Universal-Script-MoreUNC-13110",
             "https://github.com/mxsynry/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv1.luau",
             "https://github.com/mxsynry/mxsynry.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv1.luau"
         },
         ["2"] = {
-            "https://scriptblox.com/script/Universal-Script-MoreUNC-V2-15902",
+            "https://scriptblox.com/raw/Universal-Script-MoreUNC-V2-15902",
             "https://github.com/mxsynry/infiniteyield-reborn/raw/refs/heads/master/Elements/MoreUNCv2.luau",
             "https://github.com/mxsynry/mxsynry.github.io/raw/refs/heads/main/storage/iyrbackup/legacy/master/Elements/MoreUNCv2.luau"
         },
