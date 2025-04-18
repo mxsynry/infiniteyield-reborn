@@ -8027,7 +8027,7 @@ addcmd('cframefly', {'cfly'}, function(args, speaker)
     if CFloop then CFloop:Disconnect() end
     CFloop = RunService.Heartbeat:Connect(function(deltaTime)
         local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * 10 * deltaTime)
-speaker.Character.PrimaryPart.Velocity=Vector3.zero
+        speaker.Character.PrimaryPart.Velocity=Vector3.zero --dude tatsuki why do you prefer over-optimizing shits
         local headCFrame = Head.CFrame
         local cameraCFrame = workspace.CurrentCamera.CFrame
         local cameraOffset = headCFrame:ToObjectSpace(cameraCFrame).Position
