@@ -1959,6 +1959,7 @@ HttpService = cloneref(game:GetService("HttpService"))
 MarketplaceService = cloneref(game:GetService("MarketplaceService"))
 RunService = cloneref(game:GetService("RunService"))
 TeleportService = cloneref(game:GetService("TeleportService"))
+AssetService = cloneref(game:GetService("AssetService"))
 StarterGui = cloneref(game:GetService("StarterGui"))
 GuiService = cloneref(game:GetService("GuiService"))
 Lighting = cloneref(game:GetService("Lighting"))
@@ -3212,16 +3213,20 @@ else
 end
 
 function maximizeHolder()
-    if StayOpen == false then
-        Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, -220), "InOut", "Quart", 0.2, true, nil)
-    end
+	if StayOpen == false then
+		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, -220), "InOut", "Quart", 0.2, true, nil)
+		TweenService:Create(Holder, TweenInfo.new(0.2), { BackgroundTransparency = 0 }):Play()
+		TweenService:Create(Title, TweenInfo.new(0.2), { BackgroundTransparency = 0 }):Play()
+	end
 end
 
 minimizeNum = -20
 function minimizeHolder()
-    if StayOpen == false then
-        Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, minimizeNum), "InOut", "Quart", 0.5, true, nil)
-    end
+	if StayOpen == false then
+		Holder:TweenPosition(UDim2.new(1, Holder.Position.X.Offset, 1, minimizeNum), "InOut", "Quart", 0.5, true, nil)
+		TweenService:Create(Holder, TweenInfo.new(0.5), { BackgroundTransparency = 0.7 }):Play()
+		TweenService:Create(Title, TweenInfo.new(0.5), { BackgroundTransparency = 0.7 }):Play()
+	end
 end
 
 function cmdbarHolder()
@@ -4619,6 +4624,7 @@ CMDs[#CMDs + 1] = {NAME = 'showiy / unhideiy / showiyr / unhideiyr', DESC = 'Sho
 CMDs[#CMDs + 1] = {NAME = 'keepiy / keepiyr', DESC = 'Auto execute IYR when you teleport through servers'}
 CMDs[#CMDs + 1] = {NAME = 'unkeepiy / unkeepiyr', DESC = 'Disable keepiy'}
 CMDs[#CMDs + 1] = {NAME = 'togglekeepiy / togglekeepiyr', DESC = 'Toggle keepiy'}
+CMDs[#CMDs + 1] = {NAME = 'killiy / killiyr', DESC = 'Kills IYR'}
 CMDs[#CMDs + 1] = {NAME = 'savegame / saveplace', DESC = 'Uses saveinstance to save the game'}
 CMDs[#CMDs + 1] = {NAME = 'savelogs', DESC = 'Saves console logs as a file'}
 CMDs[#CMDs + 1] = {NAME = 'clearerror', DESC = 'Clears the annoying box and blur when a game kicks you'}
@@ -6610,6 +6616,15 @@ addcmd('toggleunkeepiy', {"toggleunkeepiyr"}, function(args, speaker)
     else
         notify('Incompatible Exploit','Your exploit does not support this command (missing queue_on_teleport)')
     end
+end)
+
+addcmd('killiy', {"killiyr"}, function(args, speaker)
+    getgenv().IY_LOADED = false
+    PARENT:Destroy()
+    
+    Holder = Instance.new("Frame", workspace)
+    Notification = Instance.new("Frame", workspace)
+    Settings = Instance.new("Frame", workspace)
 end)
 
 local canOpenServerinfo = true
@@ -8994,6 +9009,231 @@ addcmd('inspect', {'examine'}, function(args, speaker)
         GuiService:CloseInspectMenu()
         GuiService:InspectPlayerFromUserId(Players[v].UserId)
     end
+end)
+
+addcmd("findplaces", {"fsp"}, function(args, speaker)
+    --by dazy0349 on discord
+    local Envs = {
+        cloneref = cloneref or function(a) return a end,
+        setclipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
+    }
+
+    if Player:GetAttribute("PlaceFinder") then
+        notify("Find Places", "You already executed this!")
+        return
+    else
+        Player:SetAttribute("PlaceFinder", true)
+    end
+
+    local PlaceFinder = Instance.new("ScreenGui")
+    local Top = Instance.new("Frame")
+    local Error = Instance.new("Sound")
+    local Success = Instance.new("Sound")
+    local UIStroke_1 = Instance.new("UIStroke")
+    local Body = Instance.new("Frame")
+    local UIStroke_2 = Instance.new("UIStroke")
+    local Places = Instance.new("ScrollingFrame")
+    local Default = Instance.new("Frame")
+    local UIStroke_3 = Instance.new("UIStroke")
+    local Teleport = Instance.new("TextButton")
+    local TextLabel = Instance.new("TextLabel")
+    local CopyId = Instance.new("TextButton")
+    local TextLabel_2 = Instance.new("TextLabel")
+    local PlaceFound = Instance.new("TextLabel")
+    local TextLabel_3 = Instance.new("TextLabel")
+    local UIListLayout = Instance.new("UIListLayout")
+    local CloseB = Instance.new("TextButton")
+    local ImageLabel = Instance.new("ImageLabel")
+    local MinimizeB = Instance.new("TextButton")
+    local ImageLabel_2 = Instance.new("ImageLabel")
+    local MaximizeB = Instance.new("TextButton")
+    local ImageLabel_3 = Instance.new("ImageLabel")
+    local TextLabel_4 = Instance.new("TextLabel")
+
+    --// Properties \\--
+    PlaceFinder.Name = "PlaceFinder"
+    PlaceFinder.Parent = CoreGui
+
+    Top.Name = "Top"
+    Top.Parent = PlaceFinder
+    Top.Active = true
+    Top.Draggable = true
+    Top.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    Top.BorderSizePixel = 0
+    Top.Position = UDim2.new(0.464, 0, 0.358, 0)
+    Top.Size = UDim2.new(0, 380, 0, 20)
+    Top.ZIndex = 2
+
+    Error.Name = "Error"
+    Error.Parent = Top
+    Error.SoundId = "rbxassetid://9066167010"
+    Error.Volume = 10
+
+    Success.Name = "Success"
+    Success.Parent = Top
+    Success.SoundId = "rbxassetid://3450794184"
+    Success.Volume = 10
+
+    UIStroke_1.Parent = Top
+    UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    UIStroke_1.Color = Color3.fromRGB(60, 60, 60)
+    UIStroke_1.Thickness = 2
+
+    Body.Name = "Body"
+    Body.Parent = Top
+    Body.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Body.BorderSizePixel = 0
+    Body.ClipsDescendants = true
+    Body.Size = UDim2.new(0, 380, 0, 250)
+
+    UIStroke_2.Parent = Body
+    UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    UIStroke_2.Color = Color3.fromRGB(50, 50, 50)
+    UIStroke_2.Thickness = 2
+
+    Places.Name = "Places"
+    Places.Parent = Body
+    Places.Active = true
+    Places.BackgroundTransparency = 1.000
+    Places.Position = UDim2.new(0, 0, 0, 20)
+    Places.Size = UDim2.new(0, 380, 0, 229)
+    Places.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Places.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+    Default.Name = "Default"
+    Default.Parent = Places
+    Default.BackgroundTransparency = 1.000
+    Default.Size = UDim2.new(0, 380, 0, 60)
+    Default.Visible = false
+
+    UIStroke_3.Parent = Default
+    UIStroke_3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    UIStroke_3.Color = Color3.fromRGB(35, 35, 35)
+    UIStroke_3.Thickness = 1
+
+    Teleport.Name = "Teleport"
+    Teleport.Parent = Default
+    Teleport.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    Teleport.Position = UDim2.new(0.65, 0, 0, 0)
+    Teleport.Size = UDim2.new(0, 133, 0, 30)
+    Teleport.Font = Enum.Font.SourceSans
+    Teleport.Text = ""
+    Teleport.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Teleport.TextSize = 14
+
+    TextLabel.Parent = Teleport
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.Size = UDim2.new(1, 0, 0.884, 0)
+    TextLabel.Position = UDim2.new(0, 0, 0.055, 0)
+    TextLabel.Font = Enum.Font.SourceSans
+    TextLabel.Text = "Teleport"
+    TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.TextScaled = true
+    TextLabel.TextWrapped = true
+
+    CopyId.Name = "CopyId"
+    CopyId.Parent = Default
+    CopyId.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    CopyId.Position = UDim2.new(0.65, 0, 0.5, 0)
+    CopyId.Size = UDim2.new(0, 133, 0, 30)
+    CopyId.Font = Enum.Font.SourceSans
+    CopyId.Text = ""
+    CopyId.TextColor3 = Color3.fromRGB(0, 0, 0)
+    CopyId.TextSize = 14
+
+    TextLabel_2.Parent = CopyId
+    TextLabel_2.BackgroundTransparency = 1
+    TextLabel_2.Size = UDim2.new(1, 0, 0.884, 0)
+    TextLabel_2.Position = UDim2.new(0, 0, 0.055, 0)
+    TextLabel_2.Font = Enum.Font.SourceSans
+    TextLabel_2.Text = "Copy ID"
+    TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_2.TextScaled = true
+    TextLabel_2.TextWrapped = true
+
+    PlaceFound.Name = "PlaceFound"
+    PlaceFound.Parent = Default
+    PlaceFound.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    PlaceFound.Size = UDim2.new(0, 247, 0, 60)
+    PlaceFound.Font = Enum.Font.SourceSans
+    PlaceFound.Text = ""
+    PlaceFound.TextColor3 = Color3.fromRGB(0, 0, 0)
+    PlaceFound.TextSize = 14
+
+    TextLabel_3.Parent = PlaceFound
+    TextLabel_3.BackgroundTransparency = 1
+    TextLabel_3.Position = UDim2.new(0.014, 0, 0.058, 0)
+    TextLabel_3.Size = UDim2.new(0.976, 0, 0.883, 0)
+    TextLabel_3.Font = Enum.Font.SourceSans
+    TextLabel_3.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_3.TextScaled = true
+    TextLabel_3.TextWrapped = true
+
+    UIListLayout.Parent = Places
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    --// Clipboard Check \\--
+    if not Envs.setclipboard then
+        Error:Play()
+        notify("Find Places", "Your executor doesn't support setclipboard()")
+    end
+
+    local Debounce = false
+
+    local PlacesPages = AssetService:GetGamePlacesAsync()
+    for _, v in PlacesPages:GetCurrentPage() do
+        local FoundPlace = Default:Clone()
+        FoundPlace.Name = "FoundPlace"
+        FoundPlace.Parent = Places
+        FoundPlace.Visible = true
+        FoundPlace.PlaceFound.TextLabel.Text = v.Name .. "\nID: " .. v.PlaceId
+
+        FoundPlace.Teleport.MouseButton1Click:Connect(function()
+            notify("Find Places", "Teleporting...")
+            TeleportService:Teleport(v.PlaceId, Player)
+        end)
+
+        FoundPlace.CopyId.MouseButton1Click:Connect(function()
+            if Envs.setclipboard then
+                Envs.setclipboard(tostring(v.PlaceId))
+                Success:Play()
+                notify("Find Places", "Copied Place ID")
+            else
+                notify("Find Places", "Your executor doesn't support setclipboard()")
+            end
+        end)
+    end
+
+    local Info = TweenInfo.new(0.4, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
+    local MinFrameAnim = TweenService:Create(Body, Info, {Size = UDim2.fromOffset(380, 20)})
+    local MaxFrameAnim = TweenService:Create(Body, Info, {Size = UDim2.fromOffset(380, 250)})
+
+    MinimizeB.MouseButton1Click:Connect(function()
+        if not Debounce then
+            Debounce = true
+            MinimizeB.Visible = false
+            MaximizeB.Visible = true
+            MinFrameAnim:Play()
+            task.wait(0.4)
+            Debounce = false
+        end
+    end)
+
+    MaximizeB.MouseButton1Click:Connect(function()
+        if not Debounce then
+            Debounce = true
+            MinimizeB.Visible = true
+            MaximizeB.Visible = false
+            MaxFrameAnim:Play()
+            task.wait(0.4)
+            Debounce = false
+        end
+    end)
+
+    CloseB.MouseButton1Click:Once(function()
+        PlaceFinder:Destroy()
+        Player:SetAttribute("PlaceFinder", nil)
+    end)
 end)
 
 addcmd("savegame", {"saveplace"}, function(args, speaker)
