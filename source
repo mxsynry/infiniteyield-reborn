@@ -7,7 +7,7 @@
 
 	To check if it supports LuaU syntax, run this:
 	print(true and "Supported" or "This shouldn't be printed")
-        https://ipgrabbergohere/iplog0e9
+
 	The issue is probably different if you see the message "Supported" in the console (F9 or /console in chat).
 
 	You can also run these lines too:
