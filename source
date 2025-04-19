@@ -15902,4 +15902,4 @@ task.spawn(function()
     if PlaceId == 574746640 then
         notify("4nn1's Place", "Game Detected! Some commands were added/changed/removed")
     end
-    git branch -d upstream-mergeend)
+end)
