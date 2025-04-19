@@ -3975,22 +3975,32 @@ if not writefileExploit() then
     notify('Saves','Your exploit does not support read/write file. Your settings will not save.')
 end
 
+avatarcache = {}
 function sendChatWebhook(player, message)
-    if httprequest and vtype(logsWebhook, "string") then
-        local log = HttpService:JSONEncode({
-            content = message,
-            avatar_url = "https://files.catbox.moe/i968v2.jpg",
-            username = formatUsername(player),
-            allowed_mentions = {parse = {}}
-        })
-
-        httprequest({
-            Url = logsWebhook,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = log
-        })
+  if httprequest and vtype(logsWebhook, "string") then
+    local id = player.UserId
+    local avatar = avatarcache[id]
+    if not avatar then
+      local d = HttpService:JSONDecode(httprequest({
+        Url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. id .. "&size=420x420&format=Png&isCircular=false",
+        Method = "GET"
+      }).Body)["data"]
+      avatar = d and d[1].state == "Completed" and d[1].imageUrl or "https://files.catbox.moe/i968v2.jpg"
+      avatarcache[id] = avatar
     end
+    local log = HttpService:JSONEncode({
+      content = message,
+      avatar_url = avatar,
+      username = formatUsername(player),
+      allowed_mentions = {parse = {}}
+    })
+    httprequest({
+      Url = logsWebhook,
+      Method = "POST",
+      Headers = {["Content-Type"] = "application/json"},
+      Body = log
+    })
+  end
 end
 
 ChatLog = function(plr)
@@ -10418,11 +10428,11 @@ addcmd("replicationlag", {"backtrack"}, function(args, speaker)
 end)
 
 addcmd("noprompts", {"nopurchaseprompts"}, function(args, speaker)
-    COREGUI.PurchasePrompt.Enabled = false
+	COREGUI.PurchasePromptApp.Enabled = false
 end)
 
 addcmd("showprompts", {"showpurchaseprompts"}, function(args, speaker)
-    COREGUI.PurchasePrompt.Enabled = true
+	COREGUI.PurchasePromptApp.Enabled = true
 end)
 
 local function promptNewRig(speaker, rig)
@@ -10450,7 +10460,7 @@ local function promptNewRig(speaker, rig)
 end
 
 addcmd("r6", {"r6anim", "r6reanim", "faker6", 'r31'}, function(args, speaker)
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/Elements/faker6.luau"))()
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/Elements/faker6.luau" or 'https://raw.githubusercontent.com/mxsynry/mxsynry.github.io/refs/heads/main/storage/iyrbackup/legacy/master/Elements/faker6.luau')))()
 end)
 
 addcmd("promptr6", {}, function(args, speaker)
@@ -11048,7 +11058,7 @@ end)
 
 --nah lazy
 invisRunning = false
-addcmd('invisible',{'invis'},function(args, speaker)
+addcmd("visible", {"vis","uninvisible"}, function(args, speaker)
     if invisRunning then return end
     invisRunning = true
     permadeath(speaker)
