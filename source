@@ -7027,7 +7027,7 @@ local canOpenServerIist = true
 addcmd('serverlist',{'slist'},function(args, speaker)
     if httprequest then
         local listreq = game:HttpGet(string.format("https://api.iyr.lol/servers?id=%d", PlaceId))
-        local listbody = HttpService:JSONDecode(listreq.Body)
+        local listbody = HttpService:JSONDecode(listreq)
         if listbody then
             if not canOpenServerIist then return end
             canOpenServerIist = false
