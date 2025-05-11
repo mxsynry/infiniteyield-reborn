@@ -9252,50 +9252,30 @@ addcmd('removeanticheat', {'deleteanticheat'}, function(args, speaker)
 end)
 
 addcmd('clientantikick',{'antikick'},function(args, speaker)
-    if not hookmetamethod then 
-        return notify('Incompatible Exploit','Your exploit does not support this command (missing hookmetamethod)')
-    end
-
-    local checkcaller = checkcaller
-
-    if not checkcaller then
-        notify('Client Antikick', "Because your executor doesn't support checkcaller, scripts run by your executor will still kick you")
-        checkcaller = function() return false end
-        task.wait(2) -- thanks for overlapping, notifs :<
-    end
-
-    local AllowExecutorKicks = not (args[1] and args[1]:lower() == "false") -- some silly noobs might use "False" for the argument and then scream because their executor kicked them. also this logic statement sucks.
-
-    local LocalPlayer = Players.LocalPlayer
-    local KickFunctions = {"Kick", "kick"}
-
-    for i,v in ipairs(KickFunctions) do -- prevents localscripts from sanity checking LocalPlayer.KiCk or some other combination of capitals that aren't an actual function
-        local oldkick
-        oldkick = hookfunction(LocalPlayer[v], newcclosure(function(self, ...)
-            if self == LocalPlayer then
-                if AllowExecutorKicks and checkcaller() then
-                    return oldkick(self, ...)
-                else
-                    return
-                end
-            end
-            return oldkick(self, ...)
-        end))
-    end
-
-    local oldhmmnc
-    oldhmmnc = hookmetamethod(game, "__namecall", function(self, ...)
-        if self == LocalPlayer and table.find(KickFunctions, getnamecallmethod()) then
-            if AllowExecutorKicks and checkcaller() then
-                return oldhmmnc(self, ...)
-            else
-                return
-            end
-        end
-        return oldhmmnc(self, ...)
-    end)
-
-    notify('Client Antikick','Client anti kick is now active (only effective on localscript kick)')
+	if not hookmetamethod then 
+	    return notify('Incompatible Exploit','Your exploit does not support this command (missing hookmetamethod)')
+	end
+	local LocalPlayer = Players.LocalPlayer
+	local oldhmmi
+	local oldhmmnc
+	local oldKickFunction
+	if hookfunction then
+	    oldKickFunction = hookfunction(LocalPlayer.Kick, function() end)
+	end
+	oldhmmi = hookmetamethod(game, "__index", function(self, method)
+	    if self == LocalPlayer and method:lower() == "kick" then
+	        return error("Expected ':' not '.' calling member function Kick", 2)
+	    end
+	    return oldhmmi(self, method)
+	end)
+	oldhmmnc = hookmetamethod(game, "__namecall", function(self, ...)
+	    if self == LocalPlayer and getnamecallmethod():lower() == "kick" then
+	        return
+	    end
+	    return oldhmmnc(self, ...)
+	end)
+	
+	notify('Client Antikick','Client anti kick is now active (only effective on localscript kick)')
 end)
 
 addcmd('clientantiteleport',{'antiteleport'},function(args, speaker)
