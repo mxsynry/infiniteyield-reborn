@@ -15218,7 +15218,7 @@ end)
 
 addcmd("permadeath", {}, function(args, speaker)
     if replicatesignal then
-        notify("Permadeath", "Enablind... This may take a moment depending on the respawn time.")
+        notify("Permadeath", "Enabling... This may take a moment depending on the respawn time.")
         permadeath(speaker)
         notify("Permadeath", "Enabled")
     else
