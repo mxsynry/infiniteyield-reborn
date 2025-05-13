@@ -4603,6 +4603,7 @@ CMDs[#CMDs + 1] = {NAME = 'solaraexplorer / solaradex', DESC = 'Opens SolaraDEX 
 CMDs[#CMDs + 1] = {NAME = 'secureexplorer / securedex / bypasseddex', DESC = 'Opens Bypassed DEX by HamstaGang'}
 CMDs[#CMDs + 1] = {NAME = 'olddex / odex', DESC = 'Opens Old DEX by Moon'}
 CMDs[#CMDs + 1] = {NAME = 'remotespy / rspy', DESC = 'Opens Simple Spy V3'}
+CMDs[#CMDs + 1] = {NAME = 'hydroxidespy / hspy', DESC = 'Opens Hydroxide Spy'}
 CMDs[#CMDs + 1] = {NAME = 'audiologger / alogger', DESC = 'Opens audio logger'}
 CMDs[#CMDs + 1] = {NAME = 'serverinfo / info', DESC = 'Gives you info about the server'}
 CMDs[#CMDs + 1] = {NAME = 'jobid', DESC = 'Copies the games JobId to your clipboard'}
@@ -12202,6 +12203,19 @@ addcmd('remotespy',{'rspy'},function(args, speaker)
     else
         loadstring(game:HttpGet(("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua" or "https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/Elements/MobileSpy" or "https://mxsynry.github.io/storage/iyrbackup/legacy/master/Elements/MobileSpy")))()
     end
+end)
+
+addcmd('hydroxidespy',{'hspy'},function(args, speaker)
+    notify("Loading",'Hold on a sec')
+    local owner = "Upbolt"
+    local branch = "revision"
+
+    local function webImport(file)
+        return loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/%s/Hydroxide/%s/%s.lua"):format(owner, branch, file)), file .. '.lua')()
+    end
+
+    webImport("init")
+    webImport("ui/main")
 end)
 
 addcmd('audiologger',{'alogger'},function(args, speaker)
