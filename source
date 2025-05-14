@@ -49,7 +49,7 @@ if not game:IsLoaded() then
     notLoaded:Destroy()
 end
 
-currentVersion = '7.0.7'
+currentVersion = '7.0.8'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -15658,6 +15658,24 @@ Players.PlayerAdded:Connect(function(plr)
         createESP(plr.Name)
     end
 end)
+
+if not isLegacyChat then
+    TextChatService.MessageReceived:Connect(function(message)
+        if message.TextSource then
+            local player = Players:GetPlayerByUserId(message.TextSource.UserId)
+            if not player then return end
+
+            if logsEnabled == true then
+                CreateLabel(player.Name, message.Text)
+            end
+            if player.UserId == Players.LocalPlayer.UserId then
+                do_exec(message.Text, Players.LocalPlayer)
+            end
+            eventEditor.FireEvent("OnChatted", player.Name, message.Text)
+            sendChatWebhook(player, message.Text)
+        end
+    end)
+end
 
 for _,plr in pairs(Players:GetPlayers()) do
     pcall(function()
