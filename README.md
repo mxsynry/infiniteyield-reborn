@@ -8,19 +8,19 @@
 ## Master Branch Loadstring
 
 ```lua
-loadstring(game:HttpGet(('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/source' or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/source')))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/source'))()
 ```
 
 ## IYStore x IYR (Debloated / No NSFW)
 
 ```lua
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/Infinite%20Store" or "https://mxsynry.github.io/storage/iyrbackup/legacy/master/Infinite%20Store")))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/Infinite%20Store"))()
 ```
 
 ## IYRCMDLine (Reconstructed)
 
 ```lua
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/IYRCMDBAR" or "https://mxsynry.github.io/storage/iyrbackup/legacy/master/IYRCMDBAR")))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/IYRCMDBAR"))()
 ```
 
 ---
