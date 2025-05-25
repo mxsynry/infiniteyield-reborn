@@ -9341,14 +9341,21 @@ addcmd('antilag',{'boostfps','lowgraphics'},function(args, speaker)
     Terrain.WaterWaveSize = 0
     Terrain.WaterWaveSpeed = 0
     Terrain.WaterReflectance = 0
-    Terrain.WaterTransparency = 0
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 9e9
+	Terrain.WaterTransparency = 1
+	Lighting.GlobalShadows = false
+	Lighting.FogEnd = 9e9
+	Lighting.FogStart= 9e9
     settings().Rendering.QualityLevel = 1
     for i,v in pairs(game:GetDescendants()) do
-        if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
-            v.Material = "Plastic"
-            v.Reflectance = 0
+		if v:IsA("BasePart") then
+			v.Material = "Plastic"
+			v.Reflectance = 0
+			v.BackSurface = "SmoothNoOutlines"
+			v.BottomSurface = "SmoothNoOutlines"
+			v.FrontSurface = "SmoothNoOutlines"
+			v.LeftSurface = "SmoothNoOutlines"
+			v.RightSurface = "SmoothNoOutlines"
+			v.TopSurface = "SmoothNoOutlines"
         elseif v:IsA("Decal") then
             v.Transparency = 1
         elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
@@ -9359,12 +9366,12 @@ addcmd('antilag',{'boostfps','lowgraphics'},function(args, speaker)
         end
     end
     for i,v in pairs(Lighting:GetDescendants()) do
-        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+        if v:IsA("PostEffect") then
             v.Enabled = false
         end
     end
     workspace.DescendantAdded:Connect(function(child)
-        for _,Name in next,{"ForceField","Sparkles","Smoke","Fire"} do
+        for _,Name in next,{"ForceField","Sparkles","Smoke","Fire","Beam"} do
             if child:IsA(Name) then
                 task.defer(game.Destroy,child)
                 break
@@ -15717,12 +15724,12 @@ end
 IYMouse.Move:Connect(checkTT)
 
 CaptureService.CaptureBegan:Connect(function()
-    Holder.Visible = false
+    PARENT.Enabled = false
 end)
 
 CaptureService.CaptureEnded:Connect(function()
     task.delay(0.1, function()
-        Holder.Visible = true
+        PARENT.Enabled = true
     end)
 end)
 
