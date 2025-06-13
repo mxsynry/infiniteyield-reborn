@@ -36,7 +36,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyiel
 
 
 - Over 400 Commands at your fingertips
-- Very slow update
+- Mostly good updates.. 
 - Easy to use
 - The starting point of every exploiter
 
