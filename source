@@ -184,7 +184,7 @@ pcall(function() -- good executor trust x2
     end
 end)]] -- wtf is this
 
-currentVersion = '7.0.8'
+currentVersion = '7.0.9'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
