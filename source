@@ -39,7 +39,7 @@ if not game:IsLoaded() then game.Loaded:Wait() end
 
 function missing(t, f, fallback)
     if type(f) == t then return f end
-    return fallback or nil
+    return fallback
 end
 
 cloneref = missing("function", cloneref, function(...) return ... end)
@@ -3264,6 +3264,14 @@ end
 
 if type(binds) ~= "table" then binds = {} end
 
+if type(PluginsTable) == "table" then
+    for i = #PluginsTable, 1, -1 do
+        if string.sub(PluginsTable[i], -3) ~= ".iy" then
+            table.remove(PluginsTable, i)
+        end
+    end
+end
+
 function Time()
     local HOUR = math.floor((tick() % 86400) / 3600)
     local MINUTE = math.floor((tick() % 3600) / 60)
@@ -3396,7 +3404,9 @@ function CreateLabel(Name, Text)
         tl.Name = Name
         tl.Parent = scroll_2
         tl.ZIndex = 10
-        tl.Text = Time().." - ["..Name.."]: "..Text
+		tl.RichText = true
+		tl.Text = Time().." - ["..Name.."]: "..Text
+		tl.Text = tl.ContentText
         tl.Size = UDim2.new(0,322,0,84)
         tl.BackgroundTransparency = 1
         tl.BorderSizePixel = 0
@@ -4590,45 +4600,36 @@ local GetNearestPlayers = function()
     return false
 end
 
-spawn(function()
-    while true do
-        if (AntiBangEnabled) then
-            Character = Player.Character
-            Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
-            RootPart = Humanoid and Humanoid.RootPart
+task.spawn(function()
+	while true do
+		if (AntiBangEnabled) then
+			Character = Player.Character
+			Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
+			RootPart = Humanoid and Humanoid.RootPart
+			-- :: not sure if my funcs work, but there it is
+			if GetNearbyPlayersInRadius(2) --[[GetNearestPlayers()]] and Humanoid and RootPart and not IsVoiding then
+				IsVoiding = true
 
-            if GetNearestPlayers() and Humanoid and RootPart and not IsVoiding then
-                if (RanTP) then
-                    RootPart.CFrame = RootPart.CFrame + Vector3.new(math.random(1,50), 0, math.random(1,50))
-                else
-                    IsVoiding = true
+				local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
+				local Timer = tick()
 
-                    local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
-                    local Timer = tick()
-                    local OldDH = workspace.FallenPartsDestroyHeight
+				repeat
+					RootPart.CFrame = CFrame.new(0, workspace.FallenPartsDestroyHeight + 1, 0) * CFrame.Angles(math.rad(90), 0, 0)
+					RootPart.AssemblyLinearVelocity = Vector3.zero
+					task.wait()
+				until tick() > Timer + 1
 
-                    
-                    repeat
-                        workspace["\x46\x61\x6C\x6C\x65\x6E\x50\x61\x72\x74\x73\x44\x65\x73\x74\x72\x6F\x79\x48\x65\x69\x67\x68\x74"] = 0 / 0
-                        RootPart.CFrame = CFrame.new(0, VoidDepth, 0) * CFrame.Angles(math.rad(90), 0, 0)
-                        RootPart.AssemblyLinearVelocity = Vector3.new()
-                        task.wait()
-                    until tick() > Timer + AbDelay
+				RootPart.AssemblyLinearVelocity = Vector3.zero
+				RootPart.CFrame = CurrentPosition
 
-                    RootPart.AssemblyLinearVelocity = Vector3.new()
-                    RootPart.CFrame = CurrentPosition
+				Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 
-                    Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+				IsVoiding = false
+			end
+		end
 
-
-                    workspace["\x46\x61\x6C\x6C\x65\x6E\x50\x61\x72\x74\x73\x44\x65\x73\x74\x72\x6F\x79\x48\x65\x69\x67\x68\x74"] = OldDH
-                    IsVoiding = false
-                end
-            end
-        end
-
-        task.wait()
-    end
+		task.wait()
+	end
 end)
 
 AntiFlingEnabled = false
@@ -4721,7 +4722,7 @@ CMDs[#CMDs + 1] = {NAME = 'hideiy / hideiyr', DESC = 'Hides the main IYR GUI'}
 CMDs[#CMDs + 1] = {NAME = 'showiy / unhideiy / showiyr / unhideiyr', DESC = 'Shows IYR again'}
 CMDs[#CMDs + 1] = {NAME = 'keepiy / keepiyr', DESC = 'Auto execute IYR when you teleport through servers'}
 CMDs[#CMDs + 1] = {NAME = 'unkeepiy / unkeepiyr', DESC = 'Disable keepiy'}
-CMDs[#CMDs + 1] = {NAME = 'togglekeepiy / togglekeepiyr', DESC = 'Toggle keepiy'}
+CMDs[#CMDs + 1] = {NAME = 'togglekeepiy / togglekeepiyr', DESC = 'Toggles keepiy'}
 CMDs[#CMDs + 1] = {NAME = 'killiy / killiyr', DESC = 'Kills IYR'}
 CMDs[#CMDs + 1] = {NAME = 'savegame / saveplace', DESC = 'Uses saveinstance to save the game'}
 CMDs[#CMDs + 1] = {NAME = 'savelogs', DESC = 'Saves console logs as a file'}
@@ -4755,13 +4756,14 @@ CMDs[#CMDs + 1] = {NAME = 'vehicleflyspeed  / vflyspeed [num]', DESC = 'Set vehi
 CMDs[#CMDs + 1] = {NAME = 'cframefly / cfly [speed]', DESC = 'Makes you fly, bypassing some anti cheats (works on mobile)'}
 CMDs[#CMDs + 1] = {NAME = 'uncframefly / uncfly', DESC = 'Disables cfly'}
 CMDs[#CMDs + 1] = {NAME = 'cframeflyspeed  / cflyspeed [num]', DESC = 'Sets cfly speed'}
-CMDs[#CMDs + 1] = {NAME = 'qefly [true / false]', DESC = 'enables or disables the Q and E hotkeys for fly'}
+CMDs[#CMDs + 1] = {NAME = 'qefly [true / false]', DESC = 'Enables or disables the Q and E hotkeys for fly'}
 CMDs[#CMDs + 1] = {NAME = 'vehiclenoclip / vnoclip', DESC = 'Turns off vehicle collision'}
 CMDs[#CMDs + 1] = {NAME = 'vehicleclip / vclip / unvnoclip', DESC = 'Enables vehicle collision'}
 CMDs[#CMDs + 1] = {NAME = 'float /  platform', DESC = 'Spawns a platform beneath you causing you to float'}
 CMDs[#CMDs + 1] = {NAME = 'unfloat / noplatform', DESC = 'Removes the platform'}
 CMDs[#CMDs + 1] = {NAME = 'swim', DESC = 'Allows you to swim in the air'}
 CMDs[#CMDs + 1] = {NAME = 'unswim / noswim', DESC = 'Stops you from swimming everywhere'}
+CMDs[#CMDs + 1] = {NAME = 'toggleswim', DESC = 'Toggles swimming'}
 CMDs[#CMDs + 1] = {NAME = 'marble / ball [size]', DESC = 'Turns you into a marble'}
 CMDs[#CMDs + 1] = {NAME = 'unmarble / unball [size]', DESC = 'Turns you back from being a marble'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
@@ -4824,15 +4826,15 @@ CMDs[#CMDs + 1] = {NAME = 'bubblechat (CLIENT)', DESC = 'Enables bubble chat for
 CMDs[#CMDs + 1] = {NAME = 'unbubblechat / nobubblechat', DESC = 'Disables the bubblechat command'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'esp', DESC = 'View all players and their status'}
-CMDs[#CMDs + 1] = {NAME = 'espteam', DESC = 'Esp but teammates are green and bad guys are red'}
-CMDs[#CMDs + 1] = {NAME = 'noesp / unesp', DESC = 'Removes esp'}
-CMDs[#CMDs + 1] = {NAME = 'esptransparency [number]', DESC = 'Changes the transparency of esp related commands'}
+CMDs[#CMDs + 1] = {NAME = 'espteam', DESC = 'ESP but teammates are green and bad guys are red'}
+CMDs[#CMDs + 1] = {NAME = 'noesp / unesp / unespteam', DESC = 'Removes ESP'}
+CMDs[#CMDs + 1] = {NAME = 'esptransparency [number]', DESC = 'Changes the transparency of ESP related commands'}
 CMDs[#CMDs + 1] = {NAME = 'partesp [part name]', DESC = 'Highlights a part'}
 CMDs[#CMDs + 1] = {NAME = 'unpartesp / nopartesp [part name]', DESC = 'removes partesp'}
 CMDs[#CMDs + 1] = {NAME = 'locate [player]', DESC = 'View a single player and their status'}
 CMDs[#CMDs + 1] = {NAME = 'unlocate / nolocate [player]', DESC = 'Removes locate'}
 CMDs[#CMDs + 1] = {NAME = 'xray', DESC = 'Makes all parts in workspace transparent'}
-CMDs[#CMDs + 1] = {NAME = 'unxray / noxray', DESC = 'Restores transparency'}
+CMDs[#CMDs + 1] = {NAME = 'unxray / noxray', DESC = 'Restores transparency to all parts in workspace'}
 CMDs[#CMDs + 1] = {NAME = 'loopxray', DESC = 'Makes all parts in workspace transparent but looped'}
 CMDs[#CMDs + 1] = {NAME = 'unloopxray', DESC = 'Unloops xray'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
@@ -4978,7 +4980,7 @@ CMDs[#CMDs + 1] = {NAME = 'fling / spinfling', DESC = 'Flings anyone you touch'}
 CMDs[#CMDs + 1] = {NAME = 'unfling / unspinfling', DESC = 'Disables the fling command'}
 CMDs[#CMDs + 1] = {NAME = 'flyfling [speed]', DESC = 'Basically the invisfling command but not invisible'}
 CMDs[#CMDs + 1] = {NAME = 'unflyfling', DESC = 'Disables the flyfling command'}
-CMDs[#CMDs + 1] = {NAME = 'invisfling', DESC = 'Enables invisible fling'}
+CMDs[#CMDs + 1] = {NAME = 'invisfling', DESC = 'Enables invisible fling (the invis part is patched, try using the god command before using this)'}
 CMDs[#CMDs + 1] = {NAME = 'loopoof', DESC = 'Loops everyones character sounds (everyone can hear)'}
 CMDs[#CMDs + 1] = {NAME = 'unloopoof', DESC = 'Stops the oof chaos'}
 CMDs[#CMDs + 1] = {NAME = 'muteboombox [player]', DESC = 'Mutes someones boombox'}
@@ -4990,16 +4992,16 @@ CMDs[#CMDs + 1] = {NAME = 'reset', DESC = 'Resets your character normally'}
 CMDs[#CMDs + 1] = {NAME = 'respawn', DESC = 'Respawns you'}
 CMDs[#CMDs + 1] = {NAME = 'refresh / re', DESC = 'Respawns and brings you back to the same position'}
 CMDs[#CMDs + 1] = {NAME = 'god', DESC = 'Makes your character difficult to kill in most games'}
-CMDs[#CMDs + 1] = {NAME = 'permadeath', DESC = 'Makes you unable to die'}
+CMDs[#CMDs + 1] = {NAME = 'permadeath', DESC = 'Makes you unable to respawn after death'}
 CMDs[#CMDs + 1] = {NAME = 'invisible / invis', DESC = 'Makes you invisible to other players'}
 CMDs[#CMDs + 1] = {NAME = 'visible / vis', DESC = 'Makes you visible to other players'}
 CMDs[#CMDs + 1] = {NAME = 'toolinvisible / toolinvis / tinvis', DESC = 'Makes you invisible to other players and able to use tools'}
-CMDs[#CMDs + 1] = {NAME = 'speed / ws / walkspeed [num]', DESC = 'Change your walkspeed'}
+CMDs[#CMDs + 1] = {NAME = 'speed / ws / walkspeed [num]', DESC = 'Change your walkspeed (default is 16)'}
 CMDs[#CMDs + 1] = {NAME = 'spoofspeed / spoofws [num]', DESC = 'Spoofs your WalkSpeed on the Client'}
 CMDs[#CMDs + 1] = {NAME = 'loopspeed / loopws [num]', DESC = 'Loops your walkspeed'}
 CMDs[#CMDs + 1] = {NAME = 'unloopspeed / unloopws', DESC = 'Turns off loopspeed'}
 CMDs[#CMDs + 1] = {NAME = 'hipheight / hheight [num]', DESC = 'Adjusts hip height'}
-CMDs[#CMDs + 1] = {NAME = 'jumppower / jpower / jp [num]', DESC = 'Change a players jump height'}
+CMDs[#CMDs + 1] = {NAME = 'jumppower / jpower / jp [num]', DESC = 'Change a players jump height (default is 50)'}
 CMDs[#CMDs + 1] = {NAME = 'spoofjumppower / spoofjp [num]', DESC = 'Spoofs your JumpPower on the Client'}
 CMDs[#CMDs + 1] = {NAME = 'loopjumppower / loopjp [num]', DESC = 'Loops your jump height'}
 CMDs[#CMDs + 1] = {NAME = 'unloopjumppower / unloopjp', DESC = 'Turns off loopjumppower'}
@@ -5007,6 +5009,8 @@ CMDs[#CMDs + 1] = {NAME = 'maxslopeangle / msa [num]', DESC = 'Adjusts MaxSlopeA
 CMDs[#CMDs + 1] = {NAME = 'gravity / grav [num]', DESC = 'Change your gravity'}
 CMDs[#CMDs + 1] = {NAME = 'sit', DESC = 'Makes your character sit'}
 CMDs[#CMDs + 1] = {NAME = 'lay / laydown', DESC = 'Makes your character lay down'}
+CMDs[#CMDs + 1] = {NAME = 'climb', DESC = 'Makes your character climb a clientsided truss (no its still visible in client replication, skid)'}
+CMDs[#CMDs + 1] = {NAME = 'unclimb', DESC = 'Destroy the truss.'}
 CMDs[#CMDs + 1] = {NAME = 'sitwalk', DESC = 'Makes your character sit while still being able to walk'}
 CMDs[#CMDs + 1] = {NAME = 'unsitwalk', DESC = 'unsitwalk, reverts your original animations'}
 CMDs[#CMDs + 1] = {NAME = 'nosit', DESC = 'Prevents your character from sitting'}
@@ -5027,8 +5031,8 @@ CMDs[#CMDs + 1] = {NAME = 'unnorotate / autorotate', DESC = 'Enables AutoRotate'
 CMDs[#CMDs + 1] = {NAME = 'enablestate [StateType]', DESC = 'Enables a humanoid state type'}
 CMDs[#CMDs + 1] = {NAME = 'disablestate [StateType]', DESC = 'Disables a humanoid state type'}
 CMDs[#CMDs + 1] = {NAME = 'team [team name] (CLIENT)', DESC = 'Changes your team. Sometimes fools localscripts.'}
-CMDs[#CMDs + 1] = {NAME = 'nobillboardgui / nobgui / noname', DESC = 'Removes billboard and surface guis from your players (i.e. name guis at cafes)'}
-CMDs[#CMDs + 1] = {NAME = 'loopnobgui / loopnoname', DESC = 'Loop removes billboard and surface guis from your players (i.e. name guis at cafes)'}
+CMDs[#CMDs + 1] = {NAME = 'nobillboardgui / nobgui / noname', DESC = 'Removes billboard and surface GUIs from your players (i.e. name GUIs at cafes)'}
+CMDs[#CMDs + 1] = {NAME = 'loopnobgui / loopnoname', DESC = 'Loop removes billboard and surface GUIs from your players (i.e. name GUIs at cafes)'}
 CMDs[#CMDs + 1] = {NAME = 'unloopnobgui / unloopnoname', DESC = 'Disables loopnobgui'}
 CMDs[#CMDs + 1] = {NAME = 'deletevelocity / dv / removeforces', DESC = 'Removes any velocity / force instances in your character'}
 CMDs[#CMDs + 1] = {NAME = 'weaken [num]', DESC = 'Makes your character less dense'}
@@ -5065,8 +5069,8 @@ CMDs[#CMDs + 1] = {NAME = 'unautokeypress', DESC = 'Stops autokeypress'}
 CMDs[#CMDs + 1] = {NAME = 'hovername', DESC = 'Shows a players username when your mouse is hovered over them'}
 CMDs[#CMDs + 1] = {NAME = 'unhovername / nohovername', DESC = 'Turns off hovername'}
 CMDs[#CMDs + 1] = {NAME = 'mousesensitivity / ms [0-10]', DESC = 'Sets your mouse sensitivity (affects first person and right click drag) (default is 1)'}
-CMDs[#CMDs + 1] = {NAME = 'clickdelete / clickdel [CLIENT]', DESC = 'Go to settings > Keybinds > Add for clickdelete'}
-CMDs[#CMDs + 1] = {NAME = 'clickteleport / clicktp', DESC = 'Go to settings > Keybinds > Add for clicktp'}
+CMDs[#CMDs + 1] = {NAME = 'clickdelete / clickdel', DESC = 'Go to Settings > Keybinds > Add for click delete'}
+CMDs[#CMDs + 1] = {NAME = 'clickteleport / clicktp', DESC = 'Go to Settings > Keybinds > Add for click teleport'}
 CMDs[#CMDs + 1] = {NAME = 'mouseteleport / mousetp', DESC = 'Teleports your character to your mouse. This is recommended as a keybind'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'simulationradius / simradius / setsimradius', DESC = 'Set the simulation radius.'}
@@ -5171,7 +5175,7 @@ end
 
 IndexContents("", true)
 
-formatUsername = function(player)
+function formatUsername(player)
     if player.DisplayName ~= player.Name then
         return string.format("%s (%s)", player.Name, player.DisplayName)
     end
@@ -10487,9 +10491,13 @@ addcmd('fixcam',{'restorecam'},function(args, speaker)
     speaker.Character.Head.Anchored = false
 end)
 
-addcmd('enableshiftlock',{'enablesl','shiftlock'},function(args, speaker)
-    speaker.DevEnableMouseLock = true
-    notify('Shiftlock','Shift lock is now available')
+addcmd("enableshiftlock", {"enablesl", "shiftlock"}, function(args, speaker)
+    local function enableShiftlock() 
+        speaker.DevEnableMouseLock = true 
+    end
+    speaker:GetPropertyChangedSignal("DevEnableMouseLock"):Connect(enableShiftlock)
+    enableShiftlock()
+    notify("Shiftlock", "Shift lock should now be available")
 end)
 
 addcmd('firstp',{},function(args, speaker)
@@ -11609,6 +11617,33 @@ addcmd("lay", {"laydown"}, function(args, speaker)
     end
 end)
 
+local climbing=false
+local climbstep
+
+addcmd("climb",{},function(args,speaker)
+	if climbing == false then
+		climbing = true
+		local plr = game.Players.LocalPlayer
+		truss = Instance.new("TrussPart", workspace)
+		truss.Transparency = 0.8
+		truss.Name = "truss"
+		truss.CanCollide = true
+		truss.Anchored = true
+		truss.Size = Vector3.new(0, 10, 0)
+		climbstep = game:GetService("RunService").RenderStepped:Connect(function()
+			truss.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -1.5)
+		end)
+	else
+		notify("Climbing still active")
+	end
+end)
+
+addcmd("climb",{},function(args,speaker)
+	climbing = false
+	climbstep:Disconnect()
+	truss:Destroy()
+end)
+
 local originalAnimations = {}
 
 addcmd("sitwalk", {}, function(args, speaker)
@@ -12029,9 +12064,9 @@ addcmd('tweenoffset',{'toffset'},function(args, speaker)
     end
 end)
 
-addcmd('clickteleport',{},function(args, speaker)
+addcmd('clickteleport',{'clicktp'},function(args, speaker)
     if speaker == Players.LocalPlayer then
-        notify('Click TP','Go to Settings > Keybinds > Add to set up click tp')
+        notify('Click TP','Go to Settings > Keybinds > Add to set up click teleport')
     end
 end)
 
@@ -13338,58 +13373,29 @@ addcmd("abanimcheck", {}, function(args, speaker)
     end
 end)
 
-antivoidWasEnabled = false
-IsVoiding = false
+addcmd("mantibang", {"mantirape", "fakeout"}, function(args, speaker)
+	if not IsVoiding then
+		Character = Player.Character
+		Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
+		RootPart = Humanoid and Humanoid.RootPart
+		IsVoiding = true
 
-addcmd("fakeout", {"mantibang", "mantirape"}, function(args, speaker)
-    if IsVoiding then return end
-    IsVoiding = true
-    
-    local character = speaker.Character
-    if not character then 
-        IsVoiding = false
-        return 
-    end
-    
-    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
-    local rootPart = humanoid and humanoid.RootPart
-    if not rootPart then 
-        IsVoiding = false
-        return 
-    end
-    
-    local oldPos = rootPart.CFrame
-    local oldVelocity = rootPart.AssemblyLinearVelocity
-    local oldDestroyHeight = workspace.FallenPartsDestroyHeight
-    
-    if antivoidloop then
-        execCmd("unantivoid nonotify")
-        antivoidWasEnabled = true
-    end
-    
-    workspace.FallenPartsDestroyHeight = 0/1/0
-    rootPart.CFrame = CFrame.new(0, VoidDepth or (OrgDestroyHeight - 25), 0) * CFrame.Angles(math.rad(90), 0, 0)
-    rootPart.AssemblyLinearVelocity = Vector3.new()
-    
-    local timer = tick()
-    repeat
-        task.wait()
-    until tick() > timer + (args[1] and tonumber(args[1]) or 1)
-    
-    rootPart.CFrame = oldPos
-    rootPart.AssemblyLinearVelocity = oldVelocity
-    workspace.FallenPartsDestroyHeight = oldDestroyHeight
-    
-    if antivoidWasEnabled then
-        execCmd("antivoid nonotify")
-        antivoidWasEnabled = false
-    end
-    
-    if humanoid then
-        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-    end
-    
-    IsVoiding = false
+		local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
+		local Timer = tick()
+
+		repeat
+			RootPart.CFrame = CFrame.new(0, -499, 0) * CFrame.Angles(math.rad(90), 0, 0)
+			RootPart.AssemblyLinearVelocity = Vector3.new()
+			task.wait()
+		until tick() > Timer + 1
+
+		RootPart.AssemblyLinearVelocity = Vector3.new()
+		RootPart.CFrame = CurrentPosition
+
+		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+		IsVoiding = false
+	end
 end)
 
 addcmd("abmethod", {"armethod"}, function(args, speaker)
@@ -15061,7 +15067,7 @@ addcmd('unspin',{},function(args, speaker)
 end)
 
 xrayEnabled = false
-xray = function()
+function xray()
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") and not v.Parent:FindFirstChildWhichIsA("Humanoid") and not v.Parent.Parent:FindFirstChildWhichIsA("Humanoid") then
             v.LocalTransparencyModifier = xrayEnabled and 0.5 or 0
@@ -15085,9 +15091,7 @@ addcmd("togglexray", {}, function(args, speaker)
 end)
 
 addcmd("loopxray", {}, function(args, speaker)
-    if xrayLoop then
-        xrayLoop:Disconnect()
-    end
+    pcall(function() xrayLoop:Disconnect() end)
     
     xrayEnabled = true
     xrayLoop = RunService.RenderStepped:Connect(function()
@@ -15096,12 +15100,9 @@ addcmd("loopxray", {}, function(args, speaker)
 end)
 
 addcmd("unloopxray", {}, function(args, speaker)
-    if xrayLoop then
-        xrayLoop:Disconnect()
-        xrayLoop = nil
-        xrayEnabled = false
-        xray()
-    end
+    pcall(function() xrayLoop:Disconnect() end)
+    xrayEnabled = false
+    xray()
 end)
 
 staffRoles = {"mod", "admin", "staff", "dev", "founder", "owner", "supervis", "manager", "management", "executive", "president", "chairman", "chairwoman", "chairperson", "director"}
