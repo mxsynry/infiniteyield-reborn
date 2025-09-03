@@ -13393,28 +13393,35 @@ addcmd("abanimcheck", {}, function(args, speaker)
 end)
 
 addcmd("mantibang", {"mantirape", "fakeout"}, function(args, speaker)
-	if not IsVoiding then
-		Character = Player.Character
-		Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
-		RootPart = Humanoid and Humanoid.RootPart
-		IsVoiding = true
+    if not IsVoiding then
+        Character = Player.Character
+        Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
+        RootPart = Humanoid and Humanoid.RootPart
+        if RanTP then
+            RootPart.CFrame = RootPart.CFrame + Vector3.new(math.random(1,50), 0, math.random(1,50))
+        else
+            IsVoiding = true
 
-		local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
-		local Timer = tick()
+            local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
+            local Timer = tick()
+            local OldDH = workspace.FallenPartsDestroyHeight
 
-		repeat
-			RootPart.CFrame = CFrame.new(0, -499, 0) * CFrame.Angles(math.rad(90), 0, 0)
-			RootPart.AssemblyLinearVelocity = Vector3.new()
-			task.wait()
-		until tick() > Timer + 1
+            repeat
+                workspace["\x46\x61\x6C\x6C\x65\x6E\x50\x61\x72\x74\x73\x44\x65\x73\x74\x72\x6F\x79\x48\x65\x69\x67\x68\x74"] = 0 / 0
+                RootPart.CFrame = CFrame.new(0, -499, 0) * CFrame.Angles(math.rad(90), 0, 0)
+                RootPart.AssemblyLinearVelocity = Vector3.zero
+                task.wait()
+            until tick() > Timer + 1
 
-		RootPart.AssemblyLinearVelocity = Vector3.new()
-		RootPart.CFrame = CurrentPosition
+            RootPart.AssemblyLinearVelocity = Vector3.zero
+            RootPart.CFrame = CurrentPosition
 
-		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 
-		IsVoiding = false
-	end
+            workspace["\x46\x61\x6C\x6C\x65\x6E\x50\x61\x72\x74\x73\x44\x65\x73\x74\x72\x6F\x79\x48\x65\x69\x67\x68\x74"] = OldDH
+            IsVoiding = false
+        end
+    end
 end)
 
 addcmd("abmethod", {"armethod"}, function(args, speaker)
