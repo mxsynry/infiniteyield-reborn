@@ -13393,32 +13393,28 @@ addcmd("abanimcheck", {}, function(args, speaker)
 end)
 
 addcmd("mantibang", {"mantirape", "fakeout"}, function(args, speaker)
-    if not IsVoiding then
-        Character = Player.Character
-        Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
-        RootPart = Humanoid and Humanoid.RootPart
-        if RanTP then
-            RootPart.CFrame = RootPart.CFrame + Vector3.new(math.random(1,50), 0, math.random(1,50))
-        else
-            IsVoiding = true
+	if not IsVoiding then
+		Character = Player.Character
+		Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid")
+		RootPart = Humanoid and Humanoid.RootPart
+		IsVoiding = true
 
-            local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
-            local Timer = tick()
+		local CurrentPosition = RootPart.Velocity.Magnitude < 50 and RootPart.CFrame or Camera.Focus
+		local Timer = tick()
 
-            repeat
-                RootPart.CFrame = CFrame.new(0, -499, 0) * CFrame.Angles(math.rad(90), 0, 0)
-                RootPart.AssemblyLinearVelocity = Vector3.new()
-                task.wait()
-            until tick() > Timer + 1
+		repeat
+			RootPart.CFrame = CFrame.new(0, -499, 0) * CFrame.Angles(math.rad(90), 0, 0)
+			RootPart.AssemblyLinearVelocity = Vector3.new()
+			task.wait()
+		until tick() > Timer + 1
 
-            RootPart.AssemblyLinearVelocity = Vector3.new()
-            RootPart.CFrame = CurrentPosition
+		RootPart.AssemblyLinearVelocity = Vector3.new()
+		RootPart.CFrame = CurrentPosition
 
-            Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 
-            IsVoiding = false
-        end
-    end
+		IsVoiding = false
+	end
 end)
 
 addcmd("abmethod", {"armethod"}, function(args, speaker)
