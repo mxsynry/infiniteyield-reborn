@@ -5264,7 +5264,8 @@ function respawn(plr)
         task.wait(Players.RespawnTime - 0.1)
         replicatesignal(plr.Kill)
     elseif rcdEnabled and not replicatesignal then
-        notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+        execCmd('reset')
+        --notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
     else
         local char = plr.Character
         local hum = char:FindFirstChildWhichIsA("Humanoid")
@@ -11346,132 +11347,76 @@ addcmd("god", {}, function(args, speaker)
     nHuman.Health = nHuman.MaxHealth
 end)
 
---nah lazy
-invisRunning = false
-addcmd("visible", {"vis","uninvisible"}, function(args, speaker)
+local invisRunning = false
+local invisConn, invisDiedConn
+local InvisibleCharacter, OriginalCharacter
+
+local function cleanupInvis()
+    if invisConn then invisConn:Disconnect() end
+    if invisDiedConn then invisDiedConn:Disconnect() end
+    if InvisibleCharacter then InvisibleCharacter:Destroy() end
+    invisRunning = false
+end
+
+local function makeInvisible(speaker)
     if invisRunning then return end
     invisRunning = true
-    -- Full credit to AmokahFox @V3rmillion
+
     local Player = speaker
-    repeat task.wait(.1) until Player.Character
-    local Character = Player.Character
-    Character.Archivable = true
-    local IsInvis = false
-    local IsRunning = true
-    local InvisibleCharacter = Character:Clone()
+    repeat task.wait(0.1) until Player.Character
+    OriginalCharacter = Player.Character
+    OriginalCharacter.Archivable = true
+
+    InvisibleCharacter = OriginalCharacter:Clone()
     InvisibleCharacter.Parent = Lighting
-    local Void = workspace.FallenPartsDestroyHeight
     InvisibleCharacter.Name = ""
-    local CF
 
-    local invisFix = RunService.Stepped:Connect(function()
-        pcall(function()
-            local IsInteger
-            if tostring(Void):find'-' then
-                IsInteger = true
-            else
-                IsInteger = false
-            end
-            local Pos = Player.Character.HumanoidRootPart.Position
-            local Pos_String = tostring(Pos)
-            local Pos_Seperate = Pos_String:split(', ')
-            local X = tonumber(Pos_Seperate[1])
-            local Y = tonumber(Pos_Seperate[2])
-            local Z = tonumber(Pos_Seperate[3])
-            if IsInteger == true then
-                if Y <= Void then
-                    Respawn()
-                end
-            elseif IsInteger == false then
-                if Y >= Void then
-                    Respawn()
-                end
-            end
-        end)
-    end)
-
-    for i,v in pairs(InvisibleCharacter:GetDescendants())do
+    for _, v in pairs(InvisibleCharacter:GetDescendants()) do
         if v:IsA("BasePart") then
-            if v.Name == "HumanoidRootPart" then
-                v.Transparency = 1
-            else
-                v.Transparency = .5
-            end
+            v.Transparency = v.Name == "HumanoidRootPart" and 1 or 0.5
         end
     end
 
-    function Respawn()
-        IsRunning = false
-        if IsInvis == true then
-            pcall(function()
-                Player.Character = Character
-                task.wait()
-                Character.Parent = workspace
-                Character:FindFirstChildWhichIsA'Humanoid':Destroy()
-                IsInvis = false
-                InvisibleCharacter.Parent = nil
-                invisRunning = false
-            end)
-        elseif IsInvis == false then
-            pcall(function()
-                Player.Character = Character
-                task.wait()
-                Character.Parent = workspace
-                Character:FindFirstChildWhichIsA'Humanoid':Destroy()
-                TurnVisible()
-            end)
+    invisConn = RunService.Stepped:Connect(function()
+        local root = Player.Character:FindFirstChild("HumanoidRootPart")
+        if root and root.Position.Y <= workspace.FallenPartsDestroyHeight then
+            respawn()
         end
-    end
-
-    local invisDied
-    invisDied = InvisibleCharacter:FindFirstChildOfClass'Humanoid'.Died:Connect(function()
-        Respawn()
-        invisDied:Disconnect()
     end)
 
-    if IsInvis == true then return end
-    IsInvis = true
-    CF = workspace.CurrentCamera.CFrame
-    local CF_1 = Player.Character.HumanoidRootPart.CFrame
-    Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(9e9,9e9,9e9)
-    Character:MoveTo(Vector3.new(9e9,9e9,9e9))
-    workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
-    task.wait()
-    workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-    InvisibleCharacter = InvisibleCharacter
-    Character.Parent = Lighting
+    local humanoid = InvisibleCharacter:FindFirstChildWhichIsA("Humanoid")
+    if humanoid then
+        invisDiedConn = humanoid.Died:Connect(respawn)
+    end
+
+    local cf = OriginalCharacter:FindFirstChild("HumanoidRootPart") and OriginalCharacter.HumanoidRootPart.CFrame or CFrame.new()
+    OriginalCharacter.Parent = Lighting
     InvisibleCharacter.Parent = workspace
-    InvisibleCharacter.HumanoidRootPart.CFrame = CF_1
+    InvisibleCharacter.HumanoidRootPart.CFrame = cf
     Player.Character = InvisibleCharacter
     execCmd('fixcam')
     Player.Character.Animate.Disabled = true
     Player.Character.Animate.Disabled = false
 
-    function TurnVisible()
-        if IsInvis == false then return end
-        invisFix:Disconnect()
-        invisDied:Disconnect()
-        CF = workspace.CurrentCamera.CFrame
-        Character = Character
-        local CF_1 = Player.Character.HumanoidRootPart.CFrame
-        Character.HumanoidRootPart.CFrame = CF_1
-        InvisibleCharacter:Destroy()
-        Player.Character = Character
-        Character.Parent = workspace
-        IsInvis = false
-        Player.Character.Animate.Disabled = true
-        Player.Character.Animate.Disabled = false
-        invisDied = Character:FindFirstChildOfClass'Humanoid'.Died:Connect(function()
-            Respawn()
-            invisDied:Disconnect()
-        end)
-        invisRunning = false
+    notify('Invisible', 'You now appear invisible to other players')
+end
+
+local function makeVisible(speaker)
+    if not invisRunning then return end
+    if OriginalCharacter then
+        Player.Character = OriginalCharacter
+        OriginalCharacter.Parent = workspace
     end
-    notify('Invisible','You now appear invisible to other players')
+    cleanupInvis()
+    notify('Visible', 'You are now visible to other players')
+end
+
+addcmd('invisible', {'invis'}, function(args, speaker)
+    makeInvisible(speaker)
 end)
 
-addcmd("visible", {"vis"}, function(args, speaker)
-    TurnVisible()
+addcmd('visible', {'vis', 'uninvisible'}, function(args, speaker)
+    makeVisible(speaker)
 end)
 
 addcmd("toggleinvis", {}, function(args, speaker)
