@@ -12079,31 +12079,54 @@ addcmd('tptool', {'teleporttool'}, function(args, speaker)
 end)
 
 addcmd('hugtool', {'kisstool', 'bidentool'}, function(args, speaker)
+    local humanoid = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
     local HugTool = Instance.new("Tool")
     HugTool.Name = "Hug Tool\nOff"
     HugTool.RequiresHandle = false
-    HugTool.ToolTip = "Hug Tool R6"
+    HugTool.ToolTip = "Hug Tool"
     HugTool.Parent = game.Players.LocalPlayer.Backpack
+
+    local Anim_1 = Instance.new("Animation")
+    local Anim_2 = Instance.new("Animation")
+
+    if humanoid.RigType == Enum.HumanoidRigType.R6 then
+        Anim_1.AnimationId = "rbxassetid://283545583"
+        Anim_2.AnimationId = "rbxassetid://225975820"
+    else
+        Anim_1.AnimationId = "rbxassetid://103761102404067"
+        Anim_2.AnimationId = "rbxassetid://139846829336719"
+    end
+
+    local Play_1 = humanoid:LoadAnimation(Anim_1)
+    local Play_2 = humanoid:LoadAnimation(Anim_2)
 
     HugTool.Equipped:Connect(function()
         HugTool.Name = "Hug Tool\nOn"
-        
-        local Anim_1 = Instance.new("Animation")
-        Anim_1.AnimationId = "rbxassetid://283545583"
-        local Play_1 = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim_1)
-
-        local Anim_2 = Instance.new("Animation")
-        Anim_2.AnimationId = "rbxassetid://225975820"
-        local Play_2 = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim_2)
-
         Play_1:Play()
         Play_2:Play()
+    end)
 
-        HugTool.Unequipped:Connect(function()
+    HugTool.Unequipped:Connect(function()
         HugTool.Name = "Hug Tool\nOff"
         Play_1:Stop()
         Play_2:Stop()
-        end)
+    end)
+
+    HugTool.Activated:Connect(function()
+        if humanoid.RigType ~= Enum.HumanoidRigType.R6 then
+            Play_2:Stop()
+            if Anim_1.AnimationId == "rbxassetid://103761102404067" then
+                Anim_1.AnimationId = "rbxassetid://139846829336719"
+            else
+                Anim_1.AnimationId = "rbxassetid://103761102404067"
+            end
+            Play_1:Stop()
+            Play_2:Stop()
+            Play_1 = humanoid:LoadAnimation(Anim_1)
+            Play_1:Play()
+        end
     end)
 end)
 
@@ -13136,8 +13159,8 @@ addcmd("hug", {"kiss", "biden"}, function(args, speaker)
             if humanoid then
                 local Anim_1 = Instance.new("Animation")
                 local Anim_2 = Instance.new("Animation")
-                Anim_1.AnimationId = not r15(speaker) and "rbxassetid://225975820" or "rbxassetid://4940563117"
-                Anim_2.AnimationId = not r15(speaker) and "rbxassetid://283545583" or "rbxassetid://4940563117"
+                Anim_1.AnimationId = not r15(speaker) and "rbxassetid://225975820" or "rbxassetid://103761102404067"
+                Anim_2.AnimationId = not r15(speaker) and "rbxassetid://283545583" or "rbxassetid://139846829336719"
                 
                 hug_1 = humanoid:LoadAnimation(Anim_1)
                 hug_2 = humanoid:LoadAnimation(Anim_2)
