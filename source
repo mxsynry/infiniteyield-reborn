@@ -9480,21 +9480,12 @@ addcmd("decompile", {"decompiler"}, function(args, speaker)
 end)
 
 addcmd('removeanticheat', {'deleteanticheat'}, function(args, speaker)
+    --creds to Pixeluted and LuaDev for parts of this code
     local checkcaller = checkcaller
     if not checkcaller then
         notify('Client Antikick', "Your executor doesn't support checkcaller. Scripts run by your executor may still kick you.")
         checkcaller = function() return false end
         task.wait(2)
-    end
-
-    function BasicAntiAntiCheat(parent)
-        for _, child in pairs(parent:GetChildren()) do
-            local name = child.Name:lower()
-            if (name:find("anti") or name:find("exploit") or name:find("dll")) and child:IsA("LocalScript") then
-                child:Destroy()
-            end
-            BasicAntiAntiCheat(child)
-        end
     end
 
     function AdonisAntiCheatBypass()
@@ -9503,8 +9494,19 @@ addcmd('removeanticheat', {'deleteanticheat'}, function(args, speaker)
             notify('Adonis AntiCheat', "Failed to bypass Adonis: `hookfunction` is not supported by your executor.")
             return false
         end
+        if getgenv().adonisbypassed == true then 
+            notify("Error!", "Adonis anti-exploit already disabled.") 
+            return 
+        end
 
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Steve-Bloks/adonis/refs/heads/main/adonisdisabler.lua", true))()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua"))()
+
+        notify("LuaDev's Adonis Disabler", "Disabling...\n--[[(999 times better than pixeluted's, fuck pixeluted)]]")
+
+        getgenv().adonisbypassed = true
+        task.wait(5)
+        notify("LuaDev's Adonis Disabler", "Adonis disabled.")
 
         local badFunctions = {"Crash", "HardCrash", "GPUCrash", "RAMCrash", "KillClient", "SetFPS"}
 
@@ -9526,12 +9528,22 @@ addcmd('removeanticheat', {'deleteanticheat'}, function(args, speaker)
         return true
     end
 
-    BasicAntiAntiCheat(game)
-    notify('Client AntiCheat', 'Basic client-sided AntiCheat removal is now active (only effective on LocalScript anticheats).')
+    function BasicAntiAntiCheat(parent)
+        for _, child in pairs(parent:GetChildren()) do
+            local name = child.Name:lower()
+            if (name:find("anti") or name:find("exploit") or name:find("dll")) and child:IsA("LocalScript") then
+                child:Destroy()
+            end
+            BasicAntiAntiCheat(child)
+        end
+    end
 
     if not AdonisAntiCheatBypass() then
-        notify('AntiCheat Status', 'Basic client-sided AntiCheat removal loaded (only effective on LocalScript anticheats), but failed to load Adonis Bypasses.')
+        notify('AntiCheat Status', 'Failed to load Adonis Bypasses. Proceeding with basic client-sided AntiCheat removal.')
     end
+
+    BasicAntiAntiCheat(game)
+    notify('Client AntiCheat', 'Basic client-sided AntiCheat removal is now active (only effective on LocalScript anticheats).')
 end)
 
 addcmd('clientantikick',{'antikick'},function(args, speaker)
