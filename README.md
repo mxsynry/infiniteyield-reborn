@@ -8,12 +8,10 @@
   Infinite Yield but cooler
 </p>
 
-<p align="center">
 [![Version](https://img.shields.io/badge/version-7.1.2-blue.svg)](https://github.com/mxsynry/infiniteyield-reborn/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Discord](https://img.shields.io/discord/1369389038225592492?color=7289DA&label=Discord&logo=discord&logoColor=white)](https://discord.gg/dRGkkyeysG)
 [![Stars](https://img.shields.io/github/stars/mxsynry/infiniteyield-reborn?style=social)](https://github.com/mxsynry/infiniteyield-reborn/stargazers)
-</p>
 
 ## Table of Contents
 - [Features](#features)
