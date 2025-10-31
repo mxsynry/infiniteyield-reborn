@@ -79,39 +79,51 @@ newcclosure = missing("function", newcclosure)
 getgc = missing("function", getgc or get_gc_objects)
 setthreadidentity = missing("function", setthreadidentity or (syn and syn.set_thread_identity) or syn_context_set or setthreadcontext)
 replicatesignal = missing("function", replicatesignal)
+getconnections = missing("function", getconnections or get_signal_cons)
 
-COREGUI = cloneref(game:FindService("CoreGui"))
-Players = cloneref(game:FindService("Players"))
+Services = setmetatable({}, {
+    __index = function(self, name)
+        local success, cache = pcall(function()
+            return cloneref(game:GetService(name))
+        end)
+        if success then
+            rawset(self, name, cache)
+            return cache
+        else
+            error("Invalid Roblox Service: " .. tostring(name))
+        end
+    end
+})
 
-IYMouse = Players.LocalPlayer:GetMouse()
-PlayerGui = Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui")
-UserInputService = cloneref(game:FindService("UserInputService"))
-TweenService = cloneref(game:FindService("TweenService"))
-HttpService = cloneref(game:FindService("HttpService"))
-MarketplaceService = cloneref(game:FindService("MarketplaceService"))
-RunService = cloneref(game:FindService("RunService"))
-TeleportService = cloneref(game:FindService("TeleportService"))
-AssetService = cloneref(game:FindService("AssetService"))
-StarterGui = cloneref(game:FindService("StarterGui"))
-GuiService = cloneref(game:FindService("GuiService"))
-Lighting = cloneref(game:FindService("Lighting"))
-ContextActionService = cloneref(game:FindService("ContextActionService"))
-ReplicatedStorage = cloneref(game:FindService("ReplicatedStorage"))
-GroupService = cloneref(game:FindService("GroupService"))
-PathService = cloneref(game:FindService("PathfindingService"))
-SoundService = cloneref(game:FindService("SoundService"))
-Teams = cloneref(game:FindService("Teams"))
-StarterPlayer = cloneref(game:FindService("StarterPlayer"))
-InsertService = cloneref(game:FindService("InsertService"))
-ChatService = cloneref(game:FindService("Chat"))
-ProximityPromptService = cloneref(game:FindService("ProximityPromptService"))
-StatsService = cloneref(game:FindService("Stats"))
-MaterialService = cloneref(game:FindService("MaterialService"))
-AvatarEditorService = cloneref(game:FindService("AvatarEditorService"))
-TextChatService = cloneref(game:FindService("TextChatService"))
-TextService = cloneref(game:FindService("TextService"))
-CaptureService = cloneref(game:FindService("CaptureService"))
-VoiceChatService = cloneref(game:FindService("VoiceChatService"))
+COREGUI = Services.CoreGui
+Players = Services.Players
+UserInputService = Services.UserInputService
+TweenService = Services.TweenService
+HttpService = Services.HttpService
+MarketplaceService = Services.MarketplaceService
+RunService = Services.RunService
+TeleportService = Services.TeleportService
+StarterGui = Services.StarterGui
+GuiService = Services.GuiService
+Lighting = Services.Lighting
+ContextActionService = Services.ContextActionService
+ReplicatedStorage = Services.ReplicatedStorage
+GroupService = Services.GroupService
+PathService = Services.PathfindingService
+SoundService = Services.SoundService
+Teams = Services.Teams
+StarterPlayer = Services.StarterPlayer
+InsertService = Services.InsertService
+ChatService = Services.Chat
+ProximityPromptService = Services.ProximityPromptService
+ContentProvider = Services.ContentProvider
+StatsService = Services.Stats
+MaterialService = Services.MaterialService
+AvatarEditorService = Services.AvatarEditorService
+TextService = Services.TextService
+TextChatService = Services.TextChatService
+CaptureService = Services.CaptureService
+VoiceChatService = Services.VoiceChatService
 
 sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
@@ -121,7 +133,11 @@ httprequest = (syn and syn.request) or (http and http.request) or http_request o
 PlaceId, JobId = game.PlaceId, game.JobId
 
 local DevConsoleMaster = COREGUI:FindFirstChild("DevConsoleMaster") or COREGUI:WaitForChild("DevConsoleMaster", 5)
-local IsOnMobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform())
+xpcall(function()
+    IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+end, function()
+    IsOnMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+end)
 --local _ENV = _ENV or (getgenv and getgenv()) or getrenv or getfenv or G_
 everyClipboard = setclipboard or toclipboard or set_clipboard or (Clipboard and Clipboard.set)
 everyWebSocket = (syn and syn.websocket and syn.websocket.connect) or (WebSocket and WebSocket.connect)
@@ -184,7 +200,7 @@ pcall(function() -- good executor trust x2
     end
 end)]] -- wtf is this
 
-currentVersion = '7.0.9'
+currentVersion = '7.1.2'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -4927,6 +4943,8 @@ CMDs[#CMDs + 1] = {NAME = 'joindate / jd [player]', DESC = 'Tells you the date t
 CMDs[#CMDs + 1] = {NAME = 'chatjoindate / cjd [player]', DESC = 'Chats the date the player joined Roblox'}
 CMDs[#CMDs + 1] = {NAME = 'copyname / copyuser [player]', DESC = 'Copies a players full username to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'userid / id [player]', DESC = 'Notifies a players user ID'}
+CMDs[#CMDs + 1] = {NAME = 'copyplaceid / placeid', DESC = 'Copies the current place id to your clipboard'}
+CMDs[#CMDs + 1] = {NAME = 'copygameid / gameid', DESC = 'Copies the current game id to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'copyuserid / copyid [player]', DESC = 'Copies a players user ID to your clipboard'}
 CMDs[#CMDs + 1] = {NAME = 'appearanceid / aid [player]', DESC = 'Notifies a players appearance ID'}
 CMDs[#CMDs + 1] = {NAME = 'copyappearanceid / caid [player]', DESC = 'Copies a players appearance ID to your clipboard'}
@@ -5051,7 +5069,7 @@ CMDs[#CMDs + 1] = {NAME = 'breakvelocity', DESC = 'Sets your characters velocity
 CMDs[#CMDs + 1] = {NAME = 'spin [speed]', DESC = 'Spins your character'}
 CMDs[#CMDs + 1] = {NAME = 'unspin', DESC = 'Disables spin'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
-CMDs[#CMDs + 1] = {NAME = 'animation / anim [ID] [speed]', DESC = 'Makes your character perform an animation (must be an animation on the marketplace or by roblox/stickmasterluke to replicate)'}
+CMDs[#CMDs + 1] = {NAME = 'animation / emote / anim / em [ID] [speed]', DESC = 'Makes your character perform an animation (must be an animation on the marketplace or by roblox/stickmasterluke to replicate)'}
 CMDs[#CMDs + 1] = {NAME = 'dance', DESC = 'Makes you  d a n c e'}
 CMDs[#CMDs + 1] = {NAME = 'undance', DESC = 'Stops dance animations'}
 CMDs[#CMDs + 1] = {NAME = 'spasm', DESC = 'Makes you  c r a z y'}
@@ -5140,6 +5158,10 @@ CMDs[#CMDs + 1] = {NAME = 'unctrllock', DESC = 'Re-binds Shiftlock to LeftShift'
 CMDs[#CMDs + 1] = {NAME = 'listento [player]', DESC = 'Listens to the area around a player. Can also eavesdrop with vc'}
 CMDs[#CMDs + 1] = {NAME = 'unlistento', DESC = 'Disables listento'}
 CMDs[#CMDs + 1] = {NAME = 'unsuspendvc', DESC = 'Unsuspends you from voice chat'}
+CMDs[#CMDs + 1] = {NAME = 'muteallvcs', DESC = 'Mutes voice chat for all players'}
+CMDs[#CMDs + 1] = {NAME = 'unmuteallvcs', DESC = 'Unmutes voice chat for all players'}
+CMDs[#CMDs + 1] = {NAME = 'mutevc [player]', DESC = 'Mutes the voice chat of a player'}
+CMDs[#CMDs + 1] = {NAME = 'unmutevc [player]', DESC = 'Unmutes the voice chat of a player'}
 CMDs[#CMDs + 1] = {NAME = 'whatexpsareonline / whatexploitsareonline / weao', DESC = 'Tells you what exploits are online'}
 CMDs[#CMDs + 1] = {NAME = 'robloxstaffwatch', DESC = 'Notify if a roblox staff member joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'unrobloxstaffwatch', DESC = 'Disable roblox staff watch'}
@@ -5157,6 +5179,7 @@ CMDs[#CMDs + 1] = {NAME = 'unhidechar [player]', DESC = 'Stops hiding the charac
 CMDs[#CMDs + 1] = {NAME = 'unhideallchars', DESC = 'Unhides all the characters.'}
 CMDs[#CMDs + 1] = {NAME = 'printglobals / printg / getglobals / getg', DESC = 'Prints out every global variables'}
 CMDs[#CMDs + 1] = {NAME = 'setglobal / setg [Global Name] [true/false]', DESC = 'Set a global variable to certain value.'}
+CMDs[#CMDs + 1] = {NAME = 'deleteglobal / delg [container].[globalname]', DESC = 'Set a global variable to certain value.'}
 CMDs[#CMDs + 1] = {NAME = 'feflip', DESC = 'Loads up fe backflip by Zeezy'}
 task.wait()
 
@@ -7766,12 +7789,11 @@ addcmd("toggleantifling", {"tganfl"}, function(args, speaker)
 end)
 
 addcmd("chatlogswebhook", {"logswebhook"}, function(args, speaker)
-    if httprequest then
-        logsWebhook = args[1] or nil
-        updatesaves()
-    else
-        notify("Incompatible Exploit", "Your exploit does not support this command (missing httprequest)")
+    if not httprequest then
+        return notify("Incompatible Exploit", "Your exploit does not support this command (missing request)")
     end
+    logsWebhook = args[1] or nil
+    updatesaves()
 end)
 
 addcmd("antichatlogs", {"antichatlogger"}, function(args, speaker)
@@ -9640,55 +9662,85 @@ addcmd('clientantiteleport',{'antiteleport'},function(args, speaker)
     notify('Client AntiTP','Client anti teleport is now active (only effective on localscript teleport)')
 end)
 
-addcmd('cancelteleport',{'canceltp', 'clearteleport', 'cleartp'},function(args, speaker)
+addcmd("cancelteleport", {"canceltp"}, function(args, speaker)
     TeleportService:TeleportCancel()
 end)
 
-addcmd('volume',{'vol'},function(args, speaker)
-    local level = args[1]/10
-    UserSettings():FindService("UserGameSettings").MasterVolume = level
+addcmd("volume",{ "vol"}, function(args, speaker)
+    UserSettings():GetService("UserGameSettings").MasterVolume = args[1]/10
 end)
 
-addcmd('antilag',{'boostfps','lowgraphics'},function(args, speaker)
-    local Terrain = workspace:FindFirstChildOfClass('Terrain')
-    Terrain.WaterWaveSize = 0
-    Terrain.WaterWaveSpeed = 0
-    Terrain.WaterReflectance = 0
-	Terrain.WaterTransparency = 1
-	Lighting.GlobalShadows = false
-	Lighting.FogEnd = 9e9
-	Lighting.FogStart = 9e9
-    settings().Rendering.QualityLevel = 1
-    for i,v in pairs(game:GetDescendants()) do
-		if v:IsA("BasePart") then
-			v.Material = "Plastic"
-			v.Reflectance = 0
-			v.BackSurface = "SmoothNoOutlines"
-			v.BottomSurface = "SmoothNoOutlines"
-			v.FrontSurface = "SmoothNoOutlines"
-			v.LeftSurface = "SmoothNoOutlines"
-			v.RightSurface = "SmoothNoOutlines"
-			v.TopSurface = "SmoothNoOutlines"
-        elseif v:IsA("Decal") then
+addcmd("antilag", {"boostfps", "lowgraphics"}, function(args, speaker)
+    local Terrain = workspace:FindFirstChildOfClass("Terrain")
+    if Terrain then
+        Terrain.WaterWaveSize = 0
+        Terrain.WaterWaveSpeed = 0
+        Terrain.WaterReflectance = 0
+        Terrain.WaterTransparency = 1
+    end
+    local Lighting = game:GetService("Lighting")
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+    Lighting.FogStart = 9e9
+    pcall(function() settings().Rendering.QualityLevel = Enum.RenderQuality.Level01 end)
+    
+    for _, v in ipairs(game:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+            v.CastShadow = false
+            v.BackSurface = Enum.SurfaceType.SmoothNoOutlines
+            v.BottomSurface = Enum.SurfaceType.SmoothNoOutlines
+            v.FrontSurface = Enum.SurfaceType.SmoothNoOutlines
+            v.LeftSurface = Enum.SurfaceType.SmoothNoOutlines
+            v.RightSurface = Enum.SurfaceType.SmoothNoOutlines
+            v.TopSurface = Enum.SurfaceType.SmoothNoOutlines
+        elseif v:IsA("Decal") or v:IsA("Texture") then
             v.Transparency = 1
+            if v:IsA("Texture") then v.Texture = "" end
         elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
             v.Lifetime = NumberRange.new(0)
+            v.Enabled = false
         elseif v:IsA("Explosion") then
-            v.BlastPressure = 1
-            v.BlastRadius = 1
+            v.BlastPressure = 0
+            v.BlastRadius = 0
+        elseif v:IsA("Light") or v:IsA("PointLight") or v:IsA("SpotLight") or v:IsA("SurfaceLight") then
+            v.Enabled = false
+        elseif v:IsA("Attachment") and v:FindFirstChildOfClass("ParticleEmitter") then
+            v:Destroy()
         end
     end
-    for i,v in pairs(Lighting:GetDescendants()) do
-        if v:IsA("PostEffect") then
+    
+    for _, v in ipairs(Lighting:GetDescendants()) do
+        if v:IsA("PostEffect") or v:IsA("Atmosphere") then
             v.Enabled = false
         end
     end
-    workspace.DescendantAdded:Connect(function(child)
-        for _,Name in next,{"ForceField","Sparkles","Smoke","Fire","Beam"} do
-            if child:IsA(Name) then
-                task.defer(game.Destroy,child)
-                break
-            end
+    
+    local conn = workspace.DescendantAdded:Connect(function(child)
+        if child:IsA("ForceField") or child:IsA("Sparkles") or child:IsA("Smoke") or child:IsA("Fire") or child:IsA("Beam") or child:IsA("Trail") or child:IsA("ParticleEmitter") or child:IsA("Explosion") or child:IsA("Attachment") then
+            task.defer(child.Destroy, child)
+        end
+        if child:IsA("BasePart") then
+            child.Material = Enum.Material.Plastic
+            child.Reflectance = 0
+            child.CastShadow = false
+            child.BackSurface = Enum.SurfaceType.SmoothNoOutlines
+            child.BottomSurface = Enum.SurfaceType.SmoothNoOutlines
+            child.FrontSurface = Enum.SurfaceType.SmoothNoOutlines
+            child.LeftSurface = Enum.SurfaceType.SmoothNoOutlines
+            child.RightSurface = Enum.SurfaceType.SmoothNoOutlines
+            child.TopSurface = Enum.SurfaceType.SmoothNoOutlines
+        end
+        if child:IsA("Decal") or child:IsA("Texture") then
+            child.Transparency = 1
+            if child:IsA("Texture") then child.Texture = "" end
+        end
+        if child:IsA("PostEffect") or child:IsA("Atmosphere") then
+            child.Enabled = false
+        end
+        if child:IsA("Light") then
+            child.Enabled = false
         end
     end)
 end)
@@ -9724,80 +9776,96 @@ addcmd("setfpscap", {"fpscap", "maxfps"}, function(args, speaker)
     end
 end)
 
+local function scall(fn, ...)
+    if type(fn) == "function" then
+        local success, result = pcall(fn, ...)
+        if success then return result end
+    end
+    return nil
+end
+
+local availableEnvs = {
+    getgenv = scall(getgenv),
+    getrenv = scall(getrenv),
+    getfenv = scall(getfenv),
+    getsenv = scall(getsenv),
+    getgc = scall(getgc, false),
+    getreg = scall(getreg),
+    getinstances = scall(getinstances),
+    getnilinstances = scall(getnilinstances),
+    getloadedmodules = scall(getloadedmodules),
+    getprotectedguis = scall(getprotectedguis),
+    getscripts = scall(getscripts),
+    getthreadidentity = scall(getthreadidentity),
+    getthreadcontext = scall(getthreadcontext),
+    gethui = scall(gethui),
+    getrunningscripts = scall(getrunningscripts),
+    getrenderproperty = scall(getrenderproperty),
+    getnamecallmethod = scall(getnamecallmethod),
+    getcallbackvalue = scall(getcallbackvalue),
+    getcustomasset = scall(getcustomasset),
+    getscriptclosure = scall(getscriptclosure),
+    getrawmetatable = scall(getrawmetatable),
+    debug_getregistry = scall(debug.getregistry),
+    httpget = scall(httpget),  -- If exploit has it
+    _G = _G
+}
+
 addcmd("printglobals", {"printg", "getglobals", "getg"}, function(args, speaker)
     if #args < 1 then
-        notify("Error", "Usage: printglobals [container].[globalname] or [container] to scan all.")
+        notify("Error", "Usage: printglobals [container].[globalname] or [container] or all [custom] [depth=3]")
         return
     end
 
     local fullPath = args[1]
+    local filterCustom = args[2] == "custom"
+    local maxDepth = tonumber(args[3]) or 3
     local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$") or fullPath, nil
     containerName = containerName:gsub("%(%)", "")
 
-    local availableEnvs = {
-        getgenv = scall(getgenv),
-        getrenv = scall(getrenv),
-        getfenv = scall(getfenv),
-        getsenv = scall(getsenv),
-        getgc = scall(getgc, false),
-        getreg = scall(getreg),
-        getinstances = scall(getinstances),
-        getnilinstances = scall(getnilinstances),
-        getloadedmodules = scall(getloadedmodules),
-        getprotectedguis = scall(getprotectedguis),
-        getscripts = scall(getscripts),
-        getthreadidentity = scall(getthreadidentity),
-        getthreadcontext = scall(getthreadcontext),
-        gethui = scall(gethui),
-        getrunningscripts = scall(getrunningscripts),
-        getrenderproperty = scall(getrenderproperty),
-        getnamecallmethod = scall(getnamecallmethod),
-        getcallbackvalue = scall(getcallbackvalue),
-        getcustomasset = scall(getcustomasset),
-        getscriptclosure = scall(getscriptclosure),
-        _G = _G
-    }
-
-    local function printGlobals(envName, envTable, timeout)
-        if not envTable then
-            notify("Error", string.format("Container '%s' does not exist or is inaccessible.", envName))
-            return
-        end
-
-        print("🔹 Globals for:", envName)
-        local startTime = tick()
-
-        for k, v in pairs(envTable) do
-            print(string.format("[%s.%s] = %s", envName, k, tostring(v)))
-            notify("Console", "Press F9 to open the console")
-
-            if tick() - startTime > timeout then
-                notify("Timeout", string.format("Execution time exceeded for '%s'.", envName))
-                return
+    local function dumpTable(t, name, depth, currentDepth)
+        if currentDepth > depth then return end
+        local sortedKeys = {}
+        for k in pairs(t) do table.insert(sortedKeys, k) end
+        table.sort(sortedKeys)
+        for _, k in ipairs(sortedKeys) do
+            local v = t[k]
+            if filterCustom and (type(k) == "string" and k:match("^_") or type(v) == "function" and debug.getinfo(v).name == "") then continue end  -- Skip builtins if custom
+            print(string.format("[%s.%s] = %s (%s)", name, tostring(k), tostring(v), type(v)))
+            if type(v) == "table" then
+                dumpTable(v, name .. "." .. tostring(k), depth, currentDepth + 1)
             end
         end
     end
 
-    local timeout = (containerName == "all") and 10 or 5
-
     if containerName == "all" then
         for envName, envTable in pairs(availableEnvs) do
-            printGlobals(envName, envTable, timeout)
+            if envTable then
+                print("-- Globals for:", envName)
+                task.spawn(function()  -- Async to avoid freeze
+                    dumpTable(envTable, envName, maxDepth, 1)
+                end)
+                notify("Console", "Dumping to console; press F9")
+            end
         end
     else
         local env = availableEnvs[containerName]
-
         if env then
             if globalName then
                 local value = env[globalName]
                 if value ~= nil then
-                    print(string.format("[%s.%s] = %s", containerName, globalName, tostring(value)))
+                    print(string.format("[%s.%s] = %s (%s)", containerName, globalName, tostring(value), type(value)))
+                    if type(value) == "table" then dumpTable(value, containerName .. "." .. globalName, maxDepth, 1) end
                     notify("Global Found", string.format("%s.%s = %s", containerName, globalName, tostring(value)))
                 else
                     notify("Global Not Found", string.format("'%s' does not exist in %s.", globalName, containerName))
                 end
             else
-                printGlobals(containerName, env, timeout)
+                print("🔹 Globals for:", containerName)
+                task.spawn(function()
+                    dumpTable(env, containerName, maxDepth, 1)
+                end)
+                notify("Console", "Dumping to console; press F9")
             end
         else
             notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
@@ -9807,62 +9875,66 @@ end)
 
 addcmd("setglobal", {"setg"}, function(args, speaker)
     if #args < 2 then
-        notify("Error", "Usage: setglobal [container].[globalname] [value]")
+        notify("Error", "Usage: setglobal [container].[globalname] [value] (supports true/false/nil/number/table like {key=val})")
         return
     end
 
     local fullPath = args[1]
     local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$")
-
     if not containerName or not globalName then
         notify("Error", "Invalid format. Use [container].[globalname].")
         return
     end
-
     containerName = containerName:gsub("%(%)", "")
 
-    local value = args[2]
-    if value:lower() == "true" then
-        value = true
-    elseif value:lower() == "false" then
-        value = false
-    elseif value:lower() == "_nil_" then
-        value = nil
-    end
-
-    local function scall(fn, ...)
-        if type(fn) == "function" then
-            local success, result = pcall(fn, ...)
-            if success then
-                return result
-            end
-        end
-        return nil
-    end
-
-    local availableEnvs = {
-        getgenv = scall(getgenv),
-        getrenv = scall(getrenv),
-        getfenv = scall(getfenv),
-        getsenv = scall(getsenv),
+    local writableEnvs = {
+        getgenv = availableEnvs.getgenv,
+        getfenv = availableEnvs.getfenv,
+        getsenv = availableEnvs.getsenv,
         _G = _G
     }
 
-    local env = availableEnvs[containerName]
-
-    if env then
-        local success, err = pcall(function()
-            env[globalName] = value
-        end)
-
-        if success then
-            notify("Global Set", string.format("Set '%s' in %s to %s.", globalName, containerName, tostring(value)))
-        else
-            notify("Write Failed", string.format("Failed to set '%s' in %s: %s", globalName, containerName, err))
-        end
-    else
-        notify("Error", string.format("Container '%s' does not exist or is inaccessible.", containerName))
+    local env = writableEnvs[containerName]
+    if not env then
+        notify("Error", string.format("Container '%s' is not writable or inaccessible.", containerName))
+        return
     end
+
+    local valueStr = args[2]
+    local value
+    if valueStr:lower() == "true" then value = true
+    elseif valueStr:lower() == "false" then value = false
+    elseif valueStr:lower() == "_nil_" then value = nil
+    elseif tonumber(valueStr) then value = tonumber(valueStr)
+    elseif valueStr:match("^%{.*%}$") then  -- Simple table parse
+        local success, parsed = pcall(loadstring("return " .. valueStr))
+        if success and type(parsed) == "table" then value = parsed else notify("Parse Error", "Invalid table format.") return end
+    else value = valueStr end
+
+    local success, err = pcall(function() env[globalName] = value end)
+    if success then
+        notify("Global Set", string.format("Set '%s' in %s to %s (%s).", globalName, containerName, tostring(value), type(value)))
+    else
+        notify("Write Failed", string.format("Failed to set '%s' in %s: %s", globalName, containerName, err))
+    end
+end)
+
+addcmd("deleteglobal", {"delg"}, function(args, speaker)
+    if #args < 1 then
+        notify("Error", "Usage: deleteglobal [container].[globalname]")
+        return
+    end
+    local fullPath = args[1]
+    local containerName, globalName = fullPath:match("^([^.]+)%.(.+)$")
+    if not containerName or not globalName then return notify("Error", "Invalid format.") end
+    containerName = containerName:gsub("%(%)", "")
+    local writableEnvs = { -- Same as above }
+    local env = writableEnvs[containerName]
+    if env then
+        local success, err = pcall(function() env[globalName] = nil end)
+        if success then notify("Global Deleted", string.format("Deleted '%s' from %s.", globalName, containerName))
+        else notify("Delete Failed", err) end
+    else notify("Error", "Container not writable.") end
 end)
 
 addcmd('notify',{},function(args, speaker)
@@ -10755,41 +10827,39 @@ addcmd('uninvisibleparts',{'uninvisparts'},function(args, speaker)
     shownParts = {}
 end)
 
-addcmd('btools',{},function(args, speaker)
+addcmd("btools", {}, function(args, speaker)
     for i = 1, 4 do
         local Tool = Instance.new("HopperBin")
         Tool.BinType = i
         Tool.Name = randomString()
-        Tool.Parent = speaker:FindFirstChildOfClass("Backpack")
+        Tool.Parent = speaker:FindFirstChildWhichIsA("Backpack")
     end
 end)
 
-addcmd('f3x',{'fex'},function(args, speaker)
-    loadstring((game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/f3x.lua") or game:GetObjects("rbxassetid://6695644299")[1].Source))()
+addcmd("f3x", {"fex"}, function(args, speaker)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/f3x.lua"))()
 end)
 
-addcmd('partpath',{'partname'},function(args, speaker)
+addcmd("partpath", {"partname"}, function(args, speaker)
     selectPart()
 end)
 
-addcmd('antiafk',{'antiidle'},function(args, speaker)
-    local GC = getconnections or get_signal_cons
-    if GC then
-        for i,v in pairs(GC(Players.LocalPlayer.Idled)) do
-            if v["Disable"] then
-                v["Disable"](v)
-            elseif v["Disconnect"] then
-                v["Disconnect"](v)
+addcmd("antiafk", {"antiidle"}, function(args, speaker)
+    if getconnections then
+        for _, connection in pairs(getconnections(speaker.Idled)) do
+            if connection["Disable"] then
+                connection["Disable"](connection)
+            elseif connection["Disconnect"] then
+                connection["Disconnect"](connection)
             end
         end
     else
-        local VirtualUser = cloneref(game:FindService("VirtualUser"))
-        Players.LocalPlayer.Idled:Connect(function()
-            VirtualUser:CaptureController()
-            VirtualUser:ClickButton2(Vector2.new())
+        speaker.Idled:Connect(function()
+            Services.VirtualUser:CaptureController()
+            Services.VirtualUser:ClickButton2(Vector2.new())
         end)
     end
-    if not (args[1] and tostring(args[1]) == 'nonotify') then notify('Anti Idle','Anti idle is enabled') end
+    if not (args[1] and tostring(args[1]) == "nonotify") then notify("Anti Idle", "Anti idle is enabled") end
 end)
 
 addcmd("wallwalk", {"walkonwalls"}, function(args, speaker)
@@ -10797,11 +10867,7 @@ addcmd("wallwalk", {"walkonwalls"}, function(args, speaker)
 end)
 
 addcmd("datalimit", {}, function(args, speaker)
-    local kbps = tonumber(args[1])
-    if kbps then
-        local NetworkClient = cloneref(game:FindService("NetworkClient"))
-        NetworkClient:SetOutgoingKBPSLimit(kbps)
-    end
+    Services.NetworkClient:SetOutgoingKBPSLimit(kbps)
 end)
 
 addcmd("replicationlag", {"backtrack"}, function(args, speaker)
@@ -10890,11 +10956,13 @@ addcmd('joindate',{'jd'},function(args, speaker)
     local dates = {}
     notify("Loading",'Hold on a sec')
     for i,v in pairs(players) do
-        local user = game:HttpGet("https://users.roblox.com/v1/users/"..Players[v].UserId)
-        local json = HttpService:JSONDecode(user)
-        local date = json["created"]:sub(1,10)
-        local splitDates = string.split(date,"-")
-        table.insert(dates,Players[v].Name.." joined: "..splitDates[2].."/"..splitDates[3].."/"..splitDates[1])
+		local p = Players[v]
+
+		local secondsOld = p.AccountAge * 24 * 60 * 60
+		local now = os.time()
+		local dateJoined  = p.Name .. " joined: " .. os.date("%m/%d/%y", now - secondsOld)
+
+		table.insert(dates, dateJoined)
     end
     notify('Join Date (Month/Day/Year)',table.concat(dates, ',\n'))
 end)
@@ -10904,11 +10972,13 @@ addcmd('chatjoindate',{'cjd'},function(args, speaker)
     local dates = {}
     notify("Loading",'Hold on a sec')
     for i,v in pairs(players) do
-        local user = game:HttpGet("https://users.roblox.com/v1/users/"..Players[v].UserId)
-        local json = HttpService:JSONDecode(user)
-        local date = json["created"]:sub(1,10)
-        local splitDates = string.split(date,"-")
-        table.insert(dates,Players[v].Name.." joined: "..splitDates[2].."/"..splitDates[3].."/"..splitDates[1])
+		local p = Players[v]
+
+		local secondsOld = p.AccountAge * 24 * 60 * 60
+		local now = os.time()
+		local dateJoined  = p.Name .. " joined: " .. os.date("%m/%d/%y", now - secondsOld)
+
+		table.insert(dates, dateJoined)
     end
     local chatString = table.concat(dates, ', ')
     chatsend(chatString)
@@ -10928,6 +10998,14 @@ addcmd('userid',{'id'},function(args, speaker)
         local id = tostring(Players[v].UserId)
         notify('User ID',id)
     end
+end)
+
+addcmd("copyplaceid", {"placeid"}, function(args, speaker)
+    toClipboard(PlaceId)
+end)
+
+addcmd("copygameid", {"gameid"}, function(args, speaker)
+    toClipboard(game.GameId)
 end)
 
 addcmd('copyid',{'copyuserid'},function(args, speaker)
@@ -11940,11 +12018,22 @@ addcmd('headthrow',{},function(args, speaker)
     end
 end)
 
+local function anim2track(asset_id)
+    local objs = game:GetObjects(asset_id)
+    for i = 1, #objs do
+        if objs[i]:IsA("Animation") then
+            return objs[i].AnimationId
+        end
+    end
+    return asset_id
+end
+
 addcmd("animation", {"anim"}, function(args, speaker)
     local animid = tostring(args[1])
-	if not animid:find("rbxassetid://") then
-		animid = "rbxassetid://".. animid
-	end
+    if not animid:find("rbxassetid://") then
+        animid = "rbxassetid://" .. animid
+    end
+    animid = anim2track(animid)
     local animation = Instance.new("Animation")
     animation.AnimationId = animid
     local anim = speaker.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
@@ -12931,6 +13020,14 @@ addcmd('unbubblechat',{'nobubblechat'},function(args, speaker)
     else
         TextChatService.BubbleChatConfiguration.Enabled = false
     end
+end)
+
+addcmd("chatwindow", {}, function(args, speaker)
+    TextChatService.ChatWindowConfiguration.Enabled = true
+end)
+
+addcmd("unchatwindow", {"nochatwindow"}, function(args, speaker)
+    TextChatService.ChatWindowConfiguration.Enabled = false
 end)
 
 function getTorso(x)
@@ -14365,31 +14462,39 @@ addcmd('usetools', {}, function(args, speaker)
     end
 end)
 
-addcmd('logs',{},function(args, speaker)
+addcmd("logs", {}, function(args, speaker)
+    logsEnabled = true
+    jLogsEnabled = true
+    Toggle.Text = "Enabled"
+    Toggle_2.Text = "Enabled"
     logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 end)
 
-addcmd('chatlogs',{'clogs'},function(args, speaker)
+addcmd("chatlogs", {"clogs"}, function(args, speaker)
+    logsEnabled = true
     join.Visible = false
     chat.Visible = true
-    table.remove(shade3,table.find(shade3,selectChat))
-    table.remove(shade2,table.find(shade2,selectJoin))
-    table.insert(shade2,selectChat)
-    table.insert(shade3,selectJoin)
+    table.remove(shade3, table.find(shade3, selectChat))
+    table.remove(shade2, table.find(shade2, selectJoin))
+    table.insert(shade2, selectChat)
+    table.insert(shade3, selectJoin)
     selectJoin.BackgroundColor3 = currentShade3
     selectChat.BackgroundColor3 = currentShade2
+    Toggle.Text = "Enabled"
     logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 end)
 
-addcmd('joinlogs',{'jlogs'},function(args, speaker)
+addcmd("joinlogs", {"jlogs"}, function(args, speaker)
+    jLogsEnabled = true
     chat.Visible = false
     join.Visible = true	
-    table.remove(shade3,table.find(shade3,selectJoin))
-    table.remove(shade2,table.find(shade2,selectChat))
-    table.insert(shade2,selectJoin)
-    table.insert(shade3,selectChat)
+    table.remove(shade3, table.find(shade3, selectJoin))
+    table.remove(shade2, table.find(shade2, selectChat))
+    table.insert(shade2, selectJoin)
+    table.insert(shade3, selectChat)
     selectChat.BackgroundColor3 = currentShade3
     selectJoin.BackgroundColor3 = currentShade2
+    Toggle_2.Text = "Enabled"
     logs:TweenPosition(UDim2.new(0, 0, 1, -265), "InOut", "Quart", 0.3, true, nil)
 end)
 
@@ -15681,14 +15786,48 @@ addcmd("guiscale", {}, function(args, speaker)
     updatesaves()
 end)
 
-addcmd("unsuspendvc", {}, function(args, speaker)
-    VoiceChatService:joinVoice()
+addcmd("unsuspendchat", {}, function(args, speaker)
+	if replicatesignal then
+        replicatesignal(TextChatService.UpdateChatTimeout, speaker.UserId, 0, 10)
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+    end
+end)
 
-    if typeof(onVoiceModerated) ~= "RBXScriptConnection" then
-        onVoiceModerated = cloneref(game:FindService("VoiceChatInternal")).LocalPlayerModerated:Connect(function()
-            task.wait(1)
-            VoiceChatService:joinVoice()
-        end)
+addcmd("unsuspendvc", {}, function(args, speaker)
+	if replicatesignal then
+    	replicatesignal(VoiceChatService.ClientRetryJoin)
+
+    	if typeof(onVoiceModerated) ~= "RBXScriptConnection" then
+        	onVoiceModerated = Services.VoiceChatInternal.LocalPlayerModerated:Connect(function()
+            	task.wait(1)
+            	replicatesignal(VoiceChatService.ClientRetryJoin)
+        	end)
+    	end
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+    end
+end)
+
+addcmd("muteallvcs", {}, function(args, speaker)
+    Services.VoiceChatInternal:SubscribePauseAll(true)
+end)
+
+addcmd("unmuteallvcs", {}, function(args, speaker)
+    Services.VoiceChatInternal:SubscribePauseAll(false)
+end)
+
+addcmd("mutevc", {}, function(args, speaker)
+    for _, plr in getPlayer(args[1], speaker) do
+        if Players[plr] == speaker then continue end
+        Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, true)
+    end
+end)
+
+addcmd("unmutevc", {}, function(args, speaker)
+    for _, plr in getPlayer(args[1], speaker) do
+        if Players[plr] == speaker then continue end
+        Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, false)
     end
 end)
 

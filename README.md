@@ -1,90 +1,105 @@
-# <h1 align="center">![IYR1](/logo.png?raw=true)
-</h1>
+# Infinite Yield Reborn (IYR)
 
 <p align="center">
-	Infinite Yield but cooler
+  <img src="https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/logo.png" alt="IYR Logo" width="200">
 </p>
 
-## Master Branch Loadstring
+<p align="center">
+  Infinite Yield but cooler
+</p>
 
-```lua
-loadstring(game:HttpGet(('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/source' or 'https://mxsynry.github.io/storage/iyrbackup/legacy/master/source')))()
-```
+[![Version](https://img.shields.io/badge/version-7.1.2-blue.svg)](https://github.com/mxsynry/infiniteyield-reborn/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Discord](https://img.shields.io/discord/1369389038225592492?color=7289DA&label=Discord&logo=discord&logoColor=white)](https://discord.gg/dRGkkyeysG)
+[![Stars](https://img.shields.io/github/stars/mxsynry/infiniteyield-reborn?style=social)](https://github.com/mxsynry/infiniteyield-reborn/stargazers)
 
-## IYStore x IYR (Debloated / No NSFW)
-
-```lua
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/Infinite%20Store" or "https://mxsynry.github.io/storage/iyrbackup/legacy/master/Infinite%20Store")))()
-```
-
-## IYRCMDLine (Reconstructed)
-
-```lua
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/IYRCMDBAR" or "https://mxsynry.github.io/storage/iyrbackup/legacy/master/IYRCMDBAR")))()
-```
-
----
-
-## For Reuploaders on ScriptBlox
-[READ THIS BEFORE UPLOADING TO AVOID GETTING BANNED](https://github.com/mxsynry/infiniteyield-reborn/tree/scriptblox?tab=readme-ov-file#for-the-reuploaders-on-scriptblox-please-read-me).
-
----
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Comparison to Original IY](#comparison)
+- [Credits](#credits)
+- [Contributing](#contributing)
+- [License](#license)
+- [Disclaimer](#disclaimer)
 
 ## Features
 
-### What IY offers
+### From Original Infinite Yield
+- Over 400 commands for ultimate Roblox control.
+- Open-source foundation with 7+ years of battle-tested dev.
+- Easy integration—the starting point for every exploiter.
 
+### Exclusive to IYR
+- Full support for TextChatService.
+- Removed broken/unused commands for a leaner script.
+- Custom asset ID to evade client-side anti-cheats.
+- Debloated version (IYStore x IYR) with no NSFW bloat.
 
-- Over 400 Commands at your fingertips
-- Mostly good updates.. 
-- Easy to use
-- The starting point of every exploiter
+Preview:  
+![IYR in Action](https://github.com/user-attachments/assets/37f1e323-b344-497d-809f-9d92490d248e)
 
-### What IYR offers
-- Frequency updates
-- Has support for TextChatService
-- Removed some unused or broken commands
-- Not getting detected by some unknown client ac because IYR uses a different assetid for the image
+## Installation
 
-### Preview
+Load directly into your executor (e.g., Velocity, Krnl, CodeX):
 
-![image](https://github.com/user-attachments/assets/37f1e323-b344-497d-809f-9d92490d248e)
+### Master Branch
+```lua
+loadstring(game:HttpGet('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/source'))()
+```
 
-### Comparison
+### IYStore x IYR (Debloated/No NSFW)
+```lua
+loadstring(game:HttpGet('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/Infinite%20Store'))()
+```
 
-![image](https://github.com/user-attachments/assets/d0c64301-bd74-4804-9dd7-de0832683c0c)
-![image](https://github.com/user-attachments/assets/f2e5e15f-ba60-4ee4-85e9-83eb67cfaae8)
+### IYRCMDLine (Reconstructed)
+```lua
+loadstring(game:HttpGet('https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/refs/heads/master/IYRCMDBAR'))()
+```
+
+**Backup Mirrors**: If GitHub's down, use `https://mxsynry.github.io/storage/iyrbackup/legacy/master/source` etc. (I really need help updating the backup branch)
+
+**Note for Reuploaders on ScriptBlox**: [Read this to avoid bans](https://github.com/mxsynry/infiniteyield-reborn/tree/scriptblox#for-the-reuploaders-on-scriptblox-please-read-me).
+
+## Comparison
+
+| Aspect | Original IY | IYR |
+|--------|-------------|-----|
+| Updates | Rare | Frequent |
+| Commands | 400+ (sometimes broken) | 400+ (cleaned up) |
+| Anti-Detection | Basic, gets flagged by logo id CoreGui detections. | More commands dedicated |
+| Bloat | Some NSFW/unused | Debloated options |
+| Chat Support | Legacy | TextChatService |
+
+Screenshots:  
+![IY](https://github.com/user-attachments/assets/d0c64301-bd74-4804-9dd7-de0832683c0c)  
+![IYR](https://github.com/user-attachments/assets/f2e5e15f-ba60-4ee4-85e9-83eb67cfaae8)
 
 ## Credits
 
-### IY Devs
+### Original IY Team
 - **Creator:** [Edge](https://github.com/EdgeIY)
-- **Developer:** Moon
-- **Developer:** Zwolf
-- **Developer:** [Toon](https://github.com/Toon-arch)
+- **Developers:** [Moon](https://github.com/LorekeeperZinnia), [Zwolf](https://github.com/luatsuki), [Hunter](https://github.com/tooslzy), [Toon](https://github.com/Toon-arch), [Peyton](https://github.com/peyton2465), [ATP](https://github.com/ionizedparticle)
+- **Contributors:** [prisj](https://github.com/iprisj), [Epikest](https://github.com/Epikest), [LorekeeperZina](https://github.com/LorekeeperZinnia), [peyton2465](https://github.com/peyton2465), [and more...](https://github.com/EdgeIY/infiniteyield/graphs/contributors)
 
-### IY Contributors
-- **Contributor:** [prisj](https://github.com/iprisj)
-- **Contributor:** [Epikest](https://github.com/Epikest)
-- **Contributor:** [LorekeeperZina](https://github.com/LorekeeperZinnia)
-- **Contributor:** [peyton2465](https://github.com/peyton2465)
-[**And more...**](https://github.com/EdgeIY/infiniteyield/graphs/contributors)
-
-### IYR Devs
-- **Reborn:** [_Real](https://github.com/fuckusfm)
-- **Developer:** [FurryBoy](https://discordapp.com/users/773291558492438578)
-- **Developer:** [AwesomeDudeIsHere](https://github.com/AwesomeDudeIsHere)
-- **Developer:** [CasualDev](https://discordapp.com/users/1095404503647391754)
-
-### IYR Contributors
-- **Contributor:** [Ry](https://github.com/mxsynry)
-- **Contributor** [TheCoolestSmug](https://discordapp.com/users/807464610147598336)
-- **Contributor** [igor_tigrek](https://discordapp.com/users/1029468860652470315)
-- **Contributor** [Eku](https://github.com/ProjektEta)
-- **Contributor** [Tatsuki](https://github.com/yixiyotatsuki)
-
+### IYR Team
+- **Reborn By:** [_Real](https://github.com/fuckusfm)
+- **Developers:** [FurryBoy](https://discordapp.com/users/773291558492438578), [AwesomeDudeIsHere](https://github.com/AwesomeDudeIsHere), [CasualDev](https://discordapp.com/users/1095404503647391754)
+- **Contributors:** [Ryu Nanashi](https://github.com/mxsynry), [TheCoolestSmug](https://discordapp.com/users/807464610147598336), [igor_tigrek](https://discordapp.com/users/1029468860652470315), [Eku](https://github.com/ProjektEta), [Tatsuki](https://github.com/yixiyotatsuki)
 
 ## Contributing
-There are no specific rules for contributing at this time. Simply open a pull request, and if it checks out, we will merge it!
+We welcome chaos-bringers! Follow these steps:
+1. Fork the repo.
+2. Create a feature branch: `git checkout -b feat/epic-hack`.
+3. Commit: `git commit -m 'Add epic hack'`.
+4. Push: `git push origin feat/epic-hack`.
+5. Open a PR—describe changes, test on latest Roblox.
+6. Adhere to our [Code of Conduct](CODE_OF_CONDUCT.md).
 
----
+No strict rules, but keep it clean. Bugs? File issues with repro steps.
+
+## License
+MIT License—hack away, share the source. See [LICENSE](LICENSE) for deets.
+
+## Disclaimer
+This is an exploit—violates Roblox ToS. Use at your own risk: bans, malware from bad executors, etc. Not affiliated with Roblox. For educational purposes only (wink). Stay stealthy.
