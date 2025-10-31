@@ -1,7 +1,5 @@
-# Infinite Yield Reborn (IYR)
-
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/logo.png" alt="IYR Logo" width="200">
+  <img src="https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/logo.png" alt="IYR Logo">
 </p>
 
 <p align="center">
