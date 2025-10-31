@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/logo.png" alt="IYR Logo">
+  <img src="https://raw.githubusercontent.com/mxsynry/infiniteyield-reborn/master/logo.png" alt="IYR Logo" width="500">
 </p>
 
 <p align="center">
