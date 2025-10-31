@@ -125,6 +125,7 @@ TextChatService = Services.TextChatService
 CaptureService = Services.CaptureService
 VoiceChatService = Services.VoiceChatService
 
+IYMouse = cloneref(Players.LocalPlayer:GetMouse())
 sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
 gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
 setsimulation = setsimulationradius or set_simulation_radius
@@ -5173,13 +5174,13 @@ CMDs[#CMDs + 1] = {NAME = 'windowfocus', DESC = 'Detects if Roblox is focused or
 CMDs[#CMDs + 1] = {NAME = 'unwindowfocus', DESC = 'Stops detecting if Roblox is focused or not'}
 CMDs[#CMDs + 1] = {NAME = 'infinity', DESC = 'Makes your tools go in a infinity path'}
 CMDs[#CMDs + 1] = {NAME = 'uninfinity', DESC = ''}
-CMDs[#CMDs + 1] = {NAME = "decompiler [1-4]", DESC = "chooses to load a decompiler function to your exploit environment"}
+CMDs[#CMDs + 1] = {NAME = "decompiler [1-4]", DESC = "Chooses a decompiler function to load for your exploit environment."}
 CMDs[#CMDs + 1] = {NAME = 'hidechar [player]', DESC = 'Hides the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhidechar [player]', DESC = 'Stops hiding the character from your client.'}
 CMDs[#CMDs + 1] = {NAME = 'unhideallchars', DESC = 'Unhides all the characters.'}
 CMDs[#CMDs + 1] = {NAME = 'printglobals / printg / getglobals / getg', DESC = 'Prints out every global variables'}
 CMDs[#CMDs + 1] = {NAME = 'setglobal / setg [Global Name] [true/false]', DESC = 'Set a global variable to certain value.'}
-CMDs[#CMDs + 1] = {NAME = 'deleteglobal / delg [container].[globalname]', DESC = 'Set a global variable to certain value.'}
+--CMDs[#CMDs + 1] = {NAME = 'deleteglobal / delg [container].[globalname]', DESC = 'Set a global variable to certain value.'}
 CMDs[#CMDs + 1] = {NAME = 'feflip', DESC = 'Loads up fe backflip by Zeezy'}
 task.wait()
 
@@ -9918,7 +9919,8 @@ addcmd("setglobal", {"setg"}, function(args, speaker)
         notify("Write Failed", string.format("Failed to set '%s' in %s: %s", globalName, containerName, err))
     end
 end)
-
+--[[
+local success, result = pcall(function()
 addcmd("deleteglobal", {"delg"}, function(args, speaker)
     if #args < 1 then
         notify("Error", "Usage: deleteglobal [container].[globalname]")
@@ -9929,14 +9931,15 @@ addcmd("deleteglobal", {"delg"}, function(args, speaker)
     if not containerName or not globalName then return notify("Error", "Invalid format.") end
     containerName = containerName:gsub("%(%)", "")
     local writableEnvs = { -- Same as above }
-    local env = writableEnvs[containerName]
-    if env then
+    local wenv = writableEnvs[containerName]
+    if wenv then
         local success, err = pcall(function() env[globalName] = nil end)
         if success then notify("Global Deleted", string.format("Deleted '%s' from %s.", globalName, containerName))
         else notify("Delete Failed", err) end
     else notify("Error", "Container not writable.") end
 end)
-
+end)
+]]
 addcmd('notify',{},function(args, speaker)
     notify(getstring(1))
 end)
