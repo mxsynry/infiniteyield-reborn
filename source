@@ -4955,7 +4955,7 @@ CMDs[#CMDs + 1] = {NAME = 'walkto / follow [player]', DESC = 'Follow a player'}
 CMDs[#CMDs + 1] = {NAME = 'pathfindwalkto / pathfindfollow [player]', DESC = 'Follow a player using pathfinding'}
 CMDs[#CMDs + 1] = {NAME = 'pathfindwalktowaypoint / pathfindwalktowp [waypoint]', DESC = 'Walk to a waypoint using pathfinding'}
 CMDs[#CMDs + 1] = {NAME = 'unwalkto / unfollow', DESC = 'Stops following a player'}
-CMDs[#CMDs + 1] = {NAME = 'stareat / stare [player]', DESC = 'Stare / look at a player'}
+CMDs[#CMDs + 1] = {NAME = 'stareat / stare [player] [prediction: true/false] [smoothness: 0-1]', DESC = 'Stare / look at a player'}
 CMDs[#CMDs + 1] = {NAME = 'unstareat / unstare [player]', DESC = 'Disables stareat'}
 CMDs[#CMDs + 1] = {NAME = 'rolewatch [group id] [role name]', DESC = 'Notify if someone from a watched group joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'rolewatchstop / unrolewatch', DESC = 'Disable Rolewatch'}
@@ -6196,41 +6196,36 @@ function Locate(plr)
                 local playerRemoving
 
                 addedFunc = plr.CharacterAdded:Connect(function()
-                    if ESPholder ~= nil and ESPholder.Parent ~= nil then
+                    if ESPholder and ESPholder.Parent then
                         lcLoopFunc:Disconnect()
                         teamChange:Disconnect()
                         playerRemoving:Disconnect()
                         ESPholder:Destroy()
                         repeat task.wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChildOfClass("Humanoid")
                         Locate(plr)
-                        addedFunc:Disconnect()
-                    else
-                        teamChange:Disconnect()
-                        playerRemoving:Disconnect()
-                        addedFunc:Disconnect()
                     end
+                    addedFunc:Disconnect()
                 end)
 
                 teamChange = plr:GetPropertyChangedSignal("TeamColor"):Connect(function()
-                    if ESPholder ~= nil and ESPholder.Parent ~= nil then
+                    if ESPholder and ESPholder.Parent then
                         lcLoopFunc:Disconnect()
                         addedFunc:Disconnect()
                         playerRemoving:Disconnect()
                         ESPholder:Destroy()
                         repeat task.wait(1) until getRoot(plr.Character) and plr.Character:FindFirstChildOfClass("Humanoid")
                         Locate(plr)
-                        teamChange:Disconnect()
-                    else
-                        teamChange:Disconnect()
                     end
+                    teamChange:Disconnect()
                 end)
 
-                playerRemoving = plr.AncestryChanged:Connect(function(_, parent)
-                    if parent == nil then
-                        if ESPholder ~= nil and ESPholder.Parent ~= nil then
+                playerRemoving = Players.PlayerRemoving:Connect(function(leavingPlr)
+                    if leavingPlr == plr then
+                        if ESPholder and ESPholder.Parent then
                             lcLoopFunc:Disconnect()
                             addedFunc:Disconnect()
                             teamChange:Disconnect()
+                            playerRemoving:Disconnect()
                             ESPholder:Destroy()
                         end
                     end
@@ -8309,46 +8304,70 @@ end)
 
 CFspeed = 5
 CFing = false
-local lastGravity=workspace.Gravity
+local lastGravity = workspace.Gravity
+local CFloop = nil
+
 addcmd('cframefly', {'cfly'}, function(args, speaker)
     -- credit to peyton#9148 (apeyton)
     execCmd('untweenfly\\unfly\\unvfly\\uncfly')
     CFing = true
-    speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
-    local Head = speaker.Character:WaitForChild("Head")
-    execCmd("grav 0") -- this part was by tatsuki
-    if CFloop then CFloop:Disconnect() end
-    CFloop = RunService.Heartbeat:Connect(function(deltaTime)
-        local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * 10 * deltaTime)
-        speaker.Character.PrimaryPart.Velocity=Vector3.zero --dude tatsuki why do you prefer over-optimizing shits
-        local headCFrame = Head.CFrame
-        local camera = workspace.CurrentCamera
-		local cameraCFrame = camera.CFrame
-        local cameraOffset = headCFrame:ToObjectSpace(cameraCFrame).Position
-        cameraCFrame *= CFrame.new(-cameraOffset.X, -cameraOffset.Y, -cameraOffset.Z + 1)
-        local cameraPosition = cameraCFrame.Position
-        local headPosition = headCFrame.Position
+    
+    local char = speaker.Character or speaker.CharacterAdded:Wait()
+    local humanoid = char:FindFirstChildOfClass('Humanoid')
+    local root = char:WaitForChild("HumanoidRootPart")
+    local head = char:WaitForChild("Head")
 
-        local objectSpaceVelocity = CFrame.new(cameraPosition, Vector3.new(headPosition.X, cameraPosition.Y, headPosition.Z)):VectorToObjectSpace(moveDirection)
-        Head.CFrame = CFrame.new(headPosition) * (cameraCFrame - cameraPosition) * CFrame.new(objectSpaceVelocity)
+    humanoid.PlatformStand = true
+    root.Anchored = true
+    execCmd("grav 0")
+
+    if CFloop then CFloop:Disconnect() end
+
+    CFloop = RunService.Heartbeat:Connect(function(dt)
+        if not (char and char.Parent and root and head) then return end
+
+        local cam = workspace.CurrentCamera
+        local move = humanoid.MoveDirection
+        local speed = CFspeed * 50
+
+        local camLook = cam.CFrame.LookVector
+        local camRight = cam.CFrame.RightVector
+        local camUp = Vector3.new(0, 1, 0)
+
+        local velocity = Vector3.zero
+        if move.Magnitude > 0 then
+            velocity = (camRight * move.X + camLook * move.Z + camUp * move.Y) * speed * dt
+        end
+
+        root.CFrame = root.CFrame + velocity
+        head.CFrame = CFrame.new(head.Position, head.Position + camLook)
     end)
 end)
 
-addcmd('uncframefly',{'uncfly'},function(args, speaker)
+addcmd('uncframefly', {'uncfly'}, function(args, speaker)
     CFing = false
     execCmd("grav ".. lastGravity)
     lastGravity=workspace.Gravity
     if CFloop then
         CFloop:Disconnect()
-        speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-        local Head = speaker.Character:WaitForChild("Head")
-        Head.Anchored = false
+        CFloop = nil
     end
+
+    local char = speaker.Character
+    if char then
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if root then root.Anchored = false end
+        if humanoid then humanoid.PlatformStand = false end
+    end
+
+    execCmd("grav " .. lastGravity)
+    lastGravity = workspace.Gravity
 end)
 
-addcmd('cframeflyspeed',{'cflyspeed'},function(args, speaker)
-    if isNumber(args[1]) then
-        CFspeed = args[1]
+addcmd('cframeflyspeed', {'cflyspeed'}, function(args, speaker)
+    if args[1] and tonumber(args[1]) then
+        CFspeed = tonumber(args[1])
     end
 end)
 
@@ -9865,94 +9884,139 @@ addcmd('unwindowfocus', {}, function(args, speaker)
 end)
 
 local cachedESP = {}
-function createESP(player)
-    --print(player.." | create esp")
+local ESPenabled = false
+local espTransparency = 0.3  
+
+local function round2(x, y)
+    return math.round(x), math.round(y)
+end
+
+local function wtvp(pos)
+    local screenPos, onScreen = Camera:WorldToViewportPoint(pos)
+    return Vector2.new(screenPos.X, screenPos.Y), onScreen, screenPos.Z
+end
+
+function createESP(playerName)
     local espitems = {}
     if Drawing then
         espitems.box = Drawing.new("Square")
         espitems.box.Thickness = 1
         espitems.box.Filled = false
-        espitems.box.Color = Color3.new(255,0,0)
+        espitems.box.Color = Color3.new(1, 0, 0)
+        espitems.box.Transparency = 1 - espTransparency
         espitems.box.Visible = false
         espitems.box.ZIndex = 2
+        
         espitems.boxl = Drawing.new("Square")
         espitems.boxl.Thickness = 2
         espitems.boxl.Filled = false
-        espitems.boxl.Color = Color3.new(0,0,0)
+        espitems.boxl.Color = Color3.new(0, 0, 0)
+        espitems.boxl.Transparency = 1 - espTransparency
         espitems.boxl.Visible = false
         espitems.boxl.ZIndex = 1
+        
         espitems.healthbar = Drawing.new("Square")
         espitems.healthbar.Thickness = 1
         espitems.healthbar.Filled = true
-        espitems.healthbar.Color = Color3.new(0,255,0)
+        espitems.healthbar.Color = Color3.new(0, 1, 0)
+        espitems.healthbar.Transparency = 1 - espTransparency
         espitems.healthbar.Visible = false
         espitems.healthbar.ZIndex = 2
+        
         espitems.healthbarl = Drawing.new("Square")
         espitems.healthbarl.Thickness = 2
         espitems.healthbarl.Filled = true
-        espitems.healthbarl.Color = Color3.new(0,0,0)
+        espitems.healthbarl.Color = Color3.new(0, 0, 0)
+        espitems.healthbarl.Transparency = 1 - espTransparency
         espitems.healthbarl.Visible = false
         espitems.healthbarl.ZIndex = 1
+        
         espitems.name = Drawing.new("Text")
         espitems.name.Size = 14
         espitems.name.Center = true
         espitems.name.Outline = true
         espitems.name.Color = Color3.fromRGB(255, 255, 255)
+        espitems.name.Transparency = 1 - espTransparency
         espitems.name.Visible = false
         espitems.name.ZIndex = 2
+        
         espitems.distance = Drawing.new("Text")
         espitems.distance.Size = 14
         espitems.distance.Center = true
         espitems.distance.Outline = true
         espitems.distance.Color = Color3.fromRGB(255, 255, 255)
+        espitems.distance.Transparency = 1 - espTransparency
         espitems.distance.Visible = false
         espitems.distance.ZIndex = 2
+    else
+        warn("Drawing library not supported on this executor!")
     end
-    cachedESP[player] = espitems
+    cachedESP[playerName] = espitems
 end
 
-function removeESP(player)
-    if rawget(cachedESP, player) then
-        for _, drawing in next, cachedESP[player] do
-            drawing:Remove();
+function removeESP(playerName)
+    if cachedESP[playerName] then
+        for _, drawing in pairs(cachedESP[playerName]) do
+            pcall(function() drawing:Remove() end)  
         end
-        cachedESP[player] = nil;
+        cachedESP[playerName] = nil
     end
 end
 
-function updateESP(player, esp)
-    local char = Players:FindFirstChild(player) and Players:FindFirstChild(player).Character
-    if char then
-        local cframe = char:GetModelCFrame() --rarely used wtf
-        local position, visible, depth = wtvp(cframe.Position)
-        esp.box.Visible = visible
-        esp.boxl.Visible = visible
-        esp.healthbar.Visible = visible
-        esp.healthbarl.Visible = visible
-        esp.name.Visible = visible
-        esp.distance.Visible = visible
-        if cframe and visible then
-            local sf = 1 / (depth * math.tan(math.rad(Camera.FieldOfView / 2)) * 2) * 1000
-            local w, h = round2(4 * sf, 5 * sf)
-            local x, y = round2(position.X, position.Y)
-            esp.box.Size = Vector2.new(w,h)
-            esp.box.Position = Vector2.new(round2(x - w / 2, y - h / 2))
-            esp.box.Color = Players:FindFirstChild(player).TeamColor.Color or Color3.fromRGB(255,0,0)
-            esp.boxl.Size = esp.box.Size
-            esp.boxl.Position = esp.box.Position
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                local hp = hum.Health / hum.MaxHealth
-                esp.healthbar.Size = Vector2.new(2, h * hp)
-                esp.healthbar.Position = Vector2.new(round2(x - w / 2 - 8, y - h / 2 + h  * (1 - hp)))
-                esp.healthbarl.Size = Vector2.new(4, h)
-                esp.healthbarl.Position = Vector2.new(round2(x - w / 2 - 8, y - h / 2))
-            end
-            esp.name.Text = Players:FindFirstChild(player).DisplayName..` (@{Players:FindFirstChild(player).Name})`
-            esp.name.Position = Vector2.new(x, y - h / 2 - 24)
-            esp.distance.Text = tostring(round2(depth)).." studs"
-            esp.distance.Position = Vector2.new(x, y + h / 2 + 16)
+function updateESP(playerName, esp)
+    local player = Players:FindFirstChild(playerName)
+    if not player then return end
+    
+    local char = player.Character
+    if not char then
+        esp.box.Visible = false
+        esp.boxl.Visible = false
+        esp.healthbar.Visible = false
+        esp.healthbarl.Visible = false
+        esp.name.Visible = false
+        esp.distance.Visible = false
+        return
+    end
+    
+    local pivot = char:GetPivot()
+    local position, visible, depth = wtvp(pivot.Position)
+    
+    if visible and pivot then
+        local sf = 1 / (depth * math.tan(math.rad(Camera.FieldOfView / 2)) * 2) * 1000
+        local w, h = round2(4 * sf, 5 * sf)
+        local x, y = round2(position.X, position.Y)
+        
+        esp.box.Size = Vector2.new(w, h)
+        esp.box.Position = Vector2.new(round2(x - w / 2, y - h / 2))
+        esp.box.Color = player.TeamColor and player.TeamColor.Color or Color3.fromRGB(255, 0, 0)
+        esp.box.Visible = true
+        
+        esp.boxl.Size = esp.box.Size
+        esp.boxl.Position = esp.box.Position
+        esp.boxl.Visible = true
+        
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            local hp = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
+            esp.healthbar.Size = Vector2.new(2, h * hp)
+            esp.healthbar.Position = Vector2.new(round2(x - w / 2 - 8, y - h / 2 + h * (1 - hp)))
+            esp.healthbar.Visible = true
+            
+            esp.healthbarl.Size = Vector2.new(4, h)
+            esp.healthbarl.Position = Vector2.new(round2(x - w / 2 - 8, y - h / 2))
+            esp.healthbarl.Visible = true
+        else
+            esp.healthbar.Visible = false
+            esp.healthbarl.Visible = false
         end
+        
+        esp.name.Text = player.DisplayName .. " (@" .. player.Name .. ")"
+        esp.name.Position = Vector2.new(x, y - h / 2 - 24)
+        esp.name.Visible = true
+        
+        esp.distance.Text = tostring(math.round(depth)) .. " studs"
+        esp.distance.Position = Vector2.new(x, y + h / 2 + 16)
+        esp.distance.Visible = true
     else
         esp.box.Visible = false
         esp.boxl.Visible = false
@@ -9963,49 +10027,70 @@ function updateESP(player, esp)
     end
 end
 
-addcmd('esp',{},function(args, speaker)
+addcmd('esp', {}, function(args, speaker)
     if ESPenabled then return end
     ESPenabled = true
-    for _, plr in next, Players:GetPlayers() do
-        if plr ~= speaker then
+    local localPlayer = Players.LocalPlayer  
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= localPlayer then
             createESP(plr.Name)
         end
     end
     RunService:BindToRenderStep("iyresp", Enum.RenderPriority.Camera.Value, function()
-        for plr, drawing in pairs(cachedESP) do
-            if plr ~= speaker and drawing ~= nil then
-                updateESP(plr, drawing)
+        for plrName, esp in pairs(cachedESP) do
+            if plrName ~= localPlayer.Name and esp then
+                pcall(updateESP, plrName, esp)  
             end
         end
     end)
 end)
 
-addcmd('espteam',{},function(args, speaker)
-	if not CHMSenabled then
-		ESPenabled = true
-		for i,v in pairs(Players:GetPlayers()) do
-			if v.Name ~= speaker.Name then
-				ESP(v, true)
-			end
-		end
-	else
-		notify('ESP','Disable chams (nochams) before using esp')
-	end
+addcmd('espteam', {}, function(args, speaker)
+    if ESPenabled then return end  
+    ESPenabled = true
+    local localPlayer = Players.LocalPlayer
+    local localTeam = localPlayer.Team
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= localPlayer and plr.Team ~= localTeam then  
+            createESP(plr.Name)
+        end
+    end
+    RunService:BindToRenderStep("iyresp", Enum.RenderPriority.Camera.Value, function()
+        for plrName, esp in pairs(cachedESP) do
+            if plrName ~= localPlayer.Name and esp then
+                pcall(updateESP, plrName, esp)
+            end
+        end
+    end)
+    print("ESP enabled for enemy teams only.")  
 end)
 
-addcmd('noesp',{'unesp'},function(args, speaker)
+addcmd('noesp', {'unesp'}, function(args, speaker)
     ESPenabled = false
     RunService:UnbindFromRenderStep("iyresp")
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= speaker then
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
             removeESP(plr.Name)
         end
     end
 end)
 
-addcmd('esptransparency',{},function(args, speaker)
-    espTransparency = (args[1] and isNumber(args[1]) and args[1]) or 0.3
-    updatesaves()
+addcmd('esptransparency', {}, function(args, speaker)
+    if args[1] and tonumber(args[1]) then
+        espTransparency = math.clamp(tonumber(args[1]), 0, 1)
+        for _, esp in pairs(cachedESP) do
+            if esp then
+                local trans = 1 - espTransparency
+                esp.box.Transparency = trans
+                esp.boxl.Transparency = trans
+                esp.healthbar.Transparency = trans
+                esp.healthbarl.Transparency = trans
+                esp.name.Transparency = trans
+                esp.distance.Transparency = trans
+            end
+        end
+        print("ESP transparency set to " .. espTransparency)  
+    end
 end)
 
 local espParts = {}
@@ -10074,8 +10159,6 @@ addcmd('unpartesp',{'nopartesp'},function(args, speaker)
         end
     end
 end)
-
-
 
 addcmd('locate',{},function(args, speaker)
     local players = getPlayer(args[1], speaker)
@@ -15345,20 +15428,42 @@ end)
 
 addcmd('stareat',{'stare'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
+    local prediction = args[2] and args[2]:lower() == "true" or false
+    local smoothness = args[3] and tonumber(args[3]) or 0
+    if smoothness < 0 then smoothness = 0 elseif smoothness > 1 then smoothness = 1 end
+    
     for i,v in pairs(players) do
         if stareLoop then
             stareLoop:Disconnect()
         end
-        if not Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and Players[v].Character:FindFirstChild("HumanoidRootPart") then return end
-        local function stareFunc()
-            if Players.LocalPlayer.Character.PrimaryPart and Players:FindFirstChild(v) and Players[v].Character ~= nil and Players[v].Character:FindFirstChild("HumanoidRootPart") then
-                local chrPos=Players.LocalPlayer.Character.PrimaryPart.Position
-                local tPos=Players[v].Character:FindFirstChild("HumanoidRootPart").Position
-                local modTPos=Vector3.new(tPos.X,chrPos.Y,tPos.Z)
-                local newCF=CFrame.new(chrPos,modTPos)
-                Players.LocalPlayer.Character:SetPrimaryPartCFrame(newCF)
-            elseif not Players:FindFirstChild(v) then
-                stareLoop:Disconnect()
+        if not Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") or not Players[v].Character:FindFirstChild("HumanoidRootPart") then return end
+        
+        local function stareFunc(dt)
+            if not Players.LocalPlayer.Character.PrimaryPart or not Players:FindFirstChild(v) or not Players[v].Character or not Players[v].Character:FindFirstChild("HumanoidRootPart") then
+                if stareLoop then
+                    stareLoop:Disconnect()
+                end
+                return
+            end
+            
+            local chrPos = Players.LocalPlayer.Character.PrimaryPart.Position
+            local targetRoot = Players[v].Character:FindFirstChild("HumanoidRootPart")
+            local tPos = targetRoot.Position
+            
+            if prediction then
+                tPos = tPos + targetRoot.Velocity * dt
+            end
+            
+            local modTPos = Vector3.new(tPos.X, chrPos.Y, tPos.Z)
+            local targetCF = CFrame.new(chrPos, modTPos)
+            
+            if smoothness == 0 then
+                Players.LocalPlayer.Character:SetPrimaryPartCFrame(targetCF)
+            else
+                local alpha = math.max(0.05, 1 - smoothness * 0.95)  -- Higher smoothness = smaller alpha = smoother/slower
+                local currentCF = Players.LocalPlayer.Character.PrimaryPart.CFrame
+                local lerpedCF = currentCF:Lerp(targetCF, alpha)
+                Players.LocalPlayer.Character:SetPrimaryPartCFrame(lerpedCF)
             end
         end
 
