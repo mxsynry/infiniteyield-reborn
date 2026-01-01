@@ -82,17 +82,17 @@ replicatesignal = missing("function", replicatesignal)
 getconnections = missing("function", getconnections or get_signal_cons)
 
 Services = setmetatable({}, {
-    __index = function(self, name)
-        local success, cache = pcall(function()
-            return cloneref(game:GetService(name))
-        end)
-        if success then
-            rawset(self, name, cache)
-            return cache
-        else
-            error("Invalid Roblox Service: " .. tostring(name))
-        end
-    end
+	__index = function(self, name)
+		local success, cache = pcall(function()
+			return cloneref(game:GetService(name))
+		end)
+		if success then
+			rawset(self, name, cache)
+			return cache
+		else
+			error("Invalid Service: " .. tostring(name))
+		end
+	end
 })
 
 COREGUI = Services.CoreGui
@@ -124,6 +124,7 @@ TextService = Services.TextService
 TextChatService = Services.TextChatService
 CaptureService = Services.CaptureService
 VoiceChatService = Services.VoiceChatService
+SocialService = Services.SocialService
 
 IYMouse = cloneref(Players.LocalPlayer:GetMouse())
 sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
@@ -177,31 +178,40 @@ local function getcustomasset(asset)
     return iyrassets[asset]
 end
 
-if makefolder and isfolder and writefile and isfile then
-    pcall(function() -- good executor trust
-        local assets = "https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/"
-        for _, folder in {"infiniteyield", "IYR.LOL/assets"} do
-            if not isfolder(folder) then
-                makefolder(folder)
+if makefolder and isfolder and writefile and isfile and readfile then
+    pcall(function()
+        local assetsURL = "https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/"
+        local targetFolder = "infiniteyieldreborn/assets"
+        local sourceFolder = "infiniteyield/assets"
+
+        if not isfolder("infiniteyieldreborn") then makefolder("infiniteyieldreborn") end
+        if not isfolder(targetFolder) then makefolder(targetFolder) end
+
+        for path, _ in pairs(iyrassets) do
+            local fileName = path:gsub("IYR.LOL/assets/", "")
+            local localSource = sourceFolder .. "/" .. fileName
+            local localTarget = targetFolder .. "/" .. fileName
+
+            if not isfile(localTarget) then
+                if isfile(localSource) then
+                    writefile(localTarget, readfile(localSource))
+                else
+                    local downloadURL = assetsURL .. "assets/" .. fileName
+                    local success, content = pcall(function() return game:HttpGet(downloadURL) end)
+                    if success then
+                        writefile(localTarget, content)
+                    end
+                end
             end
         end
-        for path in iyrassets do
-            if not isfile(path) then
-                writefile(path, game:HttpGet((path:gsub("IYR.LOL/", assets))))
-            end
+
+        if IsOnMobile then 
+            writefile(targetFolder .. "/.nomedia", "") 
         end
-        if IsOnMobile then writefile("IYR.LOL/assets/.nomedia") end
     end)
 end
 
---[[
-pcall(function() -- good executor trust x2
-    for _, file in {"IY_FE", "IYSettings", "IYData", "settings", "fucku", "DexSettings", "jew", "1375859133001240586", "discord_id"} do
-        delfile(file)
-    end
-end)]] -- wtf is this
-
-currentVersion = '7.1.2'
+currentVersion = '7.1.3'
 
 -- Go to line 12602 for 4nn1's Place stuff
 -- For _Real: Add more useless stuff and also add more bang-type commands. (NON-NSFW)
@@ -349,24 +359,22 @@ function randomString()
     return table.concat(array)
 end
 
-PARENT = nil
+local MAX_DISPLAY_ORDER = 2147483647
+local PARENT
+
+local Main = Instance.new("ScreenGui")
+Main.Name = (typeof(randomString) == "function") and randomString() or "BaseGui"
+Main.ResetOnSpawn = false
+Main.DisplayOrder = MAX_DISPLAY_ORDER
 if get_hidden_gui or gethui then
     local hiddenUI = get_hidden_gui or gethui
-    local Main = Instance.new("ScreenGui")
-    Main.Name = randomString()
     Main.Parent = hiddenUI()
     PARENT = Main
 elseif (not is_sirhurt_closure) and (syn and syn.protect_gui) then
-    local Main = Instance.new("ScreenGui")
-    Main.Name = randomString()
     syn.protect_gui(Main)
     Main.Parent = COREGUI
     PARENT = Main
-elseif COREGUI:FindFirstChild("RobloxGui") then
-    PARENT = COREGUI.RobloxGui
 else
-    local Main = Instance.new("ScreenGui")
-    Main.Name = randomString()
     Main.Parent = COREGUI
     PARENT = Main
 end
@@ -2139,8 +2147,8 @@ function isNumber(str)
 end
 
 function getRoot(char)
-    local rootPart = char:FindFirstChild('HumanoidRootPart') or char:FindFirstChild('Torso') or char:FindFirstChild('UpperTorso')
-    return rootPart
+	local rootPart = char:FindFirstChildOfClass('Humanoid').RootPart
+	return rootPart
 end
 
 function tools(plr)
@@ -2156,12 +2164,12 @@ function r15(plr)
 end
 
 function toClipboard(txt)
-    if everyClipboard then
-        everyClipboard(tostring(txt))
-        notify("Clipboard", "Copied to clipboard")
-    else
-        notify("Clipboard", "Your exploit doesn't have the ability to use the clipboard")
-    end
+	if everyClipboard then
+		everyClipboard(tostring(txt)) -- some executor errored without tostring btw so dont call me out for this
+		notify("Clipboard", "Copied to clipboard")
+	else
+		notify("Clipboard", "Your exploit doesn't have the ability to use the clipboard")
+	end
 end
 
 function getHierarchy(obj)
@@ -2991,16 +2999,18 @@ defaultsettings = {
 defaults = HttpService:JSONEncode(defaultsettings)
 nosaves = false
 useFactorySettings = function()
-    prefix = ';'
-    StayOpen = false
-    KeepInfYield = true
-    espTransparency = 0.3
-    logsEnabled = false
-    jLogsEnabled = false
-    aliases = {}
-    binds = {}
-    WayPoints = {}
-    PluginsTable = {}
+	prefix = ';'
+	StayOpen = false
+	guiScale = defaultGuiScale
+	KeepInfYield = true
+	espTransparency = 0.3
+	logsEnabled = false
+	jLogsEnabled = false
+	logsWebhook = nil
+	aliases = {}
+	binds = {}
+	WayPoints = {}
+	PluginsTable = {}
 end
 
 
@@ -5070,7 +5080,7 @@ CMDs[#CMDs + 1] = {NAME = 'breakvelocity', DESC = 'Sets your characters velocity
 CMDs[#CMDs + 1] = {NAME = 'spin [speed]', DESC = 'Spins your character'}
 CMDs[#CMDs + 1] = {NAME = 'unspin', DESC = 'Disables spin'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
-CMDs[#CMDs + 1] = {NAME = 'animation / emote / anim / em [ID] [speed]', DESC = 'Makes your character perform an animation (must be an animation on the marketplace or by roblox/stickmasterluke to replicate)'}
+CMDs[#CMDs + 1] = {NAME = 'animation / emote / anim / em [ID] [speed]', DESC = 'Makes your character perform an animation (must be an animation on the marketplace or by roblox or their whitelisted admins to replicate)'}
 CMDs[#CMDs + 1] = {NAME = 'dance', DESC = 'Makes you  d a n c e'}
 CMDs[#CMDs + 1] = {NAME = 'undance', DESC = 'Stops dance animations'}
 CMDs[#CMDs + 1] = {NAME = 'spasm', DESC = 'Makes you  c r a z y'}
@@ -5163,6 +5173,7 @@ CMDs[#CMDs + 1] = {NAME = 'muteallvcs', DESC = 'Mutes voice chat for all players
 CMDs[#CMDs + 1] = {NAME = 'unmuteallvcs', DESC = 'Unmutes voice chat for all players'}
 CMDs[#CMDs + 1] = {NAME = 'mutevc [player]', DESC = 'Mutes the voice chat of a player'}
 CMDs[#CMDs + 1] = {NAME = 'unmutevc [player]', DESC = 'Unmutes the voice chat of a player'}
+CMDs[#CMDs + 1] = {NAME = 'call', DESC = 'Prompts the Roblox call UI to let you call your friends.'}
 CMDs[#CMDs + 1] = {NAME = 'whatexpsareonline / whatexploitsareonline / weao', DESC = 'Tells you what exploits are online'}
 CMDs[#CMDs + 1] = {NAME = 'robloxstaffwatch', DESC = 'Notify if a roblox staff member joins the server'}
 CMDs[#CMDs + 1] = {NAME = 'unrobloxstaffwatch', DESC = 'Disable roblox staff watch'}
@@ -5277,44 +5288,50 @@ function permadeath(plr)
 end
 
 function respawn(plr)
-    if invisRunning then TurnVisible() end
-    local rcdEnabled, wasHidden = false, false
-    if gethidden then
-        rcdEnabled, wasHidden = gethidden(workspace, "RejectCharacterDeletions") ~= Enum.RejectCharacterDeletions.Disabled
-    end
+	if invisRunning then TurnVisible() end
 
-    if rcdEnabled and replicatesignal then
-        replicatesignal(plr.ConnectDiedSignalBackend)
-        task.wait(Players.RespawnTime - 0.1)
-        replicatesignal(plr.Kill)
-    elseif rcdEnabled and not replicatesignal then
-        execCmd('reset')
-        --notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
-    else
-        local char = plr.Character
-        local hum = char:FindFirstChildWhichIsA("Humanoid")
-        if hum then hum:ChangeState(Enum.HumanoidStateType.Dead) end
-        char:ClearAllChildren()
-        local newChar = Instance.new("Model")
-        newChar.Parent = workspace
-        plr.Character = newChar
-        task.wait()
-        plr.Character = char
-        newChar:Destroy()
-    end
+	local rcdEnabled, wasHidden = false, false
+	if gethidden then
+		rcdEnabled, wasHidden = gethidden(workspace, "RejectCharacterDeletions") ~= Enum.RejectCharacterDeletions.Disabled
+	end
+
+	if rcdEnabled and replicatesignal then
+		replicatesignal(plr.ConnectDiedSignalBackend)
+		task.wait(Players.RespawnTime - 0.1)
+		replicatesignal(plr.Kill)
+	elseif rcdEnabled and not replicatesignal then
+		notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+	else
+		local char = plr.Character
+		local hum = char:FindFirstChildWhichIsA("Humanoid")
+		if hum then hum:ChangeState(Enum.HumanoidStateType.Dead) end
+		char:ClearAllChildren()
+		local newChar = Instance.new("Model")
+		newChar.Parent = workspace
+		plr.Character = newChar
+		task.wait()
+		plr.Character = char
+		newChar:Destroy()
+	end
 end
 
 local refreshCmd = false
 function refresh(plr)
-    refreshCmd = true
-    local root = plr.Character:WaitForChild("HumanoidRootPart")
-    local pos = root.CFrame
-    local pos1 = workspace.CurrentCamera.CFrame
-    respawn(plr)
-    task.spawn(function()
-        plr.CharacterAdded:Wait():WaitForChild("HumanoidRootPart").CFrame, workspace.CurrentCamera.CFrame = pos, task.wait() and pos1
-        refreshCmd = false
-    end)
+	refreshCmd = true
+	local root = getRoot(plr.Character)
+	local pos = root.CFrame
+	local pos1 = workspace.CurrentCamera.CFrame
+	respawn(plr)
+	task.spawn(function()
+		local char = plr.CharacterAdded:Wait()
+		local humanoid = char:FindFirstChildOfClass("Humanoid")
+		while not humanoid do
+			wait()
+			humanoid = char:FindFirstChildOfClass("Humanoid")
+		end
+		humanoid.RootPart.CFrame, workspace.CurrentCamera.CFrame = pos, task.wait() and pos1
+		refreshCmd = false
+	end)
 end
 
 local lastDeath
@@ -5359,18 +5376,8 @@ end)
 
 onDied()
 
-function getstring(begin)
-    local start = begin-1
-    local AA = '' for i,v in pairs(cargs) do
-        if i > start then
-            if AA ~= '' then
-                AA = AA .. ' ' .. v
-            else
-                AA = AA .. v
-            end
-        end
-    end
-    return AA
+function getstring(begin, args)
+	return table.concat(args or cargs, " ", begin)
 end
 
 findCmd=function(cmd_name)
@@ -8503,7 +8510,7 @@ addcmd('swim',{},function(args, speaker)
         Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
         swimbeat = RunService.Heartbeat:Connect(function()
             pcall(function()
-                speaker.Character.HumanoidRootPart.Velocity = ((Humanoid.MoveDirection ~= Vector3.new() or UserInputService:IsKeyDown(Enum.KeyCode.Space)) and speaker.Character.HumanoidRootPart.Velocity or Vector3.new())
+				getRoot(speaker.Character).Humanoid.RootPart.Velocity = ((Humanoid.MoveDirection ~= Vector3.new() or UserInputService:IsKeyDown(Enum.KeyCode.Space)) and getRoot(speaker.Character).Humanoid.RootPart.Velocity or Vector3.new())
             end)
         end)
         swimming = true
@@ -8663,9 +8670,9 @@ addcmd('toggleswim',{},function(args, speaker)
 end)
 
 addcmd('setwaypoint',{'swp','setwp','spos','saveposition','savepos'},function(args, speaker)
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     if getRoot(speaker.Character) then
-        notify('Modified Waypoints',"Created waypoint: "..getstring(1))
+        notify('Modified Waypoints',"Created waypoint: "..getstring(1, args))
         local torso = getRoot(speaker.Character)
         WayPoints[#WayPoints + 1] = {NAME = WPName, COORD = {math.floor(torso.Position.X), math.floor(torso.Position.Y), math.floor(torso.Position.Z)}, GAME = PlaceId}
         if AllWaypoints ~= nil then
@@ -8899,9 +8906,9 @@ addcmd('whatexploitsareonline',{'whatexpsareonline','weao'},function()
 end)
 
 addcmd('waypointpos',{'wpp','setwaypointposition','setpos','setwaypoint','setwaypointpos'},function(args, speaker)
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     if getRoot(speaker.Character) then
-        notify('Modified Waypoints',"Created waypoint: "..getstring(1))
+        notify('Modified Waypoints',"Created waypoint: "..getstring(1, args))
         WayPoints[#WayPoints + 1] = {NAME = WPName, COORD = {args[2], args[3], args[4]}, GAME = PlaceId}
         if AllWaypoints ~= nil then
             AllWaypoints[#AllWaypoints + 1] = {NAME = WPName, COORD = {args[2], args[3], args[4]}, GAME = PlaceId}
@@ -8985,7 +8992,7 @@ addcmd("unantivoid", {"noantivoid"}, function(args, speaker)
 end)
 
 addcmd('waypoint',{'wp','lpos','loadposition','loadpos'},function(args, speaker)
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     if speaker.Character then
         for i,_ in pairs(WayPoints) do
             if tostring(WayPoints[i].NAME):lower() == tostring(WPName):lower() then
@@ -9012,7 +9019,7 @@ addcmd('tweenspeed',{'tspeed'},function(args, speaker)
 end)
 
 addcmd('tweenwaypoint',{'twp'},function(args, speaker)
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     if speaker.Character then
         for i,_ in pairs(WayPoints) do
             local x = WayPoints[i].COORD[1]
@@ -9031,7 +9038,7 @@ addcmd('tweenwaypoint',{'twp'},function(args, speaker)
 end)
 
 addcmd('walktowaypoint',{'wtwp'},function(args, speaker)
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     if speaker.Character then
         for i,_ in pairs(WayPoints) do
             local x = WayPoints[i].COORD[1]
@@ -9059,14 +9066,14 @@ end)
 
 addcmd('deletewaypoint',{'dwp','dpos','deleteposition','deletepos'},function(args, speaker)
     for i,v in pairs(WayPoints) do
-        if v.NAME:lower() == tostring(getstring(1)):lower() then
+        if v.NAME:lower() == tostring(getstring(1, args)):lower() then
             notify('Modified Waypoints',"Deleted waypoint: " .. v.NAME)
             table.remove(WayPoints, i)
         end
     end
     if AllWaypoints ~= nil and #AllWaypoints > 0 then
         for i,v in pairs(AllWaypoints) do
-            if v.NAME:lower() == tostring(getstring(1)):lower() then
+            if v.NAME:lower() == tostring(getstring(1, args)):lower() then
                 if not v.GAME or v.GAME == PlaceId then
                     table.remove(AllWaypoints, i)
                 end
@@ -9074,7 +9081,7 @@ addcmd('deletewaypoint',{'dwp','dpos','deleteposition','deletepos'},function(arg
         end
     end
     for i,v in pairs(pWayPoints) do
-        if v.NAME:lower() == tostring(getstring(1)):lower() then
+        if v.NAME:lower() == tostring(getstring(1, args)):lower() then
             notify('Modified Waypoints',"Deleted waypoint: " .. v.NAME)
             table.remove(pWayPoints, i)
         end
@@ -9941,7 +9948,7 @@ end)
 end)
 ]]
 addcmd('notify',{},function(args, speaker)
-    notify(getstring(1))
+    notify(getstring(1, args))
 end)
 
 addcmd('lastcommand',{'lastcmd'},function(args, speaker)
@@ -10582,7 +10589,7 @@ addcmd('freecampos',{'fcpos','fcp','freecamposition','fcposition'},function(args
 end)
 
 addcmd('freecamwaypoint',{'fcwp'},function(args, speaker)
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     if speaker.Character then
         for i,_ in pairs(WayPoints) do
             local x = WayPoints[i].COORD[1]
@@ -10765,7 +10772,7 @@ addcmd('delete',{'remove'},function(args, speaker)
             v:Destroy()
         end
     end
-    notify('Item(s) Deleted','Deleted ' ..getstring(1))
+    notify('Item(s) Deleted','Deleted ' ..getstring(1, args))
 end)
 
 addcmd('deleteclass',{'removeclass','deleteclassname','removeclassname','dc'},function(args, speaker)
@@ -10774,7 +10781,7 @@ addcmd('deleteclass',{'removeclass','deleteclassname','removeclassname','dc'},fu
             v:Destroy()
         end
     end
-    notify('Item(s) Deleted','Deleted items with ClassName ' ..getstring(1))
+    notify('Item(s) Deleted','Deleted items with ClassName ' ..getstring(1, args))
 end)
 
 addcmd('chardelete',{'charremove','cd'},function(args, speaker)
@@ -10783,7 +10790,7 @@ addcmd('chardelete',{'charremove','cd'},function(args, speaker)
             v:Destroy()
         end
     end
-    notify('Item(s) Deleted','Deleted ' ..getstring(1))
+    notify('Item(s) Deleted','Deleted ' ..getstring(1, args))
 end)
 
 addcmd('chardeleteclass',{'charremoveclass','chardeleteclassname','charremoveclassname','cdc'},function(args, speaker)
@@ -10792,7 +10799,7 @@ addcmd('chardeleteclass',{'charremoveclass','chardeleteclassname','charremovecla
             v:Destroy()
         end
     end
-    notify('Item(s) Deleted','Deleted items with ClassName ' ..getstring(1))
+    notify('Item(s) Deleted','Deleted items with ClassName ' ..getstring(1, args))
 end)
 
 addcmd('deletevelocity',{'dv','removevelocity','removeforces'},function(args, speaker)
@@ -11294,7 +11301,7 @@ end)
 addcmd('pathfindwalktowaypoint',{'pathfindwalktowp'},function(args, speaker)
     waypointwalkto = false
     task.wait()
-    local WPName = tostring(getstring(1))
+    local WPName = tostring(getstring(1, args))
     local hum = Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
     local path = PathService:CreatePath()
     if speaker.Character then
@@ -11713,7 +11720,7 @@ addcmd("maxslopeangle", {"msa"}, function(args, speaker)
 end)
 
 addcmd("gravity", {"grav"}, function(args, speaker)
-    local grav = args[1] or 196.2
+    local grav = args[1] or oldgrav
     if isNumber(grav) then
         workspace.Gravity = grav
     end
@@ -12031,17 +12038,28 @@ local function anim2track(asset_id)
     return asset_id
 end
 
-addcmd("animation", {"anim"}, function(args, speaker)
-    local animid = tostring(args[1])
-    if not animid:find("rbxassetid://") then
-        animid = "rbxassetid://" .. animid
+addcmd("animation", {"anim", "emote", "em"}, function(args, speaker)
+    local character = speaker.Character
+    local hum = character and character:FindFirstChildOfClass("Humanoid")
+    local animator = hum and hum:FindFirstChildOfClass("Animator")
+    if not animator then return end -- Cannot play animation without an Animator
+    local rawId = tostring(args[1])
+    local animId = rawId:find("rbxassetid://") and rawId or "rbxassetid://" .. rawId
+    local animationInstance = Instance.new("Animation")
+    animationInstance.AnimationId = animId
+    local success, track = pcall(function()
+        return animator:LoadAnimation(animationInstance)
+    end)
+    if success and track then
+        track:Play()
+        if args[2] then
+            local speed = tonumber(args[2])
+            if speed then
+                track:AdjustSpeed(speed)
+            end
+        end
+        animationInstance:Destroy()
     end
-    animid = anim2track(animid)
-    local animation = Instance.new("Animation")
-    animation.AnimationId = animid
-    local anim = speaker.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
-    anim:Play()
-    if args[2] then anim:AdjustSpeed(tostring(args[2])) end
 end)
 
 addcmd('noanim',{},function(args, speaker)
@@ -15844,6 +15862,17 @@ addcmd("permadeath", {}, function(args, speaker)
     end
 end)
 
+addcmd('call',{}, function(args,speaker)
+    local success, canInvite = pcall(function()
+	    return SocialService:CanSendCallInviteAsync(Players.LocalPlayer)
+    end)
+    if success and canInvite then
+	    SocialService:PromptPhoneBook(Players.LocalPlayer, "")
+    else
+        notify("Call", "It seems you're not able to call anyone. Sorry!")
+    end
+end)
+
 local freezingua = nil
 frozenParts = {}
 addcmd('freezeunanchored',{'freezeua'},function(args, speaker)
@@ -16081,11 +16110,11 @@ addcmd('unautokeypress',{'noautokeypress','unkeypress','nokeypress'},function(ar
 end)
 
 addcmd('addplugin',{'plugin'},function(args, speaker)
-    addPlugin(getstring(1))
+    addPlugin(getstring(1, args))
 end)
 
 addcmd('removeplugin',{'deleteplugin'},function(args, speaker)
-    deletePlugin(getstring(1))
+    deletePlugin(getstring(1, args))
 end)
 
 addcmd('reloadplugin',{},function(args, speaker)
