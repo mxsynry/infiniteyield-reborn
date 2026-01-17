@@ -14,7 +14,7 @@
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
-- [Comparison to Original IY](#comparison)
+- [Preview](#screenshots)
 - [Credits](#credits)
 - [Contributing](#contributing)
 - [License](#license)
@@ -59,17 +59,7 @@ loadstring(game:HttpGet('https://raw.githubusercontent.com/mxsynry/infiniteyield
 
 **Note for Reuploaders on ScriptBlox**: [Read this to avoid bans](https://github.com/mxsynry/infiniteyield-reborn/tree/scriptblox#for-the-reuploaders-on-scriptblox-please-read-me).
 
-## Comparison
-
-| Aspect | Original IY | IYR |
-|--------|-------------|-----|
-| Updates | Rare | Frequent |
-| Commands | 400+ (sometimes broken) | 400+ (cleaned up) |
-| Anti-Detection | Basic, gets flagged by logo id CoreGui detections. | More commands dedicated |
-| Bloat | Some NSFW/unused | Debloated options |
-| Chat Support | Legacy | TextChatService |
-
-Screenshots:  
+## Screenshots:  
 ![IY](https://github.com/user-attachments/assets/d0c64301-bd74-4804-9dd7-de0832683c0c)  
 ![IYR](https://github.com/user-attachments/assets/f2e5e15f-ba60-4ee4-85e9-83eb67cfaae8)
 
@@ -94,7 +84,7 @@ We welcome chaos-bringers! Follow these steps:
 5. Open a PR—describe changes, test on latest Roblox.
 6. Adhere to our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-No strict rules, but keep it clean. Bugs? File issues with repro steps.
+No strict rules, but keep it clean. File issues with repro steps.
 
 ## License
 MIT License—hack away, share the source. See [LICENSE](LICENSE) for deets.
