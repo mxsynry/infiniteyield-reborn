@@ -8349,7 +8349,6 @@ addcmd('cframefly', {'cfly'}, function(args, speaker)
 
     humanoid.PlatformStand = true
     root.Anchored = true
-    execCmd("grav 0")
 
     if CFloop then CFloop:Disconnect() end
 
