@@ -24,7 +24,7 @@
 
 ### From Original Infinite Yield
 - Over 400 commands for ultimate Roblox control.
-- Open-source foundation with 7+ years of battle-tested dev.
+- Open-source foundation with 8+ years of battle-tested dev.
 - Easy integration—the starting point for every exploiter.
 
 ### Exclusive to IYR
