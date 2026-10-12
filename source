@@ -1,4 +1,3 @@
-local __IYRVersion = "8.0.0-nextgen.20"
 local __IYRHostEnvironment = (type(getgenv) == "function" and getgenv()) or _G
 if rawget(__IYRHostEnvironment, "IYR_RESTART_REQUIRED") then
     error("IYR was unloaded in this process. Fully restart Roblox and the executor before loading it again so legacy listeners cannot stack.")
