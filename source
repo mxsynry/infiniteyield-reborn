@@ -1,6 +1,6 @@
 local __IYRHostEnvironment = (type(getgenv) == "function" and getgenv()) or _G
 if rawget(__IYRHostEnvironment, "IYR_RESTART_REQUIRED") then
-    error("IYR was unloaded in this process. Fully restart Roblox and the executor before loading it again so legacy listeners cannot stack.")
+    error("IYR was unloaded in this process.")
 end
 if rawget(__IYRHostEnvironment, "IYR_BOOTSTRAPPING") then
     error("IYR NextGen is already starting in this process; wait for that load to finish")
