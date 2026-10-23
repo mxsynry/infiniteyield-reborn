@@ -38,8 +38,8 @@ local __IYRModuleCache = {}
 __IYRModules["@/Config"] = function(require)
 local Config = {
     Name = "Infinite Yield Reborn NextGen",
-    Version = "8.0.0-nextgen.20",
-    Marker = "-- IYR NextGen 8.0.0-nextgen.20 |",
+    Version = "8.0.0-nextgen",
+    Marker = "-- IYR NextGen 8.0.0-nextgen |",
 
     SettingsFile = "IYR.LOL/nextgen-settings.json",
     SettingsFolder = "IYR.LOL",
@@ -136,7 +136,6 @@ return Config
 end
 
 __IYRModules["@/Runtime/CameraCommands"] = function(require)
--- Native camera commands. Never destroy the engine camera or other scripts' listeners.
 local CameraCommands = {}
 function CameraCommands.Install(runtime)
     local adapter, env = runtime.Adapter, runtime.Legacy
@@ -247,7 +246,6 @@ return CameraCommands
 end
 
 __IYRModules["@/Runtime/CapabilityRequirements"] = function(require)
--- Reviewed requirements only. Unannotated legacy callbacks remain explicitly unverified.
 return {
     clientantikick = { 'hookMetamethod', 'namecall' },
     clientantiteleport = { 'hookMetamethod', 'namecall', 'functionHooks', 'newcclosure' },
@@ -309,7 +307,6 @@ return Command
 end
 
 __IYRModules["@/Runtime/ClickGuiModel"] = function(require)
--- One catalog and settings model shared by standalone UI and live Vape modules.
 local Model = {}
 Model.__index = Model
 local Search = require("@/Runtime/CommandSearch")
@@ -376,8 +373,6 @@ function Model:Refresh()
     for id in pairs(self.Modules) do
         if not live[id] then self:Disable(id) self.Modules[id] = nil end
     end
-    -- Fold only reviewed native helper commands. Retained/plugin implementations
-    -- must not be hidden merely because they happen to share a command name.
     for _, parent in ipairs(output) do
         if parent.Kind == "Toggle" and parent.Record.Raw.IYR_NATIVE
             and self.Runtime.Adapter:Support(parent.Record.Raw) ~= "Unavailable" then
@@ -879,6 +874,52 @@ function Compat:HttpGet(url)
     return body
 end
 return Compat
+end
+
+__IYRModules["@/Runtime/ErrorLog"] = function(require)
+-- Session-private diagnostics, inspired by InfYield420's contextual error log.
+local Log = {}
+Log.__index = Log
+function Log.new() return setmetatable({ Entries = {}, Limit = 250 }, Log) end
+function Log:Add(context, message)
+    table.insert(self.Entries, { Time = os.date("%H:%M:%S"), Context = tostring(context), Message = tostring(message) })
+    while #self.Entries > self.Limit do table.remove(self.Entries, 1) end
+end
+function Log:Text(limit)
+    local lines = {}
+    for index = math.max(1, #self.Entries - (limit or self.Limit) + 1), #self.Entries do
+        local entry = self.Entries[index]
+        table.insert(lines, string.format("[%s] %s\n%s", entry.Time, entry.Context, entry.Message))
+    end
+    return #lines > 0 and table.concat(lines, "\n\n") or "No errors recorded this session."
+end
+function Log:Destroy()
+    if self.Adapter and self.Adapter.ErrorRecorder == self.Recorder then self.Adapter.ErrorRecorder = nil end
+    if self.Environment and self.Environment.__IYRRecordError == self.Recorder then self.Environment.__IYRRecordError = nil end
+    if self.Preferences then self.Preferences.RecordError = nil end
+end
+function Log.Install(runtime)
+    local self = Log.new()
+    runtime.Errors = self
+    self.Adapter, self.Environment, self.Preferences = runtime.Adapter, runtime.Legacy, runtime.Preferences
+    self.Recorder = function(context, message) self:Add(context, message) end
+    self.Adapter.ErrorRecorder, self.Environment.__IYRRecordError = self.Recorder, self.Recorder
+    self.Preferences.RecordError = self.Recorder
+    if self.Preferences.LoadError then self:Add("settings:load", self.Preferences.LoadError) end
+    self.Adapter:Register("errorlog", { "errors", "iyerrors", "elog" }, function()
+        runtime.UI:ShowOutput("IYR errors · " .. #self.Entries .. " recorded", self:Text(25))
+    end, "Show the most recent 25 session errors with their actual messages and context.")
+    self.Adapter:Register("copyerrorlog", { "copyerrors" }, function()
+        local copy = assert(runtime.Capabilities.Functions.clipboard, "Clipboard API is unavailable")
+        copy(self:Text())
+    end, "Copy up to 250 session errors to your clipboard.", { "clipboard" })
+    self.Adapter:Register("clearerrorlog", { "clearerrorlogs", "celog" }, function()
+        table.clear(self.Entries)
+        runtime.Adapter:Notify("success", "Error log", "Cleared")
+    end, "Clear session diagnostics without changing command settings.")
+    return self
+end
+return Log
 end
 
 __IYRModules["@/Runtime/ExecutorCapabilities"] = function(require)
@@ -1383,6 +1424,7 @@ function LegacyAdapter:Register(name, aliases, handler, description, requirement
             handler(args, speaker)
         end, debug.traceback)
         if not ok then
+            if self.ErrorRecorder then self.ErrorRecorder("command:" .. name, message) end
             self:Notify("error", name .. " failed", tostring(message))
         end
         return ok, message
@@ -1499,6 +1541,7 @@ function LegacyAdapter:GetPlugins()
 end
 
 function LegacyAdapter:AddPlugin(name)
+    if self.PluginManager then return self.PluginManager:Load(name) end
     if type(self.Environment.addPlugin) ~= "function" then
         return false, "Plugin loader is unavailable"
     end
@@ -1521,6 +1564,7 @@ function LegacyAdapter:AddPlugin(name)
 end
 
 function LegacyAdapter:RemovePlugin(name)
+    if self.PluginManager then return self.PluginManager:Remove(name) end
     if type(self.Environment.deletePlugin) ~= "function" then
         return false, "Plugin manager is unavailable"
     end
@@ -1538,6 +1582,11 @@ function LegacyAdapter:RemovePlugin(name)
     end
     callIfFunction(self.Environment.updatesaves)
     return true
+end
+
+function LegacyAdapter:ReloadPlugin(name)
+    if self.PluginManager then return self.PluginManager:Reload(name) end
+    return false, "Managed plugin reload is unavailable"
 end
 
 function LegacyAdapter:GetAliases()
@@ -2012,6 +2061,353 @@ end
 return ESP
 end
 
+__IYRModules["@/Runtime/PluginManager"] = function(require)
+-- IYR implementation of the Init/Unload host-API pattern reviewed in SirMeme's
+-- InfiniteYield420Edition. Existing .iy command tables remain supported.
+local Maid = require("@/Runtime/Maid")
+local Manager = {}
+Manager.__index = Manager
+
+local function filename(name)
+    name = tostring(name or ""):match("^%s*(.-)%s*$")
+    assert(name ~= "" and name:lower() ~= "plugin file name", "Provide a plugin filename")
+    return name:sub(-3):lower() == ".iy" and name or name .. ".iy"
+end
+local function removeOwned(array, owned)
+    for index = #array, 1, -1 do if owned[array[index]] then table.remove(array, index) end end
+end
+local function restore(array, snapshot)
+    table.clear(array)
+    for _, item in ipairs(snapshot) do table.insert(array, item) end
+end
+local function keyName(value)
+    local token = tostring(value):gsub("^Enum%.KeyCode%.", ""):lower()
+    if token == "leftclick" then return "LeftClick" end
+    if token == "rightclick" then return "RightClick" end
+    for _, key in ipairs(Enum.KeyCode:GetEnumItems()) do
+        if key.Name:lower() == token and key.Name ~= "Unknown" then return tostring(key) end
+    end
+    error("Unknown key: " .. tostring(value), 0)
+end
+
+function Manager.new(runtime)
+    local env = runtime.Legacy
+    env.PluginsTable, env.binds = env.PluginsTable or {}, env.binds or {}
+    if env.__IYRManagePlugins and type(runtime.Preferences.Data.PluginFiles) == "table" then
+        for _, name in ipairs(runtime.Preferences.Data.PluginFiles) do
+            local ok, file = pcall(filename, name)
+            if ok and not table.find(env.PluginsTable, file) then table.insert(env.PluginsTable, file) end
+        end
+    end
+    if env.__IYRManagePlugins then
+        for index = #env.binds, 1, -1 do
+            if type(env.binds[index].IYR_PLUGIN) == "string" then table.remove(env.binds, index) end
+        end
+    end
+    return setmetatable({ Runtime = runtime, Entries = {}, Busy = {},
+        InputMaid = Maid.new(), ToggleStates = {}, PreviousAdd = env.addPlugin, PreviousDelete = env.deletePlugin }, Manager)
+end
+
+function Manager:_record(context, message)
+    local errors = self.Runtime.Errors
+    if errors then errors:Add(context, message) end
+end
+
+function Manager:_cleanup(entry)
+    if entry.State == "closed" or entry.State == "closing" then return end
+    entry.State = "closing"
+    for binding in pairs(entry.Bindings) do self.ToggleStates[binding] = nil end
+    -- Every callback runs even if one fails; none overwrites the manifest hook.
+    for index = #entry.Unloads, 1, -1 do
+        local ok, message = pcall(entry.Unloads[index])
+        if not ok then self:_record("plugin:" .. entry.File .. ":Unload", message) end
+    end
+    entry.Maid:Clean()
+    entry.State = "closed"
+end
+
+function Manager:_api(entry, old)
+    local runtime, env, adapter = self.Runtime, self.Runtime.Legacy, self.Runtime.Adapter
+    local function live(editing)
+        assert(runtime.Loaded and not self.Destroyed and entry.State ~= "closed"
+            and not (editing and entry.State == "closing"), "Plugin is unloaded: " .. entry.File)
+    end
+    local function available(token)
+        local found = adapter:FindCommand(token)
+        return not entry.Names[token] and (not found or (old and old.Commands[found]))
+    end
+    local api = { Version = runtime.Version, ApiVersion = 1, PluginName = entry.Name,
+        PluginFile = entry.File, LocalPlayer = runtime.Services.Players.LocalPlayer }
+    api.registerCommand = function(name, aliases, callback, description, listName)
+        live(true)
+        assert(type(name) == "string" and name:match("^[%w_%-]+$") and type(callback) == "function", "Invalid plugin command")
+        local base, suffix = name:lower(), 0
+        name = base
+        while not available(name) do suffix += 1 name = base .. suffix end
+        entry.Names[name] = true
+        local accepted = {}
+        for _, alias in ipairs(aliases or {}) do
+            assert(type(alias) == "string" and alias:match("^[%w_%-]+$"), "Invalid plugin alias")
+            alias = alias:lower()
+            if alias ~= name and available(alias) then table.insert(accepted, alias) entry.Names[alias] = true end
+        end
+        local definition = { Name = name, Aliases = accepted, Callback = callback,
+            Description = tostring(description or ""), ListName = listName }
+        if entry.State == "active" then self:_register(entry, definition) self:_changed()
+        else table.insert(entry.Staged, definition) end
+        return name
+    end
+    api.registerKeybind = function(command, key, isKeyUp, toggle)
+        live(true)
+        assert(type(command) == "string" and type(key) == "string" and key ~= "", "Invalid plugin keybind")
+        assert(not env.__IYR_REDUCED or self.InputSupported, "Plugin keybinds need the input service")
+        assert(toggle == nil or toggle == false or type(toggle) == "string", "Keybind toggle must be a command string")
+        local binding = { COMMAND = command, KEY = keyName(key), ISKEYUP = isKeyUp == true, TOGGLE = toggle, IYR_PLUGIN = entry.File }
+        entry.Bindings[binding] = true
+        if entry.State == "active" then table.insert(env.binds, binding) self:_changed() end
+    end
+    api.track = function(resource)
+        if entry.State == "closed" or entry.State == "closing" or self.Destroyed or not runtime.Loaded then
+            local disposer = Maid.new() disposer:Add(resource) disposer:Clean()
+            error("Plugin is unloaded: " .. entry.File, 0)
+        end
+        return entry.Maid:Add(resource)
+    end
+    api.onUnload = function(callback)
+        live(true) assert(type(callback) == "function", "Unload callback must be a function")
+        table.insert(entry.Unloads, callback)
+    end
+    api.notify = function(title, text) live() adapter:Notify("info", tostring(title), tostring(text or "")) end
+    api.getPlayers = function(selector, speaker) live() return env.getPlayer(selector, speaker or api.LocalPlayer) end
+    api.getRoot = env.getRoot
+    api.getTorso = env.getTorso or function(character)
+        return character and (character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso"))
+    end
+    api.Prefix = function() return env.prefix end
+    api.execCommand = function(command) live() return runtime:Execute(command) end
+    api.logError = function(message) live() self:_record("plugin:" .. entry.File, message) end
+    return api
+end
+
+function Manager:_prepare(file, old)
+    local runtime = self.Runtime
+    local reader = assert(runtime.Capabilities.Functions.fileRead, "readfile is unavailable")
+    local source = reader(file)
+    local chunk, _, close = runtime.ScriptExecutor:Compile(source, "@" .. file)
+    local entry = { File = file, Name = file, State = "preparing", Maid = Maid.new(),
+        Unloads = {}, Commands = {}, Bindings = {}, Names = {}, Rows = {}, Staged = {} }
+    if close then entry.Maid:Add(close) end
+    local ok, message = xpcall(function()
+        local manifest = chunk()
+        assert(type(manifest) == "table", "Plugin must return a manifest table")
+        if manifest.ApiVersion ~= nil then assert(manifest.ApiVersion == 1, "Unsupported plugin ApiVersion; host supports 1") end
+        entry.Name = tostring(manifest.Name or manifest.PluginName or file)
+        entry.Manifest = manifest
+        if manifest.Unload ~= nil then
+            assert(type(manifest.Unload) == "function", "Plugin Unload must be a function")
+            table.insert(entry.Unloads, manifest.Unload)
+        end
+        local api = self:_api(entry, old)
+        if manifest.Commands ~= nil then
+            assert(type(manifest.Commands) == "table", "Plugin Commands must be a table")
+            for name, command in pairs(manifest.Commands) do
+                assert(type(command) == "table", "Invalid legacy plugin command")
+                api.registerCommand(name, command.Aliases, command.Function, command.Description, command.ListName)
+            end
+        end
+        if manifest.Init ~= nil then
+            assert(type(manifest.Init) == "function", "Plugin Init must be a function")
+            manifest.Init(api)
+        end
+        assert(runtime.Loaded and not self.Destroyed, "IYR unloaded during plugin initialization")
+    end, debug.traceback)
+    if not ok then self:_cleanup(entry) error(message, 0) end
+    return entry
+end
+
+function Manager:_changed()
+    local runtime, env = self.Runtime, self.Runtime.Legacy
+    if self.Destroyed or not runtime.Loaded then return end
+    if not self.Restoring and type(env.updatesaves) == "function" then
+        local ok, message = pcall(env.updatesaves)
+        if not ok then self:_record("plugins:save", message) end
+    end
+    if not self.Restoring then
+        local saved, saveError = pcall(runtime.Preferences.Set, runtime.Preferences, "PluginFiles", table.clone(env.PluginsTable))
+        if not saved then self:_record("plugins:save", saveError) end
+    end
+    if runtime.ClickGuiModel then
+        local ok, message = pcall(function() runtime.ClickGuiModel:Refresh() runtime.ClickGuiModel:Changed() end)
+        if not ok then self:_record("plugins:catalog", message) end
+    end
+    if type(env.refreshplugins) == "function" then pcall(env.refreshplugins, true) end
+end
+
+function Manager:_register(entry, definition)
+    assert(not self.Runtime.Adapter:FindCommand(definition.Name), "Command name was taken during plugin initialization: " .. definition.Name)
+    local callback = definition.Callback
+    local command = assert(self.Runtime.Adapter:Register(definition.Name, definition.Aliases, function(args, speaker)
+        assert(entry.State == "active" and self.Runtime.Loaded and not self.Destroyed, "Plugin is unloaded: " .. entry.File)
+        return callback(args, speaker)
+    end, definition.Description), "Plugin command registration failed")
+    command.PLUGIN = entry.File
+    entry.Commands[command] = true
+    local row = { NAME = definition.ListName or definition.Name, DESC = definition.Description, PLUGIN = entry.File }
+    table.insert(self.Runtime.Legacy.CMDs, row) entry.Rows[row] = true
+end
+
+function Manager:Input(input, processed, ended)
+    local runtime, env, service = self.Runtime, self.Runtime.Legacy, self.Runtime.Services.UserInputService
+    if self.Destroyed or not runtime.Loaded or processed then return end
+    if env.__IYRBlockBoundKey and env.__IYRBlockBoundKey(input, ended) then return end
+    if service and type(service.GetFocusedTextBox) == "function" and service:GetFocusedTextBox() then return end
+    local key
+    if input.UserInputType == Enum.UserInputType.Keyboard then key = tostring(input.KeyCode)
+    elseif input.UserInputType == Enum.UserInputType.MouseButton1 then key = "LeftClick"
+    elseif input.UserInputType == Enum.UserInputType.MouseButton2 then key = "RightClick" end
+    if not key then return end
+    for _, entry in pairs(self.Entries) do
+        if entry.State == "active" then
+            for binding in pairs(entry.Bindings) do
+                if binding.KEY:lower() == key:lower() and binding.ISKEYUP == ended then
+                    local command = binding.COMMAND
+                    if binding.TOGGLE and not ended then
+                        if self.ToggleStates[binding] then command = binding.TOGGLE end
+                        self.ToggleStates[binding] = not self.ToggleStates[binding]
+                    end
+                    local ok, message = runtime:Execute(command)
+                    if not ok then runtime.Adapter:Notify("error", "Plugin keybind", tostring(message)) end
+                end
+            end
+        end
+    end
+end
+
+function Manager:_publish(entry, old)
+    local env = self.Runtime.Legacy
+    local snapshots = { table.clone(env.cmds), table.clone(env.CMDs), table.clone(env.binds) }
+    if old then removeOwned(env.cmds, old.Commands) removeOwned(env.CMDs, old.Rows) removeOwned(env.binds, old.Bindings) end
+    local ok, message = pcall(function()
+        for _, definition in ipairs(entry.Staged) do
+            self:_register(entry, definition)
+        end
+        for binding in pairs(entry.Bindings) do table.insert(env.binds, binding) end
+    end)
+    if not ok then
+        restore(env.cmds, snapshots[1]) restore(env.CMDs, snapshots[2]) restore(env.binds, snapshots[3])
+        self:_cleanup(entry) error(message, 0)
+    end
+    if old then self:_cleanup(old) end
+    entry.State = "active"
+    self.Entries[entry.File] = entry
+    if not table.find(env.PluginsTable, entry.File) then table.insert(env.PluginsTable, entry.File) end
+end
+
+function Manager:_operation(name, callback)
+    local parsed, file = pcall(filename, name)
+    if not parsed then return false, tostring(file) end
+    if self.Destroyed or not self.Runtime.Loaded then return false, "IYR is unloaded" end
+    if self.Busy[file] then return false, "Plugin operation already in progress: " .. file end
+    self.Busy[file] = true
+    local ok, message = xpcall(function() callback(file) end, debug.traceback)
+    self.Busy[file] = nil
+    if not ok then self:_record("plugin:" .. file, message) return false, tostring(message) end
+    self:_changed()
+    return true
+end
+
+function Manager:Load(name)
+    return self:_operation(name, function(file)
+        assert(not table.find(self.Runtime.Legacy.PluginsTable, file), "Plugin is already loaded: " .. file)
+        self:_publish(self:_prepare(file))
+    end)
+end
+
+function Manager:Remove(name)
+    return self:_operation(name, function(file)
+        local env, entry = self.Runtime.Legacy, self.Entries[file]
+        assert(entry or table.find(env.PluginsTable, file), "Plugin is not loaded: " .. file)
+        if entry then
+            removeOwned(env.cmds, entry.Commands) removeOwned(env.CMDs, entry.Rows) removeOwned(env.binds, entry.Bindings)
+            self:_cleanup(entry) self.Entries[file] = nil
+        elseif not env.__IYRManagePlugins then
+            -- Already-loaded legacy plugins retain their original removal path.
+            assert(type(self.PreviousDelete) == "function", "Legacy plugin removal is unavailable")
+            self.PreviousDelete(file)
+            assert(not table.find(env.PluginsTable, file), "Legacy plugin could not be removed: " .. file)
+        end
+        for index = #env.PluginsTable, 1, -1 do if env.PluginsTable[index] == file then table.remove(env.PluginsTable, index) end end
+    end)
+end
+
+function Manager:Reload(name)
+    return self:_operation(name, function(file)
+        local old = self.Entries[file]
+        assert(old or (self.Runtime.Legacy.__IYRManagePlugins and table.find(self.Runtime.Legacy.PluginsTable, file)),
+            "Remove and load this startup legacy plugin once to enable managed reload")
+        -- Compile and initialize before touching the working copy. A failed Init
+        -- cleans its own tracked work while the previous plugin keeps running.
+        self:_publish(self:_prepare(file, old), old)
+    end)
+end
+
+function Manager:Destroy()
+    self.Destroyed = true
+    self.InputMaid:Clean()
+    table.clear(self.ToggleStates)
+    local env = self.Runtime.Legacy
+    for file, entry in pairs(self.Entries) do
+        removeOwned(env.cmds, entry.Commands) removeOwned(env.CMDs, entry.Rows) removeOwned(env.binds, entry.Bindings)
+        self:_cleanup(entry) self.Entries[file] = nil
+    end
+    env.addPlugin, env.deletePlugin = self.PreviousAdd, self.PreviousDelete
+end
+
+function Manager:StartSaved()
+    if not self.Runtime.Legacy.__IYRManagePlugins then return end
+    self.Restoring = true
+    local restored, failure = pcall(function()
+        for _, file in ipairs(table.clone(self.Runtime.Legacy.PluginsTable)) do
+            if self.Destroyed or not self.Runtime.Loaded then return end
+            local ok, message = self:Reload(file)
+            if not ok then self.Runtime.Adapter:Notify("error", "Startup plugin not loaded", file .. ": " .. tostring(message)) end
+        end
+    end)
+    self.Restoring = false
+    if not restored then error(failure, 0) end
+end
+
+function Manager.Install(runtime)
+    local self = Manager.new(runtime)
+    runtime.PluginManager, runtime.Adapter.PluginManager = self, self
+    local env, adapter = runtime.Legacy, runtime.Adapter
+    if env.__IYR_REDUCED then
+        local input = runtime.Services.UserInputService
+        if input and input.InputBegan and input.InputEnded then
+            self.InputSupported = true
+            self.InputMaid:Add(input.InputBegan:Connect(function(value, processed) self:Input(value, processed, false) end))
+            self.InputMaid:Add(input.InputEnded:Connect(function(value, processed) self:Input(value, processed, true) end))
+        end
+    end
+    env.addPlugin = function(name) local ok, message = self:Load(name) assert(ok, message) return true end
+    env.deletePlugin = function(name) local ok, message = self:Remove(name) assert(ok, message) return true end
+    for name, definition in pairs({
+        addplugin = { { "plugin" }, "Load a local .iy plugin with managed commands, keybinds and resource cleanup.", "Load", { "fileRead", "sourceExecution" } },
+        removeplugin = { { "deleteplugin" }, "Unload a plugin and release only its registered resources.", "Remove", {} },
+        reloadplugin = { {}, "Prepare a replacement plugin before releasing the working copy.", "Reload", { "fileRead", "sourceExecution" } },
+    }) do
+        local method = definition[3]
+        local command = adapter:Register(name, definition[1], function(args)
+            local ok, message = self[method](self, table.concat(args, " ")) assert(ok, message)
+        end, definition[2], definition[4])
+        command.ARGUMENTS = "[plugin filename]"
+    end
+    return self
+end
+
+return Manager
+end
+
 __IYRModules["@/Runtime/Preferences"] = function(require)
 local Preferences = {}
 Preferences.__index = Preferences
@@ -2121,6 +2517,8 @@ function Preferences:_load()
         if oldStyle and tonumber(self.Data.Opacity) == 0.96 then
             self.Data.Opacity = 0.72
         end
+    else
+        self.LoadError = ok and "Settings JSON must contain an object" or tostring(decoded)
     end
     self:_normalize()
 end
@@ -2128,6 +2526,7 @@ end
 function Preferences:Save()
     local _, _, writefile, makefolder, isfolder = self:_fileApi()
     if type(writefile) ~= "function" then
+        self.LastSaveOk, self.LastSaveMessage = false, "writefile is unavailable"
         return false, "writefile is unavailable"
     end
     if type(makefolder) == "function" then
@@ -2140,6 +2539,8 @@ function Preferences:Save()
     local ok, message = pcall(function()
         writefile(self.Config.SettingsFile, self.HttpService:JSONEncode(self.Data))
     end)
+    self.LastSaveOk, self.LastSaveMessage = ok, not ok and tostring(message) or nil
+    if not ok and self.RecordError then self.RecordError("settings:save", message) end
     if ok then
         return true
     end
@@ -2207,7 +2608,7 @@ local split = require('@/Runtime/CommandSequence')
 local arguments = require('@/Runtime/CommandArguments')
 local Reduced = {}
 function Reduced.new(cap)
-    local env = { __IYR_REDUCED = true, prefix = ';', cmds = {}, CMDs = {}, binds = {}, shared = {},
+    local env = { __IYR_REDUCED = true, __IYRManagePlugins = true, prefix = ';', cmds = {}, CMDs = {}, binds = {}, shared = {},
         aliases = {}, customAlias = {}, WayPoints = {}, pWayPoints = {}, PluginsTable = {} }
     env._G = env
     env.loadstring = cap.Functions.loadstring
@@ -2330,6 +2731,16 @@ function Reviewed.ParseScale(value)
 end
 
 function Reviewed.Install(runtime)
+    -- Cross-fork spellings only: retain the existing callback and requirements.
+    for name, aliases in pairs({ norender = { "disable3drendering", "disable3d", "no3d" }, render = { "enable3drendering", "enable3d" } }) do
+        local command = runtime.Adapter:FindCommand(name)
+        if command then
+            command.ALIAS = command.ALIAS or {}
+            for _, alias in ipairs(aliases) do
+                if not runtime.Adapter:FindCommand(alias) then table.insert(command.ALIAS, alias) end
+            end
+        end
+    end
     local adapter, env = runtime.Adapter, runtime.Legacy
     local loading = {}
     for name, definition in pairs(Reviewed.Loaders) do
@@ -2447,18 +2858,29 @@ function ScriptExecutor:Compile(source, chunkName, options)
     local loaded, chunk, close = pcall(fiu.luau_load, bytecode, self.Environment, settings)
     assert(loaded and type(chunk) == "function", "Fiu could not load bytecode: " .. tostring(chunk))
 
-    if type(close) == "function" then table.insert(self.Interpreters, close) end
+    local closed = false
+    local function release()
+        if closed then return end
+        closed = true
+        local index = table.find(self.Interpreters, release)
+        if index then table.remove(self.Interpreters, index) end
+        if type(close) == "function" then close() end
+    end
+    table.insert(self.Interpreters, release)
     return function(...)
-        assert(not self.Destroyed, "IYR source executor is unloaded")
+        assert(not self.Destroyed and not closed, "IYR source executor is unloaded")
         local results = table.pack(pcall(chunk, ...))
         if not results[1] then error(results[2], 0) end
         return table.unpack(results, 2, results.n)
-    end, "Fiu"
+    end, "Fiu", release
 end
 
 function ScriptExecutor:Destroy()
     self.Destroyed = true
-    for _, close in ipairs(self.Interpreters) do pcall(close) end
+    while #self.Interpreters > 0 do
+        local close = self.Interpreters[#self.Interpreters]
+        pcall(close)
+    end
     table.clear(self.Interpreters)
 end
 
@@ -6192,7 +6614,7 @@ function NextGen:_buildPluginsPage()
     local _, body = self:_newPage(
         "Plugins",
         "Plugins",
-        "Load and remove legacy .iy plugins without opening the legacy interface. Plugin commands appear in search after refresh."
+        "Load, reload and remove local .iy plugins. Classic command tables and Init/Unload manifests are supported."
     )
     local input = self.Factory:Input(body, "Plugin filename, e.g. example.iy")
     input.Size = UDim2.new(1, -110, 0, 38)
@@ -6200,7 +6622,7 @@ function NextGen:_buildPluginsPage()
     add.AnchorPoint = Vector2.new(1, 0)
     add.Position = UDim2.new(1, 0, 0, 0)
     add.Size = UDim2.fromOffset(100, 38)
-    local note = self.Factory:Label(body, "Requires readfile/writefile support. Plugins run inside IYR's private compatibility environment.", 11, "TextDim", false)
+    local note = self.Factory:Label(body, "Loading needs readfile plus a source executor. New plugins can track resources for clean reload/removal. Errors are available with errorlog.", 11, "TextDim", false)
     note.Position = UDim2.fromOffset(2, 42)
     note.Size = UDim2.new(1, -4, 0, 30)
     note.TextWrapped = true
@@ -6220,14 +6642,24 @@ function NextGen:_buildPluginsPage()
             local selectedPlugin = plugin
             local row = self.Factory:Frame(list, "Surface", 0.14, 8)
             row.LayoutOrder = index
-            row.Size = UDim2.new(1, -6, 0, 44)
+            row.Size = UDim2.new(1, -6, 0, 104)
             local label = self.Factory:Label(row, plugin, 12, "Text", true)
             label.Position = UDim2.fromOffset(12, 5)
-            label.Size = UDim2.new(1, -92, 0, 34)
+            label.Size = UDim2.new(1, -24, 0, 40)
+            local manager = self.Context.Runtime.PluginManager
+            if manager and self.Context.Legacy.__IYRManagePlugins then
+                label.Text = plugin .. "\n" .. (manager.Entries[plugin] and "Active" or "Saved; not loaded")
+                label.TextWrapped = true
+            end
+            local reload = self.Factory:Button(row, "Reload", "SurfaceRaised")
+            reload.Position, reload.Size = UDim2.fromOffset(12, 50), UDim2.new(0.5, -18, 0, 44)
+            reload.Activated:Connect(function()
+                local ok, message = self.Adapter:ReloadPlugin(selectedPlugin)
+                self:Notify(ok and "success" or "error", ok and "Plugin reloaded" or "Plugin not reloaded", ok and selectedPlugin or message)
+                redraw()
+            end)
             local remove = self.Factory:Button(row, "Remove", "SurfaceRaised")
-            remove.AnchorPoint = Vector2.new(1, 0.5)
-            remove.Position = UDim2.new(1, -6, 0.5, 0)
-            remove.Size = UDim2.fromOffset(72, 30)
+            remove.Position, remove.Size = UDim2.new(0.5, 6, 0, 50), UDim2.new(0.5, -18, 0, 44)
             remove.Activated:Connect(function()
                 local ok, message = self.Adapter:RemovePlugin(selectedPlugin)
                 if not ok then
@@ -6242,7 +6674,7 @@ function NextGen:_buildPluginsPage()
         if ok then
             self:Notify("success", "Plugin loaded", input.Text)
             input.Text = ""
-            task.delay(0.1, redraw)
+            redraw()
         else
             self:Notify("error", "Plugin not loaded", message)
         end
@@ -8504,13 +8936,14 @@ return function(legacyEnvironment, hostEnvironment, capabilities, compat)
             local ok, message = pcall(callback)
             if not ok then table.insert(failures, name .. ": " .. tostring(message)) end
         end
-        for _, name in ipairs({ "ClickGui", "VapeBridge", "ClickGuiModel", "Flight", "ScriptExecutor", "PlayerESP", "UI" }) do
+        for _, name in ipairs({ "PluginManager", "ClickGui", "VapeBridge", "ClickGuiModel", "Flight", "ScriptExecutor", "PlayerESP", "UI" }) do
             local component = self[name]
             if component and type(component.Destroy) == "function" then release(name, function() component:Destroy() end) end
         end
         if self.CleanupCameraCommands then release("Camera", function() self:CleanupCameraCommands() end) end
         if self.CleanupUpstreamCommands then release("Commands", function() self:CleanupUpstreamCommands() end) end
         release("Preferences", function() preferences:Destroy() end)
+        if self.Errors then release("Error log", function() self.Errors:Destroy() end) end
         release("Legacy UI", function() if legacyEnvironment.PARENT then legacyEnvironment.PARENT:Destroy() end end)
         legacyEnvironment.IY_LOADED, legacyEnvironment.IYR_LOADED = nil, nil
         if hostEnvironment.IYR_NEXTGEN == self then hostEnvironment.IYR_NEXTGEN = nil end
@@ -8556,7 +8989,7 @@ return function(legacyEnvironment, hostEnvironment, capabilities, compat)
         adapter:Register("keybinds", { "binds" }, function()
             open("Keybinds")
         end)
-        adapter:Register("plugins", { "pluginmanager" }, function()
+        adapter:Register("plugins", { "pluginmanager", "pluginui", "manageplugins" }, function()
             open("Plugins")
         end)
         adapter:Register("aliases", { "aliasmanager" }, function()
@@ -8664,10 +9097,13 @@ return function(legacyEnvironment, hostEnvironment, capabilities, compat)
         require("@/Runtime/Flight").Install(runtime)
         require("@/Runtime/ClickGuiCommand").Install(runtime)
         require("@/Runtime/ReducedManagers")(runtime)
+        require("@/Runtime/ErrorLog").Install(runtime)
+        require("@/Runtime/PluginManager").Install(runtime)
         adapter:ApplyRequirements(require("@/Runtime/CapabilityRequirements"))
         adapter:Register("capabilities", { "caps", "executorinfo" }, function()
             ui:ShowOutput("Executor capabilities", capabilities:Report())
         end, "Show detected host APIs and active runtime mode.")
+        runtime.PluginManager:StartSaved()
         runtime.ClickGuiModel:Refresh()
         legacyEnvironment.createPopup = function(title, detail)
             ui:ShowOutput(detail and title or "Command output", detail or title)
@@ -8784,6 +9220,7 @@ setmetatable(__IYRPrivateEnvironment, {
     end,
 })
 __IYRPrivateEnvironment._G = __IYRPrivateEnvironment
+__IYRPrivateEnvironment.__IYRManagePlugins = true
 __IYRPrivateEnvironment.shared = {}
 __IYRPrivateEnvironment.getgenv = function()
     return __IYRPrivateEnvironment
@@ -14304,6 +14741,7 @@ function execCmd(cmdStr,speaker,store)
                 if infTimes then
                     while lastBreakTime < cmdStartTime do
                         local success,err = pcall(cmd.FUNC,args, speaker)
+                        if not success and __IYRRecordError then pcall(__IYRRecordError, "command:" .. cmdName, err) end
                         if not success and _G.IY_DEBUG then
                             warn("Command Error:", cmdName, err)
                         end
@@ -14315,6 +14753,7 @@ function execCmd(cmdStr,speaker,store)
                         local success,err = pcall(function()
                             cmd.FUNC(args, speaker)
                         end)
+                        if not success and __IYRRecordError then pcall(__IYRRecordError, "command:" .. cmdName, err) end
                         if not success and _G.IY_DEBUG then
                             warn("Command Error:", cmdName, err)
                         end
@@ -24851,7 +25290,7 @@ updateColors(currentText1,text1)
 updateColors(currentText2,text2)
 updateColors(currentScroll,scroll)
 
-if PluginsTable ~= nil or PluginsTable ~= {} then
+if type(PluginsTable) == "table" and not __IYRManagePlugins then
     FindPlugins(PluginsTable)
 end
 
